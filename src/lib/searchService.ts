@@ -128,13 +128,13 @@ class SearchService {
         }
 
         // Search in lessons
-        const lessonMatches = course.lessons?.map(lesson => {
+        const lessonMatches = (course.lessons?.map(lesson => {
           const lessonMatch = this.calculateWordMatch(queryWords, lesson.title.toLowerCase());
           if (lessonMatch.score > 0) {
             return `Lesson: ${lessonMatch.highlight}`;
           }
           return null;
-        }).filter(Boolean) || [];
+        }).filter(Boolean) as string[]) || [];
 
         highlights.push(...lessonMatches);
 
@@ -156,8 +156,7 @@ class SearchService {
               category: course.category,
               thumbnail: course.thumbnail,
               lessons: course.lessons.length,
-              featured: course.featured,
-              ...courseContent
+              featured: course.featured
             }
           };
         }
@@ -434,11 +433,13 @@ class SearchService {
       }
     });
 
-    // Add tags
-    Object.values(mockCourseContent).forEach(content => {
-      content.tags?.forEach((tag: string) => {
-        if (tag.toLowerCase().includes(lowercaseQuery)) {
-          suggestions.add(tag);
+    // Add tags from courses
+    this.courses.forEach(course => {
+      // Search in course metadata for tags
+      const keywords = [course.category, course.title, ...course.lessons.map(l => l.title)];
+      keywords.forEach(keyword => {
+        if (keyword.toLowerCase().includes(lowercaseQuery)) {
+          suggestions.add(keyword);
         }
       });
     });

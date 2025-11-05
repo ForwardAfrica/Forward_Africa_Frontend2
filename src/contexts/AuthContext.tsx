@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { authService, AuthUser, LoginCredentials, RegisterData } from '../lib/auth';
+import { useFirebaseAuth } from './FirebaseAuthContext';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -22,11 +23,71 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  try {
+    // Try to use the AuthContext first (for backward compatibility)
+    const context = useContext(AuthContext);
+    if (context !== undefined) {
+      return context;
+    }
+  } catch {
+    // Fall through to Firebase Auth
   }
-  return context;
+
+  // Fall back to Firebase Auth for client-side rendering
+  const firebaseAuth = useFirebaseAuth();
+
+  // Convert Firebase auth response to the expected AuthUser format
+  const convertedUser = firebaseAuth.user ? {
+    id: firebaseAuth.user.uid,
+    email: firebaseAuth.user.email || '',
+    full_name: firebaseAuth.user.displayName || '',
+    role: firebaseAuth.user.role,
+    permissions: firebaseAuth.user.permissions,
+    avatar_url: firebaseAuth.user.photoURL || undefined,
+    onboarding_completed: firebaseAuth.user.onboarding_completed,
+    industry: firebaseAuth.user.industry,
+    experience_level: firebaseAuth.user.experience_level,
+    business_stage: firebaseAuth.user.business_stage,
+    country: firebaseAuth.user.country,
+    state_province: firebaseAuth.user.state_province,
+    city: firebaseAuth.user.city,
+  } as AuthUser : null;
+
+  return {
+    user: convertedUser,
+    profile: convertedUser,
+    loading: firebaseAuth.loading,
+    isAuthenticated: firebaseAuth.isAuthenticated,
+    isAdmin: firebaseAuth.isAdmin,
+    isSuperAdmin: firebaseAuth.isSuperAdmin,
+    error: firebaseAuth.error,
+    signIn: firebaseAuth.signIn as (credentials: LoginCredentials) => Promise<void>,
+    signUp: firebaseAuth.signUp as (data: RegisterData) => Promise<void>,
+    signOut: firebaseAuth.signOut,
+    updateProfile: async (profileData: Partial<AuthUser>) => {
+      const updated = await firebaseAuth.updateProfile(profileData as any);
+      return {
+        id: updated.uid,
+        email: updated.email || '',
+        full_name: updated.displayName || '',
+        role: updated.role,
+        permissions: updated.permissions,
+        avatar_url: updated.photoURL || undefined,
+        onboarding_completed: updated.onboarding_completed,
+        industry: updated.industry,
+        experience_level: updated.experience_level,
+        business_stage: updated.business_stage,
+        country: updated.country,
+        state_province: updated.state_province,
+        city: updated.city,
+      } as AuthUser;
+    },
+    refreshToken: async () => {
+      // Firebase handles token refresh automatically
+    },
+    clearError: firebaseAuth.clearError,
+    checkAuthStatus: firebaseAuth.checkAuthStatus,
+  };
 };
 
 interface AuthProviderProps {
@@ -201,7 +262,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user, loading, isClient, router]);
 
-  const signIn = async (credentials: LoginCredentials) => {
+  const signIn = async (credentials: LoginCredentials): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -219,9 +280,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login(credentials);
       setUser(response.user);
       console.log('✅ AuthContext: Sign in successful');
-
-      // Ensure the user state is properly set before any redirects
-      return response.user;
     } catch (error) {
       console.error('❌ AuthContext: Sign in error:', error);
 
@@ -249,7 +307,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signUp = async (data: RegisterData) => {
+  const signUp = async (data: RegisterData): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -258,9 +316,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.register(data);
       setUser(response.user);
       console.log('✅ AuthContext: Sign up successful');
-
-      // Ensure the user state is properly set before any redirects
-      return response.user;
     } catch (error) {
       console.error('❌ AuthContext: Sign up error:', error);
 

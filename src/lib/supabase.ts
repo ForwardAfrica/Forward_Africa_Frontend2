@@ -1,4 +1,11 @@
-import { createClient } from '@supabase/supabase-js';
+// Supabase is optional - try to import if available
+let createClient: any;
+try {
+  const supabaseModule = require('@supabase/supabase-js');
+  createClient = supabaseModule.createClient;
+} catch {
+  createClient = null;
+}
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -26,7 +33,7 @@ const createMockClient = () => ({
   })
 });
 
-export const supabase = (supabaseUrl && supabaseAnonKey)
+export const supabase = (supabaseUrl && supabaseAnonKey && createClient)
   ? createClient(supabaseUrl, supabaseAnonKey)
   : createMockClient() as any;
 

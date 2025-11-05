@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Permission, UserRole, ROLE_PERMISSIONS } from '../types';
 import { hasPermission as checkPermission, hasAnyPermission, hasAllPermissions } from '../types';
-import { useAuth } from './AuthContext';
+import { useFirebaseAuth } from './FirebaseAuthContext';
 
 interface PermissionContextType {
   userRole: UserRole;
@@ -23,7 +23,7 @@ export const usePermissions = () => {
 };
 
 export const PermissionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const { user } = useFirebaseAuth();
   const [userRole, setUserRole] = useState<UserRole>('user');
   const [permissions, setPermissions] = useState<Permission[]>(ROLE_PERMISSIONS.user);
 

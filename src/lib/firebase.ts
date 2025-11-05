@@ -30,18 +30,28 @@ if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
   // Only connect to emulators if not already connected
   try {
     // Firestore emulator
-    if (!(db as any)._delegate._databaseId.projectId.includes('demo-')) {
-      connectFirestoreEmulator(db, 'localhost', 8080);
+    try {
+      if (!(db as any)._delegate._databaseId.projectId.includes('demo-')) {
+        connectFirestoreEmulator(db, 'localhost', 8080);
+      }
+    } catch {
+      // Already connected
     }
 
     // Auth emulator
-    if (!auth.config.emulator) {
+    try {
       connectAuthEmulator(auth, 'http://localhost:9099');
+    } catch {
+      // Already connected
     }
 
     // Storage emulator
-    if (!(storage as any)._delegate._host.includes('localhost')) {
-      connectStorageEmulator(storage, 'localhost', 9199);
+    try {
+      if (!(storage as any)._delegate._host.includes('localhost')) {
+        connectStorageEmulator(storage, 'localhost', 9199);
+      }
+    } catch {
+      // Already connected
     }
 
     console.log('✅ Connected to Firebase emulators');
@@ -56,7 +66,7 @@ if (typeof window !== "undefined") {
   try {
     analytics = getAnalytics(app);
   } catch (error) {
-    console.log('⚠️ Analytics not available:', error);
+    console.log('��️ Analytics not available:', error);
   }
 }
 

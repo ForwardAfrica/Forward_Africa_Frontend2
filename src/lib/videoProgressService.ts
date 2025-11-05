@@ -1,5 +1,10 @@
-import { VideoProgress, VideoAnalytics, ResumePoint } from '../types';
+import { VideoProgress, VideoAnalytics } from '../types';
 import { apiRequest } from './api';
+
+interface ResumePoint {
+  resumeTimeSeconds: number;
+  bufferTimeSeconds: number;
+}
 
 /**
  * Enhanced Video Progress Service
@@ -188,7 +193,7 @@ class VideoProgressService {
         body: JSON.stringify(analytics)
       });
 
-      console.log('📈 Video analytics updated:', analytics);
+      console.log('��� Video analytics updated:', analytics);
     } catch (error) {
       console.error('Error updating video analytics:', error);
       throw error;
@@ -240,4 +245,4 @@ class VideoProgressService {
   }
 }
 
-export default new VideoProgressService(); 
+export default new VideoProgressService();

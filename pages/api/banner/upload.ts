@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { formidable } from 'formidable';
+import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import { promises as fsPromises } from 'fs';
@@ -20,8 +20,8 @@ interface UploadedFile {
 }
 
 interface ParsedForm {
-  fields: formidable.Fields;
-  files: formidable.Files;
+  fields: Record<string, string[] | undefined>;
+  files: Record<string, any[] | undefined>;
 }
 
 // Parse form data with formidable
@@ -108,7 +108,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('📁 Files:', Object.keys(files));
 
     // Check if file was uploaded
-    const uploadedFile = files.banner?.[0] as formidable.File;
+    const uploadedFile = files.banner?.[0] as any;
     if (!uploadedFile) {
       console.log('❌ No banner file found in request');
       console.log('📁 Available files:', files);
