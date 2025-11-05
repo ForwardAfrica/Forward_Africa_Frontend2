@@ -20,7 +20,7 @@ interface UploadedFile {
 }
 
 interface ParsedForm {
-  fields: Record<string, string[]>;
+  fields: Record<string, string[] | undefined>;
   files: Record<string, any[]>;
 }
 
