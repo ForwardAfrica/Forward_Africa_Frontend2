@@ -262,7 +262,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user, loading, isClient, router]);
 
-  const signIn = async (credentials: LoginCredentials) => {
+  const signIn = async (credentials: LoginCredentials): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -280,9 +280,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login(credentials);
       setUser(response.user);
       console.log('✅ AuthContext: Sign in successful');
-
-      // Ensure the user state is properly set before any redirects
-      return response.user;
     } catch (error) {
       console.error('❌ AuthContext: Sign in error:', error);
 
@@ -310,7 +307,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signUp = async (data: RegisterData) => {
+  const signUp = async (data: RegisterData): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -319,9 +316,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.register(data);
       setUser(response.user);
       console.log('✅ AuthContext: Sign up successful');
-
-      // Ensure the user state is properly set before any redirects
-      return response.user;
     } catch (error) {
       console.error('❌ AuthContext: Sign up error:', error);
 
