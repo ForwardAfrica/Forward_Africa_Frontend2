@@ -21,7 +21,7 @@ interface UploadedFile {
 
 interface ParsedForm {
   fields: Record<string, string[] | undefined>;
-  files: Record<string, any[]>;
+  files: Record<string, any[] | undefined>;
 }
 
 // Parse form data with formidable
