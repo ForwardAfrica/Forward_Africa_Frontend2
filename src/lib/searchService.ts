@@ -128,13 +128,13 @@ class SearchService {
         }
 
         // Search in lessons
-        const lessonMatches = course.lessons?.map(lesson => {
+        const lessonMatches = (course.lessons?.map(lesson => {
           const lessonMatch = this.calculateWordMatch(queryWords, lesson.title.toLowerCase());
           if (lessonMatch.score > 0) {
             return `Lesson: ${lessonMatch.highlight}`;
           }
           return null;
-        }).filter(Boolean) || [];
+        }).filter(Boolean) as string[]) || [];
 
         highlights.push(...lessonMatches);
 
