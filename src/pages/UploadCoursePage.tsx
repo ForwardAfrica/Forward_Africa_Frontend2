@@ -453,7 +453,7 @@ const UploadCoursePage: React.FC = () => {
     } catch (error) {
       console.error('Error processing course:', error);
       const errorMessage = isEditing ? 'Failed to update course' : 'Failed to create course';
-      alert(`${errorMessage}: ${error.message}. Please try again.`);
+      alert(`${errorMessage}: ${error instanceof Error ? error.message : String(error)}. Please try again.`);
     } finally {
       setIsSubmitting(false);
       setUploadProgress(0);
