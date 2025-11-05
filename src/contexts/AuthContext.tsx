@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { authService, AuthUser, LoginCredentials, RegisterData } from '../lib/auth';
+import { useFirebaseAuth } from './FirebaseAuthContext';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -22,11 +23,38 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  try {
+    // Try to use the AuthContext first (for backward compatibility)
+    const context = useContext(AuthContext);
+    if (context !== undefined) {
+      return context;
+    }
+  } catch {
+    // Fall through to Firebase Auth
   }
-  return context;
+
+  // Fall back to Firebase Auth for client-side rendering
+  const firebaseAuth = useFirebaseAuth();
+
+  // Convert Firebase auth response to the expected AuthUser format
+  return {
+    user: firebaseAuth.user as unknown as AuthUser | null,
+    profile: firebaseAuth.profile as unknown as AuthUser | null,
+    loading: firebaseAuth.loading,
+    isAuthenticated: firebaseAuth.isAuthenticated,
+    isAdmin: firebaseAuth.isAdmin,
+    isSuperAdmin: firebaseAuth.isSuperAdmin,
+    error: firebaseAuth.error,
+    signIn: firebaseAuth.signIn as (credentials: LoginCredentials) => Promise<void>,
+    signUp: firebaseAuth.signUp as (data: RegisterData) => Promise<void>,
+    signOut: firebaseAuth.signOut,
+    updateProfile: firebaseAuth.updateProfile as (profileData: Partial<AuthUser>) => Promise<AuthUser>,
+    refreshToken: async () => {
+      // Firebase handles token refresh automatically
+    },
+    clearError: firebaseAuth.clearError,
+    checkAuthStatus: firebaseAuth.checkAuthStatus,
+  };
 };
 
 interface AuthProviderProps {
