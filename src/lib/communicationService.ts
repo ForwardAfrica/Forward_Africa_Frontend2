@@ -230,8 +230,8 @@ class CommunicationService {
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.status) queryParams.append('status', params.status);
 
-    const response = await api.get(`${this.baseUrl}/email-campaigns?${queryParams}`);
-    return response.data;
+    const response = await apiRequest(`${this.baseUrl}/email-campaigns?${queryParams}`);
+    return response;
   }
 
   async createEmailCampaign(data: {
@@ -242,13 +242,18 @@ class CommunicationService {
     custom_audience_ids?: number[];
     scheduled_at?: string;
   }): Promise<{ message: string; id: number }> {
-    const response = await api.post(`${this.baseUrl}/email-campaigns`, data);
-    return response.data;
+    const response = await apiRequest(`${this.baseUrl}/email-campaigns`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response;
   }
 
   async sendEmailCampaign(id: number): Promise<{ message: string; recipients_count: number }> {
-    const response = await api.post(`${this.baseUrl}/email-campaigns/${id}/send`);
-    return response.data;
+    const response = await apiRequest(`${this.baseUrl}/email-campaigns/${id}/send`, {
+      method: 'POST',
+    });
+    return response;
   }
 
   // ==================== PUSH NOTIFICATIONS ====================
