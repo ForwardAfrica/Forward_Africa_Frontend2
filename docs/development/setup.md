@@ -405,12 +405,12 @@ console.log('Memory usage:', performance.memory);
 
 ### Development Database
 
-#### Option 1: Supabase (Recommended)
+#### Option 1: Firebase (Recommended)
 
-1. Create Supabase account at [https://supabase.com](https://supabase.com)
-2. Create new project
-3. Copy URL and anon key to `.env.local`
-4. Run database migrations (see database documentation)
+1. Create a Firebase project at https://console.firebase.google.com
+2. Enable Firestore, Authentication, and Storage
+3. Configure Firebase emulator suite for local development (see FIREBASE_MIGRATION_GUIDE.md)
+4. Run migration/import scripts to populate Firestore if needed
 
 #### Option 2: Local Development (Mock Data)
 
