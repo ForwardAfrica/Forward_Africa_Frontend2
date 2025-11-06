@@ -424,7 +424,7 @@ export const functions = getFunctions(app);
 
 The application is currently configured for deployment on:
 - **Frontend**: Netlify (recommended)
-- **Backend**: Supabase (managed service)
+- **Backend**: Firebase (migrated from Supabase)
 
 ### Post-Firebase Migration Deployment
 
