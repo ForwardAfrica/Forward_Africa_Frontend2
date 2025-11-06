@@ -437,11 +437,9 @@ The application is currently configured for deployment on:
 ### Environment Variables
 
 ```env
-# Current (Supabase)
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Supabase configuration removed (legacy). See FIREBASE_MIGRATION_GUIDE.md for Firebase variables.
 
-# Future (Firebase)
+# Firebase (recommended)
 VITE_FIREBASE_API_KEY=your_firebase_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id
