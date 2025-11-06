@@ -43,9 +43,9 @@ This guide provides step-by-step instructions for setting up the Forward Africa 
 
 ### Optional Tools
 
-1. **Supabase CLI** (for backend development)
+1. Firebase CLI / Emulator Suite (for backend development)
    ```bash
-   npm install -g supabase
+   npm install -g firebase-tools
    ```
 
 2. **Netlify CLI** (for deployment)
