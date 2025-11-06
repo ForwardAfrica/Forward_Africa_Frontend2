@@ -304,7 +304,7 @@ interface AdminUser {
 
 ## Security Implementation
 
-### Current (Supabase RLS)
+### Current (Legacy - Supabase RLS)
 
 ```sql
 -- Users can read their own profile
