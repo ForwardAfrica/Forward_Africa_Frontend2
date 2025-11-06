@@ -25,10 +25,7 @@ This guide provides comprehensive instructions for deploying the Forward Africa 
 Create a `.env.production` file with the following variables:
 
 ```env
-# Supabase Configuration
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-
+# Firebase configuration and production variables. See FIREBASE_MIGRATION_GUIDE.md for required keys.
 # Application Configuration
 VITE_APP_NAME=Forward Africa
 VITE_APP_URL=https://forwardafrica.com
