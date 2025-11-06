@@ -7,11 +7,11 @@ This document provides comprehensive documentation for the backend API endpoints
 ## API Architecture
 
 ### Current Technology Stack
-- **Backend**: Supabase (PostgreSQL + REST API)
-- **Authentication**: Supabase Auth (JWT-based)
-- **Real-time**: Supabase Realtime subscriptions
-- **File Storage**: Supabase Storage
-- **Edge Functions**: Supabase Edge Functions (Deno runtime)
+- **Backend**: Firebase (Firestore + Cloud Functions) — migrated from Supabase
+- **Authentication**: Firebase Auth
+- **Real-time**: Firestore real-time listeners
+- **File Storage**: Firebase Storage
+- **Functions**: Firebase Cloud Functions (Node.js runtime)
 
 ### Planned Migration
 - **Backend**: Firebase (Firestore + Cloud Functions)
@@ -22,10 +22,10 @@ This document provides comprehensive documentation for the backend API endpoints
 
 ### Base URL
 ```
-Current Production: https://your-project.supabase.co
-Current Development: http://localhost:54321
-Planned Production: https://your-project.firebaseapp.com
-Planned Development: http://localhost:9099
+Current Production: https://your-production-domain.com
+    Current Development: http://localhost:9000 (Firebase emulator)
+    Planned Production: https://your-project.firebaseapp.com
+    Planned Development: http://localhost:9099
 ```
 
 ### Authentication
@@ -36,7 +36,7 @@ Authorization: Bearer <jwt_token>
 
 ## Authentication API
 
-### Current Authentication (Supabase)
+### Current Authentication (Legacy - Supabase)
 
 #### Sign Up
 **Endpoint**: `POST /auth/v1/signup`
@@ -98,7 +98,7 @@ const signInWithGoogle = async () => {
 
 ## User Management API
 
-### Current Implementation (Supabase)
+### Current Implementation (Legacy - Supabase)
 
 #### Get User Profile
 **Endpoint**: `GET /rest/v1/user_profiles?id=eq.{user_id}`
@@ -153,7 +153,7 @@ const updateUserProfile = async (userId: string, updates: Partial<UserProfile>) 
 
 ## Course Management API
 
-### Current Implementation (Supabase)
+### Current Implementation (Legacy - Supabase)
 
 #### Get All Courses
 **Endpoint**: `GET /rest/v1/courses`
@@ -457,21 +457,10 @@ export const createAdminUser = onCall(async (request) => {
 
 ## Real-time API
 
-### Current Implementation (Supabase)
+### Current Implementation (Legacy - Supabase)
 
 ```typescript
-// Supabase real-time subscription
-const subscription = supabase
-  .channel('user_progress')
-  .on('postgres_changes', {
-    event: 'UPDATE',
-    schema: 'public',
-    table: 'user_progress',
-    filter: `user_id=eq.${userId}`
-  }, (payload) => {
-    console.log('Progress updated:', payload.new);
-  })
-  .subscribe();
+// Legacy Supabase real-time subscription removed. Use Firestore real-time listeners as shown in the "Planned Implementation (Firebase)" section above.
 ```
 
 ### Planned Implementation (Firebase)
@@ -515,18 +504,10 @@ const subscribeToNotifications = (userId: string, callback: (notifications: Noti
 
 ## File Storage API
 
-### Current Implementation (Supabase Storage)
+### Current Implementation (Legacy - Supabase Storage)
 
 ```typescript
-// Upload file to Supabase Storage
-const { data, error } = await supabase.storage
-  .from('avatars')
-  .upload(`${userId}/avatar.jpg`, file);
-
-// Get public URL
-const { data } = supabase.storage
-  .from('avatars')
-  .getPublicUrl(`${userId}/avatar.jpg`);
+// Legacy Supabase storage examples removed. Use Firebase Storage APIs as shown in "Planned Implementation (Firebase Storage)" above.
 ```
 
 ### Planned Implementation (Firebase Storage)

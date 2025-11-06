@@ -33,7 +33,7 @@ Forward Africa is a comprehensive learning management system designed specifical
 ### Technology Stack
 
 - **Frontend**: React 18, TypeScript, Tailwind CSS
-- **Backend**: Currently Supabase (PostgreSQL, Authentication, Real-time) - **Migrating to Firebase**
+- **Backend**: Firebase (Firestore, Authentication, Real-time) — migrated from Supabase
 - **Build Tool**: Vite
 - **State Management**: React Context API
 - **Routing**: React Router v6
@@ -64,11 +64,11 @@ src/
 
 ### Data Flow
 
-1. **Authentication**: Currently Supabase Auth (migrating to Firebase Auth)
+1. **Authentication**: Firebase Auth
 2. **State Management**: React Context for global state
-3. **Data Storage**: LocalStorage for development, Supabase for production (migrating to Firestore)
-4. **Real-time Updates**: Supabase real-time subscriptions (migrating to Firestore real-time listeners)
-5. **File Storage**: Supabase Storage (migrating to Firebase Storage)
+3. **Data Storage**: LocalStorage for development, Firestore for production
+4. **Real-time Updates**: Firestore real-time listeners
+5. **File Storage**: Firebase Storage
 
 ## Frontend Documentation
 
@@ -190,7 +190,7 @@ const { certificates, generateCertificate, getCertificate } = useCertificates();
 
 ## Backend Documentation
 
-### Current Backend (Supabase)
+### Backend (Firebase)
 
 #### Database Schema
 
@@ -247,15 +247,15 @@ All tables implement comprehensive RLS policies:
 - **Memory**: Real-time state management
 
 #### Production Mode (Current)
-- **Supabase Database**: All persistent data
-- **Supabase Storage**: Media files and assets
+- **Firestore Database**: All persistent data
+- **Firebase Storage**: Media files and assets
 - **CDN**: Static assets and optimized images
 
 ## Authentication & Authorization
 
 ### Current Authentication Flow
 
-1. **Sign Up**: User creates account via Supabase Auth
+1. **Sign Up**: User creates account via Firebase Auth
 2. **Email Verification**: Optional email confirmation
 3. **Profile Creation**: User completes onboarding
 4. **Session Management**: JWT tokens for authentication
@@ -340,7 +340,7 @@ The application will be migrated from Supabase to Firebase for better scalabilit
 ### Firebase Services Integration
 
 #### 1. Firebase Authentication
-- **Current**: Supabase Auth
+- **Current (legacy)**: Supabase Auth
 - **Migration**: Firebase Auth with email/password and Google OAuth
 - **Benefits**: Better Google integration, more auth providers
 
@@ -424,7 +424,7 @@ export const functions = getFunctions(app);
 
 The application is currently configured for deployment on:
 - **Frontend**: Netlify (recommended)
-- **Backend**: Supabase (managed service)
+- **Backend**: Firebase (migrated from Supabase)
 
 ### Post-Firebase Migration Deployment
 
@@ -437,11 +437,9 @@ The application is currently configured for deployment on:
 ### Environment Variables
 
 ```env
-# Current (Supabase)
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Supabase configuration removed (legacy). See FIREBASE_MIGRATION_GUIDE.md for Firebase variables.
 
-# Future (Firebase)
+# Firebase (recommended)
 VITE_FIREBASE_API_KEY=your_firebase_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id

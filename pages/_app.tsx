@@ -14,6 +14,57 @@ const FirebaseAuthInitializer = () => {
 
   useEffect(() => {
     setIsClient(true);
+
+    // Global error handlers to suppress noisy extension/devtools errors
+    // (e.g. MetaMask inpage script or Next.js version notices) so they don't
+    // trigger the React error overlay during development.
+    const onUnhandledRejection = (ev: PromiseRejectionEvent) => {
+      try {
+        const reason = (ev && (ev.reason && (typeof ev.reason === 'string' ? ev.reason : ev.reason.message))) || '';
+        const stack = ev && ev.reason && ev.reason.stack ? ev.reason.stack : '';
+
+        if (
+          reason.includes('Failed to connect to MetaMask') ||
+          stack.includes('chrome-extension://') ||
+          reason.includes('Next.js (') ||
+          (typeof reason === 'string' && reason.toLowerCase().includes('metamask'))
+        ) {
+          // Prevent the error from surfacing to the overlay
+          ev.preventDefault();
+          console.warn('Suppressed unhandledrejection from extension/devtools:', reason || stack);
+        }
+      } catch (e) {
+        // Ignore errors in the handler
+      }
+    };
+
+    const onError = (ev: ErrorEvent) => {
+      try {
+        const msg = ev && ev.message ? ev.message : '';
+        const filename = ev && (ev.filename || '');
+
+        if (
+          msg.includes('Failed to connect to MetaMask') ||
+          filename.startsWith('chrome-extension://') ||
+          msg.includes('Next.js (') ||
+          msg.toLowerCase().includes('metamask')
+        ) {
+          // Prevent the default reporting (which can trigger the overlay)
+          ev.preventDefault();
+          console.warn('Suppressed window error from extension/devtools:', msg || filename);
+        }
+      } catch (e) {
+        // Ignore errors in the handler
+      }
+    };
+
+    window.addEventListener('unhandledrejection', onUnhandledRejection);
+    window.addEventListener('error', onError);
+
+    return () => {
+      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+      window.removeEventListener('error', onError);
+    };
   }, []);
 
   // Firebase Auth handles token management automatically

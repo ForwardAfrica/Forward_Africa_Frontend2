@@ -54,7 +54,8 @@ if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
       // Already connected
     }
 
-    console.log('✅ Connected to Firebase emulators');
+    // Connected to Firebase emulators (development). Suppress noisy message in console.
+    console.debug('Connected to Firebase emulators (development)');
   } catch (error) {
     console.log('⚠️ Firebase emulators already connected or not available');
   }

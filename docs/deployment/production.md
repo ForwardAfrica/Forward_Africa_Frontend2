@@ -7,7 +7,7 @@ This guide provides comprehensive instructions for deploying the Forward Africa 
 ## Prerequisites
 
 ### Required Accounts
-- **Supabase Account**: For backend services
+- **Firebase Project**: For backend services (Firestore, Auth, Storage)
 - **Netlify Account**: For frontend hosting (recommended)
 - **Domain Provider**: For custom domain setup
 - **CDN Provider**: For asset optimization (optional)
@@ -15,7 +15,7 @@ This guide provides comprehensive instructions for deploying the Forward Africa 
 ### Required Tools
 - Node.js 18+ and npm
 - Git
-- Supabase CLI (optional)
+- Firebase CLI (optional)
 - Netlify CLI (optional)
 
 ## Environment Setup
@@ -25,10 +25,7 @@ This guide provides comprehensive instructions for deploying the Forward Africa 
 Create a `.env.production` file with the following variables:
 
 ```env
-# Supabase Configuration
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-
+# Firebase configuration and production variables. See FIREBASE_MIGRATION_GUIDE.md for required keys.
 # Application Configuration
 VITE_APP_NAME=Forward Africa
 VITE_APP_URL=https://forwardafrica.com
@@ -56,102 +53,18 @@ VITE_ALLOWED_ORIGINS=https://forwardafrica.com,https://www.forwardafrica.com
 VITE_API_RATE_LIMIT=1000
 ```
 
-## Supabase Backend Setup
+## Backend (Firestore) Setup
 
-### 1. Create Supabase Project
+This project has migrated from Supabase to Firebase. Please follow FIREBASE_MIGRATION_GUIDE.md for full production setup instructions (Firestore, Firebase Auth, Firebase Storage, and Cloud Functions).
 
-```bash
-# Using Supabase CLI
-supabase projects create forward-africa-prod
+Key reminders:
 
-# Or create through dashboard at https://app.supabase.com
-```
+- Set up a Firebase project and enable Firestore, Authentication, and Storage.
+- Configure OAuth providers (e.g., Google) in the Firebase Console.
+- Deploy Cloud Functions for server-side tasks (certificate generation, emails, AI assistant).
+- Use the Firestore security rules and Storage rules to enforce access control.
 
-### 2. Database Setup
-
-Run the following SQL scripts in your Supabase SQL editor:
-
-```sql
--- Enable necessary extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
--- Create user profiles table
-CREATE TABLE user_profiles (
-  id UUID REFERENCES auth.users(id) PRIMARY KEY,
-  email TEXT NOT NULL,
-  full_name TEXT,
-  avatar_url TEXT,
-  education_level TEXT,
-  job_title TEXT,
-  topics_of_interest TEXT[],
-  onboarding_completed BOOLEAN DEFAULT FALSE,
-  role TEXT DEFAULT 'user' CHECK (role IN ('user', 'content_manager', 'admin', 'super_admin')),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Enable RLS
-ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
-
--- Create RLS policies
-CREATE POLICY "Users can read own profile" ON user_profiles
-  FOR SELECT USING (auth.uid() = id);
-
-CREATE POLICY "Users can update own profile" ON user_profiles
-  FOR UPDATE USING (auth.uid() = id);
-
--- Create other tables (courses, facilitators, etc.)
--- See database.md for complete schema
-```
-
-### 3. Authentication Setup
-
-Configure authentication providers in Supabase dashboard:
-
-1. **Google OAuth**:
-   - Enable Google provider
-   - Add OAuth credentials
-   - Set redirect URLs
-
-2. **Email Settings**:
-   - Configure SMTP settings
-   - Customize email templates
-   - Set up email confirmations
-
-### 4. Storage Setup
-
-Create storage buckets:
-
-```sql
--- Create storage buckets
-INSERT INTO storage.buckets (id, name, public) VALUES
-('avatars', 'avatars', true),
-('course-media', 'course-media', true),
-('certificates', 'certificates', false);
-
--- Set up storage policies
-CREATE POLICY "Avatar images are publicly accessible" ON storage.objects
-  FOR SELECT USING (bucket_id = 'avatars');
-
-CREATE POLICY "Users can upload their own avatar" ON storage.objects
-  FOR INSERT WITH CHECK (
-    bucket_id = 'avatars' AND
-    auth.uid()::text = (storage.foldername(name))[1]
-  );
-```
-
-### 5. Edge Functions Deployment
-
-Deploy edge functions for AI assistant and certificate generation:
-
-```bash
-# Deploy AI assistant function
-supabase functions deploy ai-assistant
-
-# Deploy certificate generator function
-supabase functions deploy certificate-generator
-```
+For migration steps and data import, see FIREBASE_MIGRATION_GUIDE.md.
 
 ## Frontend Build and Optimization
 
@@ -313,8 +226,7 @@ npm i -g vercel
 vercel --prod
 
 # Configure environment variables
-vercel env add VITE_SUPABASE_URL production
-vercel env add VITE_SUPABASE_ANON_KEY production
+# Use vercel env add to set production environment variables (Firebase keys or other secrets)
 ```
 
 Create `vercel.json`:
@@ -510,10 +422,10 @@ ON notifications(user_id, read, created_at);
 
 ### 2. Connection Pooling
 
-Configure in Supabase dashboard:
-- Pool size: 15-25 connections
-- Pool timeout: 30 seconds
-- Idle timeout: 10 minutes
+Configure performance settings via Firebase Console / Google Cloud Console:
+- Use Firestore indexes and Cloud Firestore performance monitoring
+- Configure automatic scaling via Firestore settings
+- Use Cloud Tasks or Cloud Functions for long-running jobs and batching
 
 ### 3. Query Optimization
 
@@ -532,10 +444,10 @@ LIMIT 10;
 
 ### 1. Database Backups
 
-Supabase provides automated backups:
-- Daily backups retained for 7 days
-- Weekly backups retained for 4 weeks
-- Monthly backups retained for 3 months
+Use Firebase export/import and Google Cloud storage for backups:
+- Schedule automated exports of Firestore to Cloud Storage
+- Retain backups according to your retention policy (daily/weekly/monthly)
+- Use managed exports for point-in-time recovery where applicable
 
 ### 2. Application Backups
 
@@ -551,8 +463,8 @@ cp .env.production .env.production.backup
 ### 3. Recovery Procedures
 
 1. **Database Recovery**:
-   - Use Supabase dashboard for point-in-time recovery
-   - Restore from specific backup if needed
+   - Use Firebase/Google Cloud managed export and backup procedures for recovery
+   - Restore from exported backups stored in Cloud Storage if needed
 
 2. **Application Recovery**:
    - Rollback to previous Git tag

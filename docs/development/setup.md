@@ -43,9 +43,9 @@ This guide provides step-by-step instructions for setting up the Forward Africa 
 
 ### Optional Tools
 
-1. **Supabase CLI** (for backend development)
+1. Firebase CLI / Emulator Suite (for backend development)
    ```bash
-   npm install -g supabase
+   npm install -g firebase-tools
    ```
 
 2. **Netlify CLI** (for deployment)
@@ -93,10 +93,7 @@ cp .env.example .env.local
 Update `.env.local` with your configuration:
 
 ```env
-# Supabase Configuration (Optional for development)
-VITE_SUPABASE_URL=your_supabase_url_here
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
-
+# Firebase configuration is used. See FIREBASE_MIGRATION_GUIDE.md for required variables and emulator setup.
 # Development Configuration
 VITE_APP_NAME=Forward Africa (Dev)
 VITE_APP_URL=http://localhost:5173
@@ -408,12 +405,12 @@ console.log('Memory usage:', performance.memory);
 
 ### Development Database
 
-#### Option 1: Supabase (Recommended)
+#### Option 1: Firebase (Recommended)
 
-1. Create Supabase account at [https://supabase.com](https://supabase.com)
-2. Create new project
-3. Copy URL and anon key to `.env.local`
-4. Run database migrations (see database documentation)
+1. Create a Firebase project at https://console.firebase.google.com
+2. Enable Firestore, Authentication, and Storage
+3. Configure Firebase emulator suite for local development (see FIREBASE_MIGRATION_GUIDE.md)
+4. Run migration/import scripts to populate Firestore if needed
 
 #### Option 2: Local Development (Mock Data)
 

@@ -7,10 +7,10 @@ This document provides comprehensive documentation for the database schema, rela
 ## Database Architecture
 
 ### Current Technology Stack
-- **Primary Database**: Supabase (PostgreSQL)
+- **Primary Database**: Firestore (NoSQL) — migrated from Supabase
 - **Development Storage**: LocalStorage (browser-based)
-- **Real-time Features**: Supabase Realtime
-- **File Storage**: Supabase Storage
+- **Real-time Features**: Firestore real-time listeners
+- **File Storage**: Firebase Storage
 
 ### Planned Migration
 - **Target Database**: Firebase Firestore (NoSQL)
@@ -19,11 +19,11 @@ This document provides comprehensive documentation for the database schema, rela
 - **Real-time**: Firestore real-time listeners
 - **Functions**: Firebase Cloud Functions
 
-### Current Database Structure (Supabase)
+### Current Database Structure (Legacy - Supabase)
 
 ```
 Database: forward_africa_platform
-├── auth.users (Supabase managed)
+├── auth.users (Legacy - Supabase managed)
 ├── public.user_profiles
 ├── public.courses
 ├── public.facilitators
@@ -56,7 +56,7 @@ Firestore Collections:
 
 ### User Profiles
 
-**Current (Supabase)**:
+**Current (Legacy - Supabase)**:
 ```sql
 CREATE TABLE user_profiles (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
@@ -92,7 +92,7 @@ interface UserProfile {
 
 ### Courses
 
-**Current (Supabase)**:
+**Current (Legacy - Supabase)**:
 ```sql
 CREATE TABLE courses (
   id TEXT PRIMARY KEY,
@@ -137,7 +137,7 @@ interface Course {
 
 ### Instructors/Facilitators
 
-**Current (Supabase)**:
+**Current (Legacy - Supabase)**:
 ```sql
 CREATE TABLE facilitators (
   id TEXT PRIMARY KEY,
@@ -304,7 +304,7 @@ interface AdminUser {
 
 ## Security Implementation
 
-### Current (Supabase RLS)
+### Current (Legacy - Supabase RLS)
 
 ```sql
 -- Users can read their own profile
