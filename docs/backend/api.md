@@ -504,18 +504,10 @@ const subscribeToNotifications = (userId: string, callback: (notifications: Noti
 
 ## File Storage API
 
-### Current Implementation (Supabase Storage)
+### Current Implementation (Legacy - Supabase Storage)
 
 ```typescript
-// Upload file to Supabase Storage
-const { data, error } = await supabase.storage
-  .from('avatars')
-  .upload(`${userId}/avatar.jpg`, file);
-
-// Get public URL
-const { data } = supabase.storage
-  .from('avatars')
-  .getPublicUrl(`${userId}/avatar.jpg`);
+// Legacy Supabase storage examples removed. Use Firebase Storage APIs as shown in "Planned Implementation (Firebase Storage)" above.
 ```
 
 ### Planned Implementation (Firebase Storage)
