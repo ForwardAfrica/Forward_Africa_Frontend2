@@ -255,7 +255,7 @@ All tables implement comprehensive RLS policies:
 
 ### Current Authentication Flow
 
-1. **Sign Up**: User creates account via Supabase Auth
+1. **Sign Up**: User creates account via Firebase Auth
 2. **Email Verification**: Optional email confirmation
 3. **Profile Creation**: User completes onboarding
 4. **Session Management**: JWT tokens for authentication
