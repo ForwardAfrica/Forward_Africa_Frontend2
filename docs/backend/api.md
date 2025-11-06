@@ -7,11 +7,11 @@ This document provides comprehensive documentation for the backend API endpoints
 ## API Architecture
 
 ### Current Technology Stack
-- **Backend**: Supabase (PostgreSQL + REST API)
-- **Authentication**: Supabase Auth (JWT-based)
-- **Real-time**: Supabase Realtime subscriptions
-- **File Storage**: Supabase Storage
-- **Edge Functions**: Supabase Edge Functions (Deno runtime)
+- **Backend**: Firebase (Firestore + Cloud Functions) — migrated from Supabase
+- **Authentication**: Firebase Auth
+- **Real-time**: Firestore real-time listeners
+- **File Storage**: Firebase Storage
+- **Functions**: Firebase Cloud Functions (Node.js runtime)
 
 ### Planned Migration
 - **Backend**: Firebase (Firestore + Cloud Functions)
