@@ -1,83 +1,30 @@
-// Supabase is optional - try to import if available
-let createClient: any;
-try {
-  const supabaseModule = require('@supabase/supabase-js');
-  createClient = supabaseModule.createClient;
-} catch {
-  createClient = null;
-}
+// Supabase integration removed
+// All functions below are disabled to prevent accidental usage.
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+export const supabase = null as any;
 
-// Create a mock client if environment variables are not set
-const createMockClient = () => ({
-  auth: {
-    signInWithOAuth: async () => ({ data: null, error: new Error('Supabase not configured') }),
-    signOut: async () => ({ error: null }),
-    getUser: async () => ({ data: { user: null }, error: null }),
-    getSession: async () => ({ data: { session: null }, error: null }),
-    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
-  },
-  from: () => ({
-    select: () => ({
-      eq: () => ({
-        single: async () => ({ data: null, error: new Error('Supabase not configured') })
-      })
-    }),
-    upsert: () => ({
-      select: () => ({
-        single: async () => ({ data: null, error: new Error('Supabase not configured') })
-      })
-    })
-  })
-});
+const notConfigured = async (name: string) => {
+  const error = new Error(`Supabase integration has been removed: ${name} is unavailable`);
+  console.warn(error.message);
+  return { data: null, error };
+};
 
-export const supabase = (supabaseUrl && supabaseAnonKey && createClient)
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : createMockClient() as any;
-
-// Auth helper functions
 export const signInWithGoogle = async () => {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    // Mock sign in for development
-    console.log('Mock Google sign in - Supabase not configured');
-    return { data: null, error: null };
-  }
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/onboarding`
-    }
-  });
-  return { data, error };
+  return await notConfigured('signInWithGoogle');
 };
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  return { error };
+  return await notConfigured('signOut');
 };
 
 export const getCurrentUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  return { user, error };
+  return await notConfigured('getCurrentUser');
 };
 
 export const getUserProfile = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-  return { data, error };
+  return await notConfigured('getUserProfile');
 };
 
 export const updateUserProfile = async (userId: string, profile: any) => {
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .upsert({ id: userId, ...profile })
-    .select()
-    .single();
-  return { data, error };
+  return await notConfigured('updateUserProfile');
 };
