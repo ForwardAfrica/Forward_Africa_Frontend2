@@ -13,7 +13,7 @@ const CoursesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated - before rendering anything
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.replace('/login');
@@ -28,8 +28,12 @@ const CoursesPage: React.FC = () => {
     fetchAllCourses
   } = useCourses();
 
-  // Fetch data on component mount - same as HomePage
+  // Fetch data only if authenticated
   useEffect(() => {
+    if (authLoading || !isAuthenticated) {
+      return;
+    }
+
     const loadCourses = async () => {
       setLoading(true);
       setError(null);
@@ -45,7 +49,7 @@ const CoursesPage: React.FC = () => {
     };
 
     loadCourses();
-  }, [fetchAllCourses]);
+  }, [fetchAllCourses, authLoading, isAuthenticated]);
 
   // Update loading state based on API loading - same as HomePage
   useEffect(() => {
