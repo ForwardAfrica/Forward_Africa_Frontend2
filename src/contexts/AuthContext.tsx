@@ -176,7 +176,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const currentPath = router.pathname;
 
     if (user && authPages.some(p => currentPath === p)) {
-      router.replace('/');
+      router.replace('/home');
     }
   }, [user, loading, isClient, router]);
 
