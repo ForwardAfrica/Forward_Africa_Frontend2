@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import CourseCard from '../components/ui/CourseCard';
 import { courseAPI, categoryAPI } from '../lib/api';
@@ -20,12 +21,17 @@ const CategoryPage: React.FC = () => {
         setError(null);
         try {
           // Get category details
-          const categoryData = await categoryAPI.getCategory(categoryId);
-          setCategory(categoryData);
+          const categoryData: any = await categoryAPI.getCategory(categoryId);
+          if (categoryData && typeof categoryData === 'object' && 'id' in categoryData && 'name' in categoryData) {
+            setCategory(categoryData as Category);
+          } else {
+            setCategory(null);
+          }
 
           // Get courses for this category
-          const coursesData = await courseAPI.getCoursesByCategory(categoryId);
-          setCourses(coursesData);
+          const coursesData: any = await courseAPI.getCoursesByCategory(categoryId);
+          const coursesArray: Course[] = Array.isArray(coursesData) ? (coursesData as Course[]) : [];
+          setCourses(coursesArray);
         } catch (error) {
           console.error('Failed to load category data:', error);
           setError('Failed to load category data. Please try again.');
