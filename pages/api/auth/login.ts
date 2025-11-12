@@ -22,6 +22,34 @@ const initFirebaseAdmin = () => {
   }
 };
 
+// Verify password using Firebase REST API
+const verifyPasswordWithFirebase = async (email: string, password: string, apiKey: string): Promise<any> => {
+  const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email,
+      password,
+      returnSecureToken: true
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    if (error.error?.message === 'INVALID_PASSWORD') {
+      throw new Error('INVALID_PASSWORD');
+    }
+    if (error.error?.message === 'EMAIL_NOT_FOUND') {
+      throw new Error('EMAIL_NOT_FOUND');
+    }
+    throw new Error(error.error?.message || 'Password verification failed');
+  }
+
+  return response.json();
+};
+
 // JWT utilities
 class JWTManager {
   private static JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-change-in-production';
@@ -134,6 +162,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     initFirebaseAdmin();
 
     const { email, password } = req.body;
+    const apiKey = process.env.FIREBASE_API_KEY;
+
+    if (!apiKey) {
+      throw new Error('FIREBASE_API_KEY is not configured');
+    }
 
     // Validate input
     validation.validateCredentials(email, password);
@@ -143,7 +176,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log('🔐 Login attempt for:', email);
 
-    // Get user from Firebase Auth
+    // Verify password using Firebase REST API
+    let authResponse;
+    try {
+      authResponse = await verifyPasswordWithFirebase(email, password, apiKey);
+    } catch (error: any) {
+      rateLimit.recordAttempt(email, false);
+      if (error.message === 'INVALID_PASSWORD' || error.message === 'EMAIL_NOT_FOUND') {
+        return res.status(401).json({ error: 'Invalid email or password' });
+      }
+      throw error;
+    }
+
+    // Get user record from Firebase Auth
     let userRecord;
     try {
       userRecord = await admin.auth().getUserByEmail(email);
@@ -199,10 +244,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ...userData
     };
 
-    // Set JWT token in HTTP-only cookie
+    // Set JWT token in cookie (accessible to JavaScript)
     const cookieOptions = [
       'Path=/',
-      'HttpOnly',
       'SameSite=Strict',
       `Max-Age=${tokenExpiryMs / 1000}`, // Convert ms to seconds
       process.env.NODE_ENV === 'production' ? 'Secure' : ''
@@ -221,21 +265,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
   } catch (error: any) {
-    console.error('❌ Login error:', error);
+    console.error('❌ Login error:', error?.message || error);
 
     const errorMessages: { [key: string]: { status: number; message: string } } = {
       'MISSING_CREDENTIALS': { status: 400, message: 'Email and password are required' },
       'INVALID_EMAIL': { status: 400, message: 'Please enter a valid email address' },
       'WEAK_PASSWORD': { status: 400, message: 'Password must be at least 6 characters' },
-      'RATE_LIMITED': { status: 429, message: 'Too many login attempts. Please try again later.' }
+      'RATE_LIMITED': { status: 429, message: 'Too many login attempts. Please try again later.' },
+      'FIREBASE_API_KEY is not configured': { status: 500, message: 'Server configuration error - FIREBASE_API_KEY missing' }
     };
 
-    const errorInfo = errorMessages[error.message];
+    const errorInfo = errorMessages[error?.message];
     if (errorInfo) {
+      console.error('Mapped error response:', errorInfo);
       return res.status(errorInfo.status).json({ error: errorInfo.message });
     }
 
-    return res.status(500).json({ error: 'Login failed. Please try again.' });
+    // Log full error for debugging
+    console.error('Unmapped error:', error?.message, error?.toString());
+    return res.status(500).json({
+      error: 'Login failed. Please try again.',
+      debug: process.env.NODE_ENV === 'development' ? error?.message : undefined
+    });
   }
 }
 

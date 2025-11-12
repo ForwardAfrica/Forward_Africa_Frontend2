@@ -75,12 +75,8 @@ const LoginPage: React.FC = () => {
 
     try {
       await signIn({ email, password });
-      setSuccess('Login successful! Redirecting to dashboard...');
-
-      // Use router.replace to force a fresh page load
-      setTimeout(() => {
-        router.replace('/home');
-      }, 1000);
+      setSuccess('Login successful! Redirecting...');
+      // AuthContext will handle the redirect automatically when user is set
     } catch (error) {
       // Error is already handled in AuthContext
       console.log('Login error caught in component:', error);
