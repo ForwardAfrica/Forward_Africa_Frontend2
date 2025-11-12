@@ -149,7 +149,8 @@ export const authService = {
 
   // Parse token to get user data
   getUserFromToken(): AuthUser | null {
-    const token = this.getTokenFromCookie();
+    // Try cookie first, then fallback to localStorage
+    const token = this.getToken();
     if (!token) return null;
 
     try {
