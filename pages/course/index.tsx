@@ -1,11 +1,35 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useAuth } from '../src/contexts/AuthContext';
+import { hasValidToken } from '../src/lib/tokenValidator';
 
 export default function CourseIndex() {
   const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const [hasCheckedToken, setHasCheckedToken] = useState(false);
+
+  // Check token synchronously on mount - redirect immediately if no valid token
+  useEffect(() => {
+    if (!hasValidToken()) {
+      router.replace('/login');
+      return;
+    }
+    setHasCheckedToken(true);
+  }, [router]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (hasCheckedToken && !authLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, authLoading, router, hasCheckedToken]);
 
   useEffect(() => {
+    if (authLoading || !isAuthenticated || !hasCheckedToken) {
+      return;
+    }
+
     const fetchAndRedirect = async () => {
       try {
         // Check if we're already on a specific course route
@@ -84,7 +108,7 @@ export default function CourseIndex() {
     };
 
     fetchAndRedirect();
-  }, [router]);
+  }, [router, authLoading, isAuthenticated, hasCheckedToken]);
 
   // Show loading while fetching and redirecting
   return (

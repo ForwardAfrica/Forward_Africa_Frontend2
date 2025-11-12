@@ -1,13 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '../components/layout/Layout';
 import CourseCard from '../components/ui/CourseCard';
 import { useCourses } from '../hooks/useDatabase';
+import { useAuth } from '../contexts/AuthContext';
+import { hasValidToken } from '../lib/tokenValidator';
 import { Course } from '../types';
 
 const CoursesPage: React.FC = () => {
+  const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasCheckedToken, setHasCheckedToken] = useState(false);
+
+  // Check token synchronously on mount - redirect immediately if no valid token
+  useEffect(() => {
+    if (!hasValidToken()) {
+      router.replace('/login');
+      return;
+    }
+    setHasCheckedToken(true);
+  }, [router]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (hasCheckedToken && !authLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, authLoading, router, hasCheckedToken]);
 
   // Database hooks - same as HomePage
   const {
@@ -17,8 +39,12 @@ const CoursesPage: React.FC = () => {
     fetchAllCourses
   } = useCourses();
 
-  // Fetch data on component mount - same as HomePage
+  // Fetch data only if authenticated
   useEffect(() => {
+    if (authLoading || !isAuthenticated) {
+      return;
+    }
+
     const loadCourses = async () => {
       setLoading(true);
       setError(null);
@@ -34,21 +60,22 @@ const CoursesPage: React.FC = () => {
     };
 
     loadCourses();
-  }, [fetchAllCourses]);
+  }, [fetchAllCourses, authLoading, isAuthenticated]);
 
   // Update loading state based on API loading - same as HomePage
   useEffect(() => {
     console.log('🔄 CoursesPage Loading State:', {
       apiLoading,
+      authLoading,
       localLoading: loading,
       allCoursesLength: allCourses.length,
       apiError
     });
 
-    if (!apiLoading) {
+    if (!apiLoading && !authLoading) {
       setLoading(false);
     }
-  }, [apiLoading, allCourses, apiError]);
+  }, [apiLoading, authLoading, allCourses, apiError]);
 
   // Get unique categories from courses - same as HomePage
   const allCategories = Array.from(new Set(allCourses.map(course => course.category)))
@@ -88,7 +115,20 @@ const CoursesPage: React.FC = () => {
     }))
   });
 
-  // Show loading state
+  // Show blank loading state while checking authentication - prevent showing content to unauthenticated users
+  if (!hasCheckedToken || authLoading) {
+    console.log('🎬 CoursesPage: Checking authentication...');
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
+          <p className="mt-4 text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state for courses data
   if (loading) {
     console.log('🎬 CoursesPage: Showing loading state');
     return (

@@ -6,6 +6,8 @@ import VideoPlayer from '../components/ui/VideoPlayer';
 import Layout from '../components/layout/Layout';
 import { Course, UserProgress, Certificate } from '../types';
 import { useCertificates } from '../hooks/useCertificates';
+import { useAuth } from '../contexts/AuthContext';
+import { hasValidToken } from '../lib/tokenValidator';
 import { downloadCertificate } from '../utils/certificateGenerator';
 import Image from 'next/image';
 import CourseProgressDashboard from '../components/ui/CourseProgressDashboard';
@@ -13,6 +15,8 @@ import CourseProgressDashboard from '../components/ui/CourseProgressDashboard';
 const CoursePage: React.FC = () => {
   const router = useRouter();
   const { courseId } = router.query;
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const [hasCheckedToken, setHasCheckedToken] = useState(false);
   const [course, setCourse] = useState<Course | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -43,6 +47,22 @@ const CoursePage: React.FC = () => {
     setIsClient(true);
   }, []);
 
+  // Check token synchronously on mount - redirect immediately if no valid token
+  useEffect(() => {
+    if (!hasValidToken()) {
+      router.replace('/login');
+      return;
+    }
+    setHasCheckedToken(true);
+  }, [router]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (hasCheckedToken && !authLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, authLoading, router, hasCheckedToken]);
+
   // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -56,6 +76,10 @@ const CoursePage: React.FC = () => {
   }, [courseId, getCertificate, isClient]);
 
   useEffect(() => {
+    if (authLoading || !isAuthenticated || !hasCheckedToken) {
+      return;
+    }
+
     const fetchCourseData = async () => {
       if (courseId && typeof courseId === 'string') {
         try {
@@ -300,7 +324,7 @@ const CoursePage: React.FC = () => {
     };
 
     fetchCourseData();
-  }, [courseId, router]);
+  }, [courseId, router, authLoading, isAuthenticated, hasCheckedToken]);
 
   // Reset redirect state when courseId changes
   useEffect(() => {
@@ -465,6 +489,18 @@ const CoursePage: React.FC = () => {
   }, [courseCompletionStatus, courseId, course]);
 
   // Load completion data from localStorage
+
+  // Show blank loading state while checking authentication - prevent showing content to unauthenticated users
+  if (!hasCheckedToken || authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
+          <p className="mt-4 text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show loading state while redirecting or before client-side hydration
   if (loading || redirecting || !isClient) {
