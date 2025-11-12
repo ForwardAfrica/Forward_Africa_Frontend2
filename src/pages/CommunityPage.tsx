@@ -633,10 +633,10 @@ const CommunityPage: React.FC = () => {
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-white">John Doe</p>
-                <p className="text-sm text-green-400 flex items-center">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-                  Online
-                </p>
+                <div className="text-sm text-green-400 flex items-center">
+                  <span className="w-2 h-2 bg-green-400 rounded-full mr-2 inline-block animate-pulse" />
+                  <span>Online</span>
+                </div>
               </div>
             </div>
           </div>
