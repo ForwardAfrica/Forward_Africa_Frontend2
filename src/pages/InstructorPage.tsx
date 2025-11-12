@@ -74,34 +74,37 @@ const InstructorPage: React.FC = () => {
         console.log('🔍 Fetching instructor data for ID:', instructorId);
 
         // Fetch instructor details
-        const instructorData = await instructorAPI.getInstructor(instructorId);
+        const instructorData: any = await instructorAPI.getInstructor(instructorId);
         console.log('📋 Instructor data received:', instructorData);
 
-        if (instructorData) {
-          setInstructor(instructorData);
+        if (instructorData && typeof instructorData === 'object' && 'id' in instructorData) {
+          setInstructor(instructorData as Instructor);
         } else {
+          console.warn('Instructor API returned unexpected shape:', instructorData);
           throw new Error('Instructor not found');
         }
 
                  // Fetch instructor courses
          try {
-           const coursesData = await instructorAPI.getInstructorCourses(instructorId);
-           console.log('📚 Courses data received:', coursesData);
+          const coursesData: any = await instructorAPI.getInstructorCourses(instructorId);
+          console.log('📚 Courses data received:', coursesData);
 
-           // Transform the data to match the expected types
-           const transformedCourses = coursesData.map((course: any) => ({
-             ...course,
-             instructor: {
-               ...course.instructor,
-               createdAt: new Date(course.instructor.createdAt || new Date())
-             }
-           }));
+          const coursesArray: any[] = Array.isArray(coursesData) ? coursesData : [];
 
-           setCourses(transformedCourses || []);
-         } catch (coursesError) {
-           console.warn('⚠️ Failed to fetch courses, using empty array:', coursesError);
-           setCourses([]);
-         }
+          // Transform the data to match the expected types
+          const transformedCourses = coursesArray.map((course: any) => ({
+            ...course,
+            instructor: {
+              ...(course && course.instructor ? course.instructor : {}),
+              createdAt: new Date((course && course.instructor && course.instructor.createdAt) || new Date())
+            }
+          }));
+
+          setCourses(transformedCourses || []);
+        } catch (coursesError) {
+          console.warn('⚠️ Failed to fetch courses, using empty array:', coursesError);
+          setCourses([]);
+        }
 
       } catch (err) {
         console.error('❌ Error fetching instructor data:', err);

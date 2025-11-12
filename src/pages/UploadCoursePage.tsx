@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Upload, ArrowLeft, Plus, X, Star, User, Info } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useNavigate, useSearchParams } from '../lib/router';
@@ -63,8 +63,9 @@ const UploadCoursePage: React.FC = () => {
         }
 
         // Load categories
-        const categoriesData = await categoryAPI.getAllCategories();
-        setAvailableCategories(categoriesData);
+        const categoriesData: any = await categoryAPI.getAllCategories();
+        const categoriesArr: Category[] = Array.isArray(categoriesData) ? categoriesData as Category[] : [];
+        setAvailableCategories(categoriesArr);
       } catch (error) {
         console.error('Error loading data:', error);
       }
@@ -127,7 +128,8 @@ const UploadCoursePage: React.FC = () => {
         const response = await fetch('http://localhost:3002/api/categories');
         if (response.ok) {
           const data = await response.json();
-          setAvailableCategories(data);
+          const categoriesArr: Category[] = Array.isArray(data) ? data as Category[] : [];
+          setAvailableCategories(categoriesArr);
         } else {
           console.error('Failed to load categories');
         }

@@ -403,7 +403,26 @@ export const useInstructors = () => {
 
     try {
       const data = await instructorAPI.getAllInstructors();
-      setInstructors(data);
+
+      // Normalize different possible response shapes
+      // Possible shapes: Instructor[], null, { success: boolean } or { data: Instructor[] } or { instructors: Instructor[] }
+      let instructorsArray: Instructor[] = [];
+
+      if (Array.isArray(data)) {
+        instructorsArray = data as Instructor[];
+      } else if (data && typeof data === 'object') {
+        if (Array.isArray((data as any).data)) {
+          instructorsArray = (data as any).data as Instructor[];
+        } else if (Array.isArray((data as any).instructors)) {
+          instructorsArray = (data as any).instructors as Instructor[];
+        } else {
+          instructorsArray = [];
+        }
+      } else {
+        instructorsArray = [];
+      }
+
+      setInstructors(instructorsArray);
     } catch (err) {
       console.error('Failed to fetch instructors:', err);
       setError('Failed to load instructors');
@@ -495,7 +514,20 @@ export const useCertificates = (userId: string) => {
     setError(null);
     try {
       const data = await certificateAPI.getUserCertificates(userId);
-      setCertificates(data);
+
+      // Normalize response shapes: Certificate[] | null | { data: Certificate[] } | { certificates: Certificate[] }
+      let certificatesArray: Certificate[] = [];
+      if (Array.isArray(data)) {
+        certificatesArray = data as Certificate[];
+      } else if (data && typeof data === 'object') {
+        if (Array.isArray((data as any).data)) {
+          certificatesArray = (data as any).data as Certificate[];
+        } else if (Array.isArray((data as any).certificates)) {
+          certificatesArray = (data as any).certificates as Certificate[];
+        }
+      }
+
+      setCertificates(certificatesArray);
     } catch (err) {
       setError('Failed to fetch certificates');
       console.error('Error fetching certificates:', err);
@@ -541,7 +573,20 @@ export const useAchievements = (userId: string) => {
     setError(null);
     try {
       const data = await achievementAPI.getUserAchievements(userId);
-      setAchievements(data);
+
+      // Normalize response shapes: Achievement[] | null | { data: Achievement[] } | { achievements: Achievement[] }
+      let achievementsArray: Achievement[] = [];
+      if (Array.isArray(data)) {
+        achievementsArray = data as Achievement[];
+      } else if (data && typeof data === 'object') {
+        if (Array.isArray((data as any).data)) {
+          achievementsArray = (data as any).data as Achievement[];
+        } else if (Array.isArray((data as any).achievements)) {
+          achievementsArray = (data as any).achievements as Achievement[];
+        }
+      }
+
+      setAchievements(achievementsArray);
     } catch (err) {
       setError('Failed to fetch achievements');
       console.error('Error fetching achievements:', err);

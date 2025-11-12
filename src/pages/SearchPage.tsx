@@ -56,12 +56,16 @@ const SearchPage: React.FC = () => {
           instructorAPI.getAllInstructors()
         ]);
 
-        setAllCourses(coursesData);
-        setAllCategories(categoriesData);
-        setAllInstructors(instructorsData);
+        const coursesArr: Course[] = Array.isArray(coursesData) ? (coursesData as Course[]) : [];
+        const categoriesArr: Category[] = Array.isArray(categoriesData) ? (categoriesData as Category[]) : [];
+        const instructorsArr: Instructor[] = Array.isArray(instructorsData) ? (instructorsData as Instructor[]) : [];
+
+        setAllCourses(coursesArr);
+        setAllCategories(categoriesArr);
+        setAllInstructors(instructorsArr);
         setSearchResults({
-          courses: coursesData,
-          instructors: instructorsData,
+          courses: coursesArr,
+          instructors: instructorsArr,
         });
       } catch (error) {
         console.error('Failed to load data:', error);
