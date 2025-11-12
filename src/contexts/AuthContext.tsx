@@ -261,6 +261,65 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user, loading, isClient, router]);
 
+  // Session policy enforcement: session length 1 hour; allow extension if user active in last 5 minutes
+  useEffect(() => {
+    if (!isClient) return;
+
+    const SESSION_DURATION = 60 * 60 * 1000; // 1 hour
+    const ACTIVITY_WINDOW = 5 * 60 * 1000; // last 5 minutes
+
+    // Update activity timestamp when the user interacts
+    const updateActivity = () => {
+      authService.updateLastActivity();
+    };
+
+    const events = ['mousemove', 'keydown', 'click', 'touchstart'];
+    events.forEach(ev => document.addEventListener(ev, updateActivity));
+
+    // Periodic check for session expiry
+    const checkInterval = setInterval(async () => {
+      try {
+        const sessionStart = authService.getSessionStart();
+        if (!sessionStart) return;
+
+        const sessionExpiry = sessionStart + SESSION_DURATION;
+        const now = Date.now();
+
+        // If session expired
+        if (now >= sessionExpiry) {
+          const lastActivity = authService.getLastActivity() || 0;
+          const wasActiveNearExpiry = lastActivity >= (sessionExpiry - ACTIVITY_WINDOW);
+
+          if (wasActiveNearExpiry && user) {
+            // Try to refresh token to extend session
+            console.log('🔄 Session expired but recent activity detected — attempting refresh');
+            try {
+              await refreshToken();
+              console.log('✅ Session extended via token refresh');
+            } catch (err) {
+              console.error('❌ Failed to refresh token after expiry:', err);
+              authService.clearAuthData();
+              setUser(null);
+              router.push({ pathname: '/login', query: { redirect: router.pathname } });
+            }
+          } else {
+            console.log('⏳ Session expired and no recent activity — logging out');
+            authService.clearAuthData();
+            setUser(null);
+            router.push({ pathname: '/login', query: { redirect: router.pathname } });
+          }
+        }
+      } catch (err) {
+        console.error('❌ Session check error:', err);
+      }
+    }, 30 * 1000); // check every 30 seconds
+
+    return () => {
+      events.forEach(ev => document.removeEventListener(ev, updateActivity));
+      clearInterval(checkInterval);
+    };
+  }, [isClient, user, refreshToken, router]);
+
   const signIn = async (credentials: LoginCredentials): Promise<void> => {
     try {
       setLoading(true);
