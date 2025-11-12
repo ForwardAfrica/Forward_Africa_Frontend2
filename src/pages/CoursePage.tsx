@@ -313,7 +313,7 @@ const CoursePage: React.FC = () => {
     };
 
     fetchCourseData();
-  }, [courseId, router]);
+  }, [courseId, router, authLoading, isAuthenticated]);
 
   // Reset redirect state when courseId changes
   useEffect(() => {
