@@ -19,7 +19,7 @@ const WebSocket = require('ws');
 const { rateLimiters, getRateLimitStatus } = require('./middleware/rateLimiter');
 const { apiResponseMiddleware, errorHandler, asyncHandler, requestLogger } = require('./middleware/apiResponse');
 const { monitoringService, monitoringMiddleware } = require('./services/monitoringService');
-const { initializeFirebaseAdmin, verifyIdToken, getFirestore } = require('./lib/firebaseAdmin');
+const { initializeFirebaseAdmin, verifyIdToken, getFirestore, getAuth } = require('./lib/firebaseAdmin');
 
 // Import secure routes
 const secureRoutes = require('./routes/secureRoutes');
@@ -1010,17 +1010,47 @@ app.post('/api/auth/register', async (req, res) => {
       city
     } = req.body;
 
-    // Check if user already exists
-    const [existingUser] = await executeQuery('SELECT id FROM users WHERE email = ?', [email]);
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+    if (!email || !password || !full_name) {
+      return res.status(400).json({ error: 'Email, password and full_name are required' });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const id = uuidv4();
+    const authAdmin = getAuth();
 
-    // Convert undefined values to null for database
+    // Check if user exists in Firebase
+    try {
+      const existingFirebaseUser = await authAdmin.getUserByEmail(email);
+      if (existingFirebaseUser) {
+        return res.status(400).json({ error: 'User already exists' });
+      }
+    } catch (err) {
+      // If error is user-not-found, proceed. Otherwise, log and fail.
+      if (!err || !err.code || err.code !== 'auth/user-not-found') {
+        // Some SDKs throw different error shapes; proceed if it's not a not-found error
+        if (err && err.code && err.code !== 'auth/user-not-found') {
+          console.error('Firebase check user error:', err);
+          return res.status(500).json({ error: 'Failed to check existing user' });
+        }
+      }
+    }
+
+    // Create user in Firebase
+    const firebaseUserRecord = await authAdmin.createUser({
+      email: email,
+      password: password,
+      displayName: full_name
+    });
+
+    // Optionally set default custom claims/role
+    try {
+      await authAdmin.setCustomUserClaims(firebaseUserRecord.uid, { role: 'user' });
+    } catch (claimErr) {
+      console.warn('Could not set custom claims for user:', claimErr);
+    }
+
+    // Also create user in MySQL for legacy data and app logic
+    const id = firebaseUserRecord.uid; // Use Firebase UID as primary id in DB
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const dbIndustry = industry || null;
     const dbExperienceLevel = experience_level || null;
     const dbBusinessStage = business_stage || null;
@@ -1028,16 +1058,36 @@ app.post('/api/auth/register', async (req, res) => {
     const dbStateProvince = state_province || null;
     const dbCity = city || null;
 
-    // Create user with only existing columns
     await executeQuery(
       'INSERT INTO users (id, email, full_name, industry, experience_level, business_stage, country, state_province, city, password, role, onboarding_completed, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [id, email, full_name, dbIndustry, dbExperienceLevel, dbBusinessStage, dbCountry, dbStateProvince, dbCity, hashedPassword, 'user', false, true]
     );
 
-    // Generate JWT token
-    const token = jwt.sign({ id, email, role: 'user' }, JWT_SECRET, { expiresIn: '24h' });
+    // Create a Firestore profile document (best-effort)
+    try {
+      const firestore = getFirestore();
+      await firestore.collection('users').doc(firebaseUserRecord.uid).set({
+        uid: firebaseUserRecord.uid,
+        email,
+        displayName: full_name,
+        role: 'user',
+        permissions: [],
+        onboarding_completed: false,
+        industry: dbIndustry,
+        experience_level: dbExperienceLevel,
+        business_stage: dbBusinessStage,
+        country: dbCountry,
+        state_province: dbStateProvince,
+        city: dbCity,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+    } catch (fsErr) {
+      console.warn('Could not write Firestore user doc:', fsErr);
+    }
 
-    // Generate refresh token
+    // Generate app JWT token and refresh token to keep compatibility with frontend
+    const token = jwt.sign({ id, email, role: 'user' }, JWT_SECRET, { expiresIn: '24h' });
     const refreshToken = jwt.sign({ id, email }, JWT_SECRET, { expiresIn: '7d' });
 
     // Store refresh token in database
@@ -1058,6 +1108,15 @@ app.post('/api/auth/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
+    // If Firebase created a user but DB insert failed, try to cleanup
+    try {
+      if (error && error.code !== 'auth/email-already-exists' && error.uid) {
+        const authAdmin = getAuth();
+        await authAdmin.deleteUser(error.uid).catch(() => {});
+      }
+    } catch (cleanupErr) {
+      console.warn('Cleanup error after registration failure:', cleanupErr);
+    }
     res.status(500).json({ error: 'Failed to register user' });
   }
 });
@@ -1066,38 +1125,66 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Get user with password hash
-    const [user] = await executeQuery('SELECT * FROM users WHERE email = ?', [email]);
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    if (!apiKey) {
+      console.error('Missing Firebase API key in environment');
+      return res.status(500).json({ error: 'Server misconfiguration' });
+    }
+
+    // Verify password with Firebase Auth REST API
+    const verifyUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
+    const verifyResp = await fetch(verifyUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, returnSecureToken: true })
+    });
+
+    if (!verifyResp.ok) {
+      const errBody = await verifyResp.json().catch(() => ({}));
+      console.warn('Firebase verify failed:', errBody);
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const verifyData = await verifyResp.json();
+    const uid = verifyData.localId;
+
+    // Ensure local DB user exists; if not, create a basic record
+    const [user] = await executeQuery('SELECT * FROM users WHERE id = ? OR email = ?', [uid, email]);
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      // Create a DB record for this Firebase user
+      const id = uid;
+      const full_name = verifyData.displayName || '';
+      await executeQuery(
+        'INSERT INTO users (id, email, full_name, role, onboarding_completed, is_active) VALUES (?, ?, ?, ?, ?, ?)',
+        [id, email, full_name, 'user', false, true]
+      );
     }
 
-    // Check password
-    const validPassword = await bcrypt.compare(password, user.password || '');
-    if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
+    // At this point, load the user from DB to get role and other metadata
+    const [dbUser] = await executeQuery('SELECT * FROM users WHERE id = ? OR email = ?', [uid, email]);
 
-    // Generate JWT token
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-
-    // Generate refresh token
-    const refreshToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+    // Generate app JWT token and refresh token
+    const token = jwt.sign({ id: dbUser.id, email: dbUser.email, role: dbUser.role }, JWT_SECRET, { expiresIn: '24h' });
+    const refreshToken = jwt.sign({ id: dbUser.id, email: dbUser.email }, JWT_SECRET, { expiresIn: '7d' });
 
     // Store refresh token in database
-    await executeQuery('UPDATE users SET refresh_token = ? WHERE id = ?', [refreshToken, user.id]);
+    await executeQuery('UPDATE users SET refresh_token = ? WHERE id = ?', [refreshToken, dbUser.id]);
 
     res.json({
       token,
       refreshToken,
       user: {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        role: user.role,
-        avatar_url: user.avatar_url,
-        onboarding_completed: user.onboarding_completed,
-        permissions: [] // Add empty permissions array for now
+        id: dbUser.id,
+        email: dbUser.email,
+        full_name: dbUser.full_name,
+        role: dbUser.role,
+        avatar_url: dbUser.avatar_url,
+        onboarding_completed: dbUser.onboarding_completed,
+        permissions: []
       },
       message: 'Login successful'
     });
@@ -4268,6 +4355,3 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     res.status(500).json({ error: 'Failed to process password reset request' });
   }
 });
-
-
-
