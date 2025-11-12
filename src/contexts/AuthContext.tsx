@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { authService, AuthUser, LoginCredentials, RegisterData } from '../lib/auth';
-import { auth } from '../lib/firebase';
-import { useFirebaseAuth } from './FirebaseAuthContext';
-import { firebaseAuthService, FirebaseUser as FBUser } from '../lib/firebaseAuth';
+import { authService, AuthUser, LoginCredentials, RegisterData, AuthError } from '../lib/authService';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -25,71 +22,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-  try {
-    // Try to use the AuthContext first (for backward compatibility)
-    const context = useContext(AuthContext);
-    if (context !== undefined) {
-      return context;
-    }
-  } catch {
-    // Fall through to Firebase Auth
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within AuthProvider');
   }
-
-  // Fall back to Firebase Auth for client-side rendering
-  const firebaseAuth = useFirebaseAuth();
-
-  // Convert Firebase auth response to the expected AuthUser format
-  const convertedUser = firebaseAuth.user ? {
-    id: firebaseAuth.user.uid,
-    email: firebaseAuth.user.email || '',
-    full_name: firebaseAuth.user.displayName || '',
-    role: firebaseAuth.user.role,
-    permissions: firebaseAuth.user.permissions,
-    avatar_url: firebaseAuth.user.photoURL || undefined,
-    onboarding_completed: firebaseAuth.user.onboarding_completed,
-    industry: firebaseAuth.user.industry,
-    experience_level: firebaseAuth.user.experience_level,
-    business_stage: firebaseAuth.user.business_stage,
-    country: firebaseAuth.user.country,
-    state_province: firebaseAuth.user.state_province,
-    city: firebaseAuth.user.city,
-  } as AuthUser : null;
-
-  return {
-    user: convertedUser,
-    profile: convertedUser,
-    loading: firebaseAuth.loading,
-    isAuthenticated: firebaseAuth.isAuthenticated,
-    isAdmin: firebaseAuth.isAdmin,
-    isSuperAdmin: firebaseAuth.isSuperAdmin,
-    error: firebaseAuth.error,
-    signIn: firebaseAuth.signIn as (credentials: LoginCredentials) => Promise<void>,
-    signUp: firebaseAuth.signUp as (data: RegisterData) => Promise<void>,
-    signOut: firebaseAuth.signOut,
-    updateProfile: async (profileData: Partial<AuthUser>) => {
-      const updated = await firebaseAuth.updateProfile(profileData as any);
-      return {
-        id: updated.uid,
-        email: updated.email || '',
-        full_name: updated.displayName || '',
-        role: updated.role,
-        permissions: updated.permissions,
-        avatar_url: updated.photoURL || undefined,
-        onboarding_completed: updated.onboarding_completed,
-        industry: updated.industry,
-        experience_level: updated.experience_level,
-        business_stage: updated.business_stage,
-        country: updated.country,
-        state_province: updated.state_province,
-        city: updated.city,
-      } as AuthUser;
-    },
-    refreshToken: async () => {
-      // Firebase handles token refresh automatically
-    },
-    clearError: firebaseAuth.clearError,
-    checkAuthStatus: firebaseAuth.checkAuthStatus,
-  };
+  return context;
 };
 
 interface AuthProviderProps {
@@ -105,101 +42,55 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check authentication status
   const checkAuthStatus = useCallback(async () => {
-    // Only run on client side to prevent hydration issues
     if (typeof window === 'undefined') return;
 
     try {
       console.log('🔍 AuthContext: Checking authentication status...');
-      const token = authService.getToken();
 
-      if (!token) {
-        console.log('🔍 AuthContext: No token found');
-
-        // Try to use Firebase client auth if available (handles persistence across refresh)
-        try {
-          const firebaseUser = auth.currentUser;
-          if (firebaseUser) {
-            // Convert minimal Firebase user to AuthUser shape
-            const converted: AuthUser = {
-              id: (firebaseUser as any).uid,
-              email: firebaseUser.email || '',
-              full_name: (firebaseUser as any).displayName || '',
-              role: (firebaseUser as any).role || 'user',
-              permissions: (firebaseUser as any).permissions || [],
-              avatar_url: (firebaseUser as any).photoURL || undefined,
-              onboarding_completed: (firebaseUser as any).onboarding_completed || false
-            } as AuthUser;
-
-            setUser(converted);
-            setError(null);
-            return;
-          }
-        } catch (fbErr) {
-          console.warn('⚠️ AuthContext: Firebase check failed', fbErr);
-        }
-
+      if (!authService.hasValidToken()) {
+        console.log('🔍 AuthContext: No valid token found');
         setUser(null);
         return;
       }
 
-      console.log('🔍 AuthContext: Token found, validating...');
-      const user = await authService.getProfile();
-      console.log('✅ AuthContext: User profile loaded:', user?.email);
-      setUser(user);
+      // Try to get user from token first
+      const tokenUser = authService.getUserFromToken();
+      if (tokenUser) {
+        console.log('✅ AuthContext: User loaded from token:', tokenUser.email);
+        setUser(tokenUser);
+        setError(null);
+        return;
+      }
+
+      // If no user from token, fetch from server
+      const profileUser = await authService.getProfile();
+      console.log('✅ AuthContext: User profile loaded:', profileUser.email);
+      setUser(profileUser);
       setError(null);
     } catch (error) {
       console.error('❌ AuthContext: Auth check error:', error);
-      // Clear invalid auth data
-      authService.clearAuthData();
       setUser(null);
-      setError('Authentication expired. Please log in again.');
+      setError('Authentication check failed');
     }
   }, []);
 
-  // Enhanced refresh token with better error handling
+  // Refresh token
   const refreshToken = useCallback(async () => {
-    // Only run on client side
     if (typeof window === 'undefined') return;
 
     try {
       console.log('🔄 AuthContext: Refreshing token...');
 
-      const refreshToken = authService.getRefreshToken();
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
+      const response = await authService.refreshToken();
+      
+      if (response.user) {
+        setUser(response.user);
+        setError(null);
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refreshToken })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Token refresh failed' }));
-        throw new Error(errorData.error || 'Token refresh failed');
-      }
-
-      const data = await response.json();
-
-      // Validate response data
-      if (!data.token || !data.refreshToken) {
-        throw new Error('Invalid refresh response');
-      }
-
-      // Update stored tokens
-      const currentUser = authService.getUser();
-      if (currentUser) {
-        authService.setAuthData(data.token, data.refreshToken, currentUser);
-      }
-
-      setError(null);
       console.log('✅ AuthContext: Token refreshed successfully');
     } catch (error) {
       console.error('❌ AuthContext: Token refresh failed:', error);
-      authService.clearAuthData();
       setUser(null);
       setError('Session expired. Please log in again.');
     }
@@ -210,73 +101,76 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
   }, []);
 
-  // Set client flag on mount to prevent hydration issues
+  // Set client flag
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Check authentication status only after client-side hydration
+  // Check authentication on mount
   useEffect(() => {
     if (!isClient) return;
 
-    // Check for existing authentication on app load
     checkAuthStatus().finally(() => {
       setLoading(false);
     });
   }, [checkAuthStatus, isClient]);
 
-  // Watch for authentication state changes and handle navigation
+  // Watch for token expiry and refresh
   useEffect(() => {
-    if (!isClient) return;
+    if (!isClient || !user) return;
 
-    // If user becomes unauthenticated, redirect to login for all protected pages
-    if (!user && !loading) {
+    const checkTokenExpiry = () => {
+      const status = authService.getTokenStatus();
+      
+      if (status.isExpired) {
+        console.log('⏳ Token expired, logging out');
+        setUser(null);
+        router.push({ pathname: '/login', query: { redirect: router.pathname } });
+      } else if (authService.shouldRefreshToken()) {
+        console.log('🔄 Token expiring soon, refreshing...');
+        refreshToken().catch(() => {
+          console.error('Failed to refresh token');
+        });
+      }
+    };
+
+    // Check every 30 seconds
+    const interval = setInterval(checkTokenExpiry, 30 * 1000);
+
+    // Also check on page visibility change
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkTokenExpiry();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isClient, user, refreshToken, router]);
+
+  // Redirect unauthenticated users from protected pages
+  useEffect(() => {
+    if (!isClient || loading) return;
+
+    if (!user) {
       const currentPath = router.pathname;
-
-      // Only these paths are public
       const publicPaths = ['/', '/login', '/register'];
       const isPublicPath = publicPaths.some(path => currentPath === path || currentPath.startsWith(path));
 
       if (!isPublicPath) {
-        console.log('🚪 AuthContext: User logged out, redirecting from', currentPath);
-
-        // Show a brief notification to the user
-        if (typeof window !== 'undefined') {
-          const notification = document.createElement('div');
-          notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #dc2626;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 9999;
-            font-family: system-ui, sans-serif;
-            font-size: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s ease-out;
-          `;
-          notification.textContent = 'Session expired. Redirecting to login...';
-          document.body.appendChild(notification);
-
-          setTimeout(() => {
-            if (notification.parentNode) {
-              notification.parentNode.removeChild(notification);
-            }
-          }, 3000);
-        }
-
-        // Redirect to login page, preserving the current path for post-login redirect
+        console.log('🚪 AuthContext: Redirecting unauthenticated user');
         router.push({ pathname: '/login', query: { redirect: currentPath } });
       }
     }
   }, [user, loading, isClient, router]);
 
-  // If a logged-in user lands on auth pages (login/register), redirect them to home
+  // Redirect authenticated users from auth pages
   useEffect(() => {
-    if (!isClient) return;
-    if (loading) return;
+    if (!isClient || loading) return;
 
     const authPages = ['/login', '/register'];
     const currentPath = router.pathname;
@@ -286,126 +180,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user, loading, isClient, router]);
 
-  // Session policy enforcement: session length 1 hour; allow extension if user active in last 5 minutes
-  useEffect(() => {
-    if (!isClient) return;
-
-    const SESSION_DURATION = 60 * 60 * 1000; // 1 hour
-    const ACTIVITY_WINDOW = 5 * 60 * 1000; // last 5 minutes
-
-    // Update activity timestamp when the user interacts
-    const updateActivity = () => {
-      authService.updateLastActivity();
-    };
-
-    const events = ['mousemove', 'keydown', 'click', 'touchstart'];
-    events.forEach(ev => document.addEventListener(ev, updateActivity));
-
-    // Periodic check for session expiry
-    const checkInterval = setInterval(async () => {
-      try {
-        const sessionStart = authService.getSessionStart();
-        if (!sessionStart) return;
-
-        const sessionExpiry = sessionStart + SESSION_DURATION;
-        const now = Date.now();
-
-        // If session expired
-        if (now >= sessionExpiry) {
-          const lastActivity = authService.getLastActivity() || 0;
-          const wasActiveNearExpiry = lastActivity >= (sessionExpiry - ACTIVITY_WINDOW);
-
-          if (wasActiveNearExpiry && user) {
-            // Try to refresh token to extend session
-            console.log('🔄 Session expired but recent activity detected — attempting refresh');
-            try {
-              await refreshToken();
-              console.log('✅ Session extended via token refresh');
-            } catch (err) {
-              console.error('❌ Failed to refresh token after expiry:', err);
-              authService.clearAuthData();
-              setUser(null);
-              router.push({ pathname: '/login', query: { redirect: router.pathname } });
-            }
-          } else {
-            console.log('⏳ Session expired and no recent activity — logging out');
-            authService.clearAuthData();
-            setUser(null);
-            router.push({ pathname: '/login', query: { redirect: router.pathname } });
-          }
-        }
-      } catch (err) {
-        console.error('❌ Session check error:', err);
-      }
-    }, 30 * 1000); // check every 30 seconds
-
-    return () => {
-      events.forEach(ev => document.removeEventListener(ev, updateActivity));
-      clearInterval(checkInterval);
-    };
-  }, [isClient, user, refreshToken, router]);
-
   const signIn = async (credentials: LoginCredentials): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
       console.log('🔐 AuthContext: Signing in...');
 
-      // Validate credentials before sending
-      if (!credentials.email || !credentials.password) {
-        throw new Error('Email and password are required');
-      }
-
-      if (!credentials.email.includes('@')) {
-        throw new Error('Please enter a valid email address');
-      }
-
-      let response;
-      if (typeof window !== 'undefined') {
-        // Use Firebase client SDK when running in browser
-        const fbResp = await firebaseAuthService.signIn(credentials);
-        const fu = fbResp.user as FBUser;
-        response = {
-          token: null,
-          refreshToken: null,
-          user: {
-            id: fu.uid,
-            email: fu.email || '',
-            full_name: fu.displayName || '',
-            role: (fu as any).role || 'user',
-            permissions: fu.permissions || [],
-            avatar_url: fu.photoURL || undefined,
-            onboarding_completed: fu.onboarding_completed || false,
-            industry: fu.industry,
-            experience_level: fu.experience_level,
-            business_stage: fu.business_stage,
-            country: fu.country,
-            state_province: fu.state_province,
-            city: fu.city
-          }
-        } as any;
-      } else {
-        response = await authService.login(credentials);
-      }
+      const response = await authService.login(credentials);
       setUser(response.user);
       console.log('✅ AuthContext: Sign in successful');
     } catch (error) {
       console.error('❌ AuthContext: Sign in error:', error);
 
-      // Handle specific error types
       let errorMessage = 'Sign in failed';
 
-      if (error instanceof Error) {
-        if (error.message.includes('Network') || error.message.includes('fetch')) {
-          errorMessage = 'Network error. Please check your connection.';
-        } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
-          errorMessage = 'Invalid email or password.';
-        } else if (error.message.includes('500') || error.message.includes('Internal server')) {
-          errorMessage = 'Server error. Please try again later.';
-        } else if (error.message.includes('429') || error.message.includes('rate limit')) {
-          errorMessage = 'Too many login attempts. Please wait a moment.';
-        } else {
-          errorMessage = error.message;
+      if (error instanceof AuthError) {
+        switch (error.code) {
+          case 'INVALID_CREDENTIALS':
+          case 'UNAUTHORIZED':
+            errorMessage = 'Invalid email or password';
+            break;
+          case 'RATE_LIMITED':
+            errorMessage = 'Too many login attempts. Please wait a moment.';
+            break;
+          case 'MISSING_CREDENTIALS':
+            errorMessage = 'Please enter both email and password';
+            break;
+          case 'INVALID_EMAIL':
+            errorMessage = 'Please enter a valid email address';
+            break;
+          default:
+            errorMessage = error.message;
         }
       }
 
@@ -422,59 +227,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setError(null);
       console.log('📝 AuthContext: Signing up...');
 
-      let response;
-      if (typeof window !== 'undefined') {
-        const fbResp = await firebaseAuthService.signUp(data);
-        const fu = fbResp.user as FBUser;
-        response = {
-          token: null,
-          refreshToken: null,
-          user: {
-            id: fu.uid,
-            email: fu.email || '',
-            full_name: fu.displayName || '',
-            role: (fu as any).role || 'user',
-            permissions: fu.permissions || [],
-            avatar_url: fu.photoURL || undefined,
-            onboarding_completed: fu.onboarding_completed || false,
-            industry: fu.industry,
-            experience_level: fu.experience_level,
-            business_stage: fu.business_stage,
-            country: fu.country,
-            state_province: fu.state_province,
-            city: fu.city
-          }
-        } as any;
-      } else {
-        response = await authService.register(data);
-      }
-
+      const response = await authService.register(data);
       setUser(response.user);
       console.log('✅ AuthContext: Sign up successful');
     } catch (error) {
       console.error('❌ AuthContext: Sign up error:', error);
 
-      // Enhanced error handling for registration
       let errorMessage = 'Sign up failed';
 
-      if (error instanceof Error) {
-        // Check for specific error types
-        if (error.message.includes('User already exists') ||
-            error.message.includes('EMAIL_EXISTS') ||
-            error.message.includes('already registered')) {
-          errorMessage = 'This email is already registered. Please try logging in instead.';
-        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
-          errorMessage = 'Network error. Please check your connection.';
-        } else if (error.message.includes('WEAK_PASSWORD')) {
-          errorMessage = 'Password should be at least 6 characters.';
-        } else if (error.message.includes('INVALID_EMAIL')) {
-          errorMessage = 'Please enter a valid email address.';
-        } else if (error.message.includes('MISSING_DATA')) {
-          errorMessage = 'Please fill in all required fields.';
-        } else if (error.message.includes('500') || error.message.includes('Internal server')) {
-          errorMessage = 'Server error. Please try again later.';
-        } else {
-          errorMessage = error.message;
+      if (error instanceof AuthError) {
+        switch (error.code) {
+          case 'EMAIL_EXISTS':
+            errorMessage = 'This email is already registered. Please try logging in.';
+            break;
+          case 'INVALID_EMAIL':
+            errorMessage = 'Please enter a valid email address';
+            break;
+          case 'WEAK_PASSWORD':
+            errorMessage = 'Password must be at least 6 characters';
+            break;
+          case 'MISSING_DATA':
+            errorMessage = 'Please fill in all required fields';
+            break;
+          default:
+            errorMessage = error.message;
         }
       }
 
@@ -488,24 +264,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signOut = async () => {
     try {
       console.log('🚪 AuthContext: Signing out...');
-      if (typeof window !== 'undefined') {
-        await firebaseAuthService.signOut();
-      } else {
-        await authService.logout();
-      }
+      await authService.logout();
       setUser(null);
       setError(null);
       console.log('✅ AuthContext: Sign out successful');
-
-      // Redirect to home page after logout
       router.push('/');
     } catch (error) {
       console.error('❌ AuthContext: Sign out error:', error);
-      // Even if logout fails, clear local state
+      // Clear local state even if logout fails
       setUser(null);
       setError(null);
-
-      // Still redirect even if logout fails
       router.push('/');
     }
   };
@@ -513,47 +281,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateProfile = async (profileData: Partial<AuthUser>) => {
     try {
       setError(null);
-      console.log('🔄 AuthContext: Updating profile with data:', profileData);
-      let updatedUser;
-      if (typeof window !== 'undefined') {
-        const fu = await firebaseAuthService.updateProfile(profileData as any);
-        updatedUser = {
-          id: fu.uid,
-          email: fu.email || '',
-          full_name: fu.displayName || '',
-          role: (fu as any).role || 'user',
-          permissions: fu.permissions || [],
-          avatar_url: fu.photoURL || undefined,
-          onboarding_completed: fu.onboarding_completed || false,
-          industry: fu.industry,
-          experience_level: fu.experience_level,
-          business_stage: fu.business_stage,
-          country: fu.country,
-          state_province: fu.state_province,
-          city: fu.city
-        } as AuthUser;
-      } else {
-        updatedUser = await authService.updateProfile(profileData);
+      console.log('🔄 AuthContext: Updating profile...');
+
+      // Make authenticated request to update profile
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(profileData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
       }
 
-      console.log('✅ AuthContext: Profile updated, new user data:', updatedUser);
-
-      // Update the user state with the new data
+      const updatedUser: AuthUser = await response.json();
       setUser(updatedUser);
-      console.log('✅ AuthContext: User state updated with onboarding_completed:', updatedUser.onboarding_completed);
+      console.log('✅ AuthContext: Profile updated');
 
       return updatedUser;
     } catch (error) {
       console.error('❌ AuthContext: Profile update error:', error);
-      setError(error instanceof Error ? error.message : 'Profile update failed');
+      setError('Failed to update profile');
       throw error;
     }
   };
 
   const value = {
     user,
-    profile: user, // For compatibility with existing code
-    loading: loading || !isClient, // Show loading until client-side hydration is complete
+    profile: user,
+    loading: loading || !isClient,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'super_admin' || user?.role === 'content_manager' || user?.role === 'community_manager',
     isSuperAdmin: user?.role === 'super_admin',
@@ -564,7 +321,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateProfile,
     refreshToken,
     clearError,
-    checkAuthStatus,
+    checkAuthStatus
   };
 
   return (
