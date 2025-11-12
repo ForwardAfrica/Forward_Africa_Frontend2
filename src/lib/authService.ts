@@ -343,9 +343,14 @@ export const authService = {
         console.warn('⚠️ Logout endpoint failed');
       });
 
+      // Clear token from storage
+      this.clearTokenFromStorage();
+
       console.log('✅ AuthService: Logout completed');
     } catch (error) {
       console.warn('⚠️ AuthService: Logout error:', error);
+      // Still clear token even if logout fails
+      this.clearTokenFromStorage();
     }
   },
 
