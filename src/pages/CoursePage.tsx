@@ -47,12 +47,21 @@ const CoursePage: React.FC = () => {
     setIsClient(true);
   }, []);
 
+  // Check token synchronously on mount - redirect immediately if no valid token
+  useEffect(() => {
+    if (!hasValidToken()) {
+      router.replace('/login');
+      return;
+    }
+    setHasCheckedToken(true);
+  }, [router]);
+
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (hasCheckedToken && !authLoading && !isAuthenticated) {
       router.replace('/login');
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [isAuthenticated, authLoading, router, hasCheckedToken]);
 
   // Scroll to top on component mount
   useEffect(() => {
