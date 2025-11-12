@@ -36,7 +36,8 @@ const RoleManagement: React.FC<RoleManagementProps> = ({ currentUserRole, curren
       setError(null);
       try {
         const usersData = await userAPI.getUsers();
-        setUsers(usersData);
+        const usersArray: User[] = Array.isArray(usersData) ? usersData as User[] : [];
+        setUsers(usersArray);
       } catch (error) {
         console.error('Failed to load users:', error);
         setError('Failed to load users. Please try again.');
