@@ -1,5 +1,6 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
+import AuthGuard from '../src/components/ui/AuthGuard'
 
 const AdminPage = dynamic(() => import('../src/pages/AdminPage'), {
   ssr: false,
@@ -14,5 +15,9 @@ const AdminPage = dynamic(() => import('../src/pages/AdminPage'), {
 })
 
 export default function Admin() {
-  return <AdminPage />
+  return (
+    <AuthGuard requiredRole="admin">
+      <AdminPage />
+    </AuthGuard>
+  )
 }

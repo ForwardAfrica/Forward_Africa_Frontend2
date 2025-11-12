@@ -6,6 +6,7 @@ import { Search, Menu, X, Bell, User, ChevronDown, LogOut, Settings } from 'luci
 import NotificationsDropdown from '../ui/NotificationsDropdown';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useAuthEnhanced } from '../../hooks/useAuthEnhanced';
+import { usePermissions } from '../../contexts/PermissionContext';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,6 +17,8 @@ const Header: React.FC = () => {
   const router = useRouter();
   const { notifications, markAsRead, markAllAsRead, unreadCount } = useNotifications();
   const { user, profile, enhancedSignOut } = useAuthEnhanced();
+  const { userRole } = usePermissions();
+  const canAccessAdmin = userRole === 'super_admin' || userRole === 'content_manager';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -190,14 +193,16 @@ const Header: React.FC = () => {
                           <User className="h-4 w-4 mr-3" />
                           Profile Settings
                         </Link>
-                        <Link
-                          href="/admin"
-                          className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                          onClick={() => setIsProfileOpen(false)}
-                        >
-                          <Settings className="h-4 w-4 mr-3" />
-                          Admin Panel
-                        </Link>
+                        {canAccessAdmin && (
+                          <Link
+                            href="/admin"
+                            className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            <Settings className="h-4 w-4 mr-3" />
+                            Admin Panel
+                          </Link>
+                        )}
                         <button
                           onClick={handleSignOut}
                           className="w-full flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
