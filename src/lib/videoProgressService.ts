@@ -1,6 +1,5 @@
 import { VideoProgress, VideoAnalytics } from '../types';
 import { apiRequest } from './api';
-import { VideoAnalytics } from '../types';
 
 interface ResumePoint {
   resumeTimeSeconds: number;
