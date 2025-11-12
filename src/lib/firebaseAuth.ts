@@ -154,6 +154,11 @@ export const firebaseAuthService = {
     try {
       console.log('🔐 Firebase Auth: Signing in...');
 
+      // Fail fast if API key not configured in client env
+      if (typeof window !== 'undefined' && !process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+        throw new FirebaseAuthError('MISSING_API_KEY', 'Missing NEXT_PUBLIC_FIREBASE_API_KEY. Add it to project environment variables and rebuild the app.');
+      }
+
       const { user: firebaseUser } = await signInWithEmailAndPassword(
         auth,
         credentials.email,
@@ -169,6 +174,11 @@ export const firebaseAuthService = {
       };
     } catch (error: any) {
       console.error('❌ Firebase Auth: Sign in failed:', error);
+
+      // Network error guidance
+      if (error?.code === 'auth/network-request-failed' || (error?.message && error.message.toLowerCase().includes('network'))) {
+        throw new FirebaseAuthError('NETWORK_ERROR', 'Network error: could not reach Firebase Auth. Check NEXT_PUBLIC_FIREBASE_API_KEY, authorized domains in Firebase console, and that Email/Password provider is enabled.');
+      }
 
       // Handle specific Firebase error codes
       switch (error.code) {
@@ -188,10 +198,16 @@ export const firebaseAuthService = {
     }
   },
 
+
   // Sign up with email and password
   signUp: async (userData: RegisterData): Promise<AuthResponse> => {
     try {
       console.log('📝 Firebase Auth: Signing up...');
+
+      // Fail fast if API key not configured in client env
+      if (typeof window !== 'undefined' && !process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+        throw new FirebaseAuthError('MISSING_API_KEY', 'Missing NEXT_PUBLIC_FIREBASE_API_KEY. Add it to project environment variables and rebuild the app.');
+      }
 
       const { user: firebaseUser } = await createUserWithEmailAndPassword(
         auth,
@@ -238,6 +254,11 @@ export const firebaseAuthService = {
       };
     } catch (error: any) {
       console.error('❌ Firebase Auth: Sign up failed:', error);
+
+      // Network error guidance
+      if (error?.code === 'auth/network-request-failed' || (error?.message && error.message.toLowerCase().includes('network'))) {
+        throw new FirebaseAuthError('NETWORK_ERROR', 'Network error: could not reach Firebase Auth. Check NEXT_PUBLIC_FIREBASE_API_KEY, authorized domains in Firebase console, and that Email/Password provider is enabled.');
+      }
 
       // Handle specific Firebase error codes
       switch (error.code) {
