@@ -26,7 +26,7 @@ export default function CourseIndex() {
   }, [isAuthenticated, authLoading, router, hasCheckedToken]);
 
   useEffect(() => {
-    if (authLoading || !isAuthenticated) {
+    if (authLoading || !isAuthenticated || !hasCheckedToken) {
       return;
     }
 
