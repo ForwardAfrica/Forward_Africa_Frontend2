@@ -86,23 +86,25 @@ const InstructorPage: React.FC = () => {
 
                  // Fetch instructor courses
          try {
-           const coursesData = await instructorAPI.getInstructorCourses(instructorId);
-           console.log('📚 Courses data received:', coursesData);
+          const coursesData: any = await instructorAPI.getInstructorCourses(instructorId);
+          console.log('📚 Courses data received:', coursesData);
 
-           // Transform the data to match the expected types
-           const transformedCourses = coursesData.map((course: any) => ({
-             ...course,
-             instructor: {
-               ...course.instructor,
-               createdAt: new Date(course.instructor.createdAt || new Date())
-             }
-           }));
+          const coursesArray: any[] = Array.isArray(coursesData) ? coursesData : [];
 
-           setCourses(transformedCourses || []);
-         } catch (coursesError) {
-           console.warn('⚠️ Failed to fetch courses, using empty array:', coursesError);
-           setCourses([]);
-         }
+          // Transform the data to match the expected types
+          const transformedCourses = coursesArray.map((course: any) => ({
+            ...course,
+            instructor: {
+              ...(course && course.instructor ? course.instructor : {}),
+              createdAt: new Date((course && course.instructor && course.instructor.createdAt) || new Date())
+            }
+          }));
+
+          setCourses(transformedCourses || []);
+        } catch (coursesError) {
+          console.warn('⚠️ Failed to fetch courses, using empty array:', coursesError);
+          setCourses([]);
+        }
 
       } catch (err) {
         console.error('❌ Error fetching instructor data:', err);
