@@ -1,13 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '../components/layout/Layout';
 import CourseCard from '../components/ui/CourseCard';
 import { useCourses } from '../hooks/useDatabase';
+import { useAuth } from '../contexts/AuthContext';
 import { Course } from '../types';
 
 const CoursesPage: React.FC = () => {
+  const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   // Database hooks - same as HomePage
   const {
