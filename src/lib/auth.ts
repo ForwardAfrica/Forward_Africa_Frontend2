@@ -313,12 +313,11 @@ export const authService = {
     }
   },
 
-  // Enhanced register with validation
+  // Enhanced register (mocked for frontend-only UI)
   register: async (userData: RegisterData): Promise<AuthResponse> => {
     try {
-      console.log('📝 Attempting registration...');
+      console.log('📝 Mock registration (frontend-only UI)');
 
-      // Validate user data
       if (!userData.email || !userData.password || !userData.full_name) {
         throw new AuthError('MISSING_DATA', 'Email, password, and full name are required');
       }
@@ -335,47 +334,40 @@ export const authService = {
         throw new AuthError('INVALID_NAME', 'Full name must be at least 2 characters long');
       }
 
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
+      // Create mock token
+      const payload = {
+        id: userData.email,
+        role: 'user',
+        exp: Math.floor(Date.now() / 1000) + 24 * 3600
+      };
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      const base64Payload = (typeof window !== 'undefined' && typeof btoa === 'function')
+        ? btoa(JSON.stringify(payload))
+        : Buffer.from(JSON.stringify(payload)).toString('base64');
 
-        switch (response.status) {
-          case 400:
-            throw new AuthError('INVALID_DATA', errorData.error || 'Invalid registration data');
-          case 409:
-            throw new AuthError('EMAIL_EXISTS', 'Email already exists');
-          case 500:
-            throw new AuthError('SERVER_ERROR', 'Internal server error. Please try again later.');
-          default:
-            throw new AuthError('REGISTRATION_FAILED', errorData.error || 'Registration failed');
-        }
-      }
+      const token = `mock.${base64Payload}.sig`;
+      const refreshToken = `mock-refresh-${Date.now()}`;
 
-      const data: AuthResponse = await response.json();
+      const user = {
+        id: payload.id,
+        email: userData.email,
+        full_name: userData.full_name,
+        role: 'user',
+        permissions: [],
+        onboarding_completed: false
+      } as AuthUser;
 
-      // Validate and store auth data
-      if (!data.token || !data.refreshToken || !data.user) {
-        throw new AuthError('INVALID_RESPONSE', 'Invalid response from server');
-      }
+      authService.setAuthData(token, refreshToken, user);
 
-      authService.setAuthData(data.token, data.refreshToken, data.user);
-
-      console.log('✅ Registration successful');
-      return data;
+      return {
+        token,
+        refreshToken,
+        user,
+        message: 'Account created (mock)'
+      };
     } catch (error) {
-      console.error('❌ Registration failed:', error);
-
-      if (error instanceof AuthError) {
-        throw error;
-      }
-
+      console.error('❌ Mock registration failed:', error);
+      if (error instanceof AuthError) throw error;
       throw new AuthError('UNKNOWN_ERROR', 'An unexpected error occurred');
     }
   },
