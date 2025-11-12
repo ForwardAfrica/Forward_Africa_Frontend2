@@ -1129,62 +1129,38 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-    if (!apiKey) {
-      console.error('Missing Firebase API key in environment');
-      return res.status(500).json({ error: 'Server misconfiguration' });
-    }
-
-    // Verify password with Firebase Auth REST API
-    const verifyUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
-    const verifyResp = await fetch(verifyUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, returnSecureToken: true })
-    });
-
-    if (!verifyResp.ok) {
-      const errBody = await verifyResp.json().catch(() => ({}));
-      console.warn('Firebase verify failed:', errBody);
+    // Get user with password hash from DB
+    const [user] = await executeQuery('SELECT * FROM users WHERE email = ?', [email]);
+    if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const verifyData = await verifyResp.json();
-    const uid = verifyData.localId;
-
-    // Ensure local DB user exists; if not, create a basic record
-    const [user] = await executeQuery('SELECT * FROM users WHERE id = ? OR email = ?', [uid, email]);
-    if (!user) {
-      // Create a DB record for this Firebase user
-      const id = uid;
-      const full_name = verifyData.displayName || '';
-      await executeQuery(
-        'INSERT INTO users (id, email, full_name, role, onboarding_completed, is_active) VALUES (?, ?, ?, ?, ?, ?)',
-        [id, email, full_name, 'user', false, true]
-      );
+    // Check password
+    const validPassword = await bcrypt.compare(password, user.password || '');
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // At this point, load the user from DB to get role and other metadata
-    const [dbUser] = await executeQuery('SELECT * FROM users WHERE id = ? OR email = ?', [uid, email]);
+    // Generate JWT token
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
 
-    // Generate app JWT token and refresh token
-    const token = jwt.sign({ id: dbUser.id, email: dbUser.email, role: dbUser.role }, JWT_SECRET, { expiresIn: '24h' });
-    const refreshToken = jwt.sign({ id: dbUser.id, email: dbUser.email }, JWT_SECRET, { expiresIn: '7d' });
+    // Generate refresh token
+    const refreshToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 
     // Store refresh token in database
-    await executeQuery('UPDATE users SET refresh_token = ? WHERE id = ?', [refreshToken, dbUser.id]);
+    await executeQuery('UPDATE users SET refresh_token = ? WHERE id = ?', [refreshToken, user.id]);
 
     res.json({
       token,
       refreshToken,
       user: {
-        id: dbUser.id,
-        email: dbUser.email,
-        full_name: dbUser.full_name,
-        role: dbUser.role,
-        avatar_url: dbUser.avatar_url,
-        onboarding_completed: dbUser.onboarding_completed,
-        permissions: []
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
+        role: user.role,
+        avatar_url: user.avatar_url,
+        onboarding_completed: user.onboarding_completed,
+        permissions: [] // Add empty permissions array for now
       },
       message: 'Login successful'
     });
