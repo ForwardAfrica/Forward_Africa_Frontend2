@@ -6,44 +6,23 @@ import { Course, Category, Instructor, User, UserProgress, Certificate, Achievem
 
 // Generic API request function with authentication
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const url = `${API_BASE_URL}${endpoint}`;
+  // Backend removed — return mock data to keep UI functional.
+  console.warn('API request intercepted (backend removed). Returning mock for:', endpoint, options?.method || 'GET');
 
-  // Check if we're on the client side before accessing localStorage
-  const token = typeof window !== 'undefined' ? localStorage.getItem('forward_africa_token') : null;
+  const method = (options.method || 'GET').toUpperCase();
 
-  const defaultOptions: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
-  };
-
-  try {
-    const response = await fetch(url, defaultOptions);
-
-    if (response.status === 401) {
-      // Clear auth data and redirect to login (only on client side)
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('forward_africa_token');
-        localStorage.removeItem('forward_africa_user');
-        window.location.href = '/login';
-      }
-      throw new Error('Authentication required');
+  // Heuristic mocks
+  // List endpoints -> return empty array
+  if (/\/(users|courses|categories|instructors|lessons)(?:$|\?|\/|$)/.test(endpoint)) {
+    if (/\/(users|courses)\/[^/]+/.test(endpoint)) {
+      // single resource
+      return null;
     }
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('API request failed:', error);
-    throw error;
+    return [];
   }
+
+  if (method === 'GET') return null;
+  return { success: true };
 };
 
 // User API
