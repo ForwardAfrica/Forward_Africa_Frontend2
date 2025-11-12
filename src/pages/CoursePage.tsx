@@ -45,6 +45,13 @@ const CoursePage: React.FC = () => {
     setIsClient(true);
   }, []);
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
   // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
