@@ -108,7 +108,7 @@ export default function CourseIndex() {
     };
 
     fetchAndRedirect();
-  }, [router, authLoading, isAuthenticated]);
+  }, [router, authLoading, isAuthenticated, hasCheckedToken]);
 
   // Show loading while fetching and redirecting
   return (
