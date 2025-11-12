@@ -491,7 +491,7 @@ const CoursePage: React.FC = () => {
   // Load completion data from localStorage
 
   // Show blank loading state while checking authentication - prevent showing content to unauthenticated users
-  if (authLoading) {
+  if (!hasCheckedToken || authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
         <div className="text-center">
