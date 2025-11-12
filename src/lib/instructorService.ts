@@ -1,5 +1,6 @@
 import { Instructor } from '../types';
 import { instructorAPI } from './api';
+import { Instructor } from '../types';
 
 export interface InstructorFormData {
   name: string;
@@ -270,13 +271,13 @@ export class InstructorService {
     }
 
     try {
-      const response = await instructorAPI.getInstructor(id);
+      const response: any = await instructorAPI.getInstructor(id);
 
       if (!response || !response.id) {
         throw new InstructorServiceError('Instructor not found', 404, 'NOT_FOUND');
       }
 
-      return response;
+      return response as Instructor;
     } catch (error) {
       if (error instanceof InstructorServiceError) {
         throw error;
@@ -296,16 +297,16 @@ export class InstructorService {
    */
   static async fetchAllInstructors(): Promise<Instructor[]> {
     try {
-      const response = await instructorAPI.getAllInstructors();
+      const response: any = await instructorAPI.getAllInstructors();
 
       if (!Array.isArray(response)) {
         console.warn('Expected array of instructors, received:', typeof response);
         return [];
       }
 
-      return response.filter(instructor =>
+      return (response as any[]).filter((instructor: any) =>
         instructor && instructor.id && instructor.name && instructor.email
-      );
+      ) as Instructor[];
     } catch (error) {
       console.error('Error fetching instructors:', error);
       throw new InstructorServiceError(
@@ -327,13 +328,13 @@ export class InstructorService {
     }
 
     try {
-      const response = await instructorAPI.createInstructor(data);
+      const response: any = await instructorAPI.createInstructor(data);
 
       if (!response || !response.id) {
         throw new InstructorServiceError('Failed to create instructor', 500, 'CREATE_ERROR');
       }
 
-      return response;
+      return response as Instructor;
     } catch (error) {
       if (error instanceof InstructorServiceError) {
         throw error;
@@ -382,13 +383,13 @@ export class InstructorService {
     }
 
     try {
-      const response = await instructorAPI.updateInstructor(id, data);
+      const response: any = await instructorAPI.updateInstructor(id, data);
 
       if (!response || !response.id) {
         throw new InstructorServiceError('Failed to update instructor', 500, 'UPDATE_ERROR');
       }
 
-      return response;
+      return response as Instructor;
     } catch (error) {
       if (error instanceof InstructorServiceError) {
         throw error;
