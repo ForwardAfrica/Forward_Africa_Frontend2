@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import CourseCard from '../components/ui/CourseCard';
 import { courseAPI, categoryAPI } from '../lib/api';
