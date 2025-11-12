@@ -299,7 +299,7 @@ export const useAuditLogs = () => {
     setError(null);
 
     try {
-      console.log('📋 Fetching audit logs...');
+      console.log('��� Fetching audit logs...');
       const data = await auditLogsAPI.getAuditLogs(filters);
       console.log('📋 Audit logs received:', data);
 
@@ -352,7 +352,28 @@ export const useCategories = () => {
 
     try {
       const data = await categoryAPI.getAllCategories();
-      setCategories(data);
+
+      // Normalize different possible response shapes from apiRequest/mocked backend
+      // Possible shapes: Category[], null, { success: boolean } or { data: Category[] }
+      let categoriesArray: Category[] = [];
+
+      if (Array.isArray(data)) {
+        categoriesArray = data as Category[];
+      } else if (data && typeof data === 'object') {
+        // If the API returns an object with a `data` or `categories` property
+        if (Array.isArray((data as any).data)) {
+          categoriesArray = (data as any).data as Category[];
+        } else if (Array.isArray((data as any).categories)) {
+          categoriesArray = (data as any).categories as Category[];
+        } else {
+          // fallback: leave as empty array
+          categoriesArray = [];
+        }
+      } else {
+        categoriesArray = [];
+      }
+
+      setCategories(categoriesArray);
     } catch (err) {
       console.error('Failed to fetch categories:', err);
       setError('Failed to load categories');
