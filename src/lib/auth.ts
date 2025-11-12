@@ -262,12 +262,11 @@ export const authService = {
     }
   },
 
-  // Enhanced login with better error handling
+  // Enhanced login (mocked for frontend-only UI)
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     try {
-      console.log('🔐 Attempting login...');
+      console.log('🔐 Mock login (frontend-only UI)');
 
-      // Validate credentials
       if (!credentials.email || !credentials.password) {
         throw new AuthError('MISSING_CREDENTIALS', 'Email and password are required');
       }
@@ -276,62 +275,40 @@ export const authService = {
         throw new AuthError('INVALID_EMAIL', 'Please enter a valid email address');
       }
 
-      if (credentials.password.length < 6) {
-        throw new AuthError('WEAK_PASSWORD', 'Password must be at least 6 characters long');
-      }
+      // Create a simple mock JWT token payload
+      const payload = {
+        id: credentials.email,
+        role: 'user',
+        exp: Math.floor(Date.now() / 1000) + 24 * 3600
+      };
 
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
+      const base64Payload = (typeof window !== 'undefined' && typeof btoa === 'function')
+        ? btoa(JSON.stringify(payload))
+        : Buffer.from(JSON.stringify(payload)).toString('base64');
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      const token = `mock.${base64Payload}.sig`;
+      const refreshToken = `mock-refresh-${Date.now()}`;
 
-        // Handle specific error codes
-        switch (response.status) {
-          case 400:
-            throw new AuthError('INVALID_CREDENTIALS', errorData.error || 'Invalid credentials');
-          case 401:
-            throw new AuthError('UNAUTHORIZED', errorData.error || 'Invalid email or password');
-          case 403:
-            throw new AuthError('ACCOUNT_SUSPENDED', errorData.error || 'Account is suspended');
-          case 429:
-            throw new AuthError('RATE_LIMITED', errorData.error || 'Too many login attempts');
-          case 500:
-            throw new AuthError('SERVER_ERROR', 'Internal server error. Please try again later.');
-          default:
-            throw new AuthError('LOGIN_FAILED', errorData.error || 'Login failed');
-        }
-      }
+      const user: AuthUser = {
+        id: payload.id,
+        email: credentials.email,
+        full_name: '',
+        role: 'user',
+        permissions: [],
+        onboarding_completed: false
+      };
 
-      const data: AuthResponse = await response.json();
+      authService.setAuthData(token, refreshToken, user);
 
-      // Validate response data
-      if (!data.token || !data.refreshToken || !data.user) {
-        throw new AuthError('INVALID_RESPONSE', 'Invalid response from server');
-      }
-
-      // Store auth data
-      authService.setAuthData(data.token, data.refreshToken, data.user);
-
-      console.log('✅ Login successful');
-      return data;
+      return {
+        token,
+        refreshToken,
+        user,
+        message: 'Logged in (mock)'
+      };
     } catch (error) {
-      console.error('❌ Login failed:', error);
-
-      if (error instanceof AuthError) {
-        throw error;
-      }
-
-      // Handle network errors
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new AuthError('NETWORK_ERROR', 'Network error. Please check your connection.');
-      }
-
+      console.error('❌ Mock login failed:', error);
+      if (error instanceof AuthError) throw error;
       throw new AuthError('UNKNOWN_ERROR', 'An unexpected error occurred');
     }
   },
