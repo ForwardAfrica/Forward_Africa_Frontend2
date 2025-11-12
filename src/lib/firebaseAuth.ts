@@ -112,12 +112,39 @@ const convertFirebaseUser = async (firebaseUser: User): Promise<FirebaseUser> =>
       };
 
       // Save to Firestore
-      await setDoc(doc(db, 'users', firebaseUser.uid), defaultUser);
+      try {
+        await setDoc(doc(db, 'users', firebaseUser.uid), defaultUser);
+      } catch (writeError: any) {
+        // If write fails due to permissions, return the default user anyway
+        // The user can still use the app, and the document will be created on next update
+        console.warn('⚠️ Could not create user document in Firestore:', writeError);
+        if (writeError.code !== 'permission-denied') {
+          throw writeError;
+        }
+      }
       return defaultUser;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error converting Firebase user:', error);
-    throw new FirebaseAuthError('USER_CONVERSION_FAILED', 'Failed to convert user data');
+
+    // If it's a permission error, return a minimal user object
+    if (error.code === 'permission-denied' || error.message?.includes('permission')) {
+      console.warn('⚠️ Permission denied when accessing user document. Returning minimal user data.');
+      return {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: firebaseUser.displayName,
+        photoURL: firebaseUser.photoURL,
+        emailVerified: firebaseUser.emailVerified,
+        role: 'user',
+        permissions: [],
+        onboarding_completed: false,
+        created_at: null,
+        updated_at: null
+      };
+    }
+
+    throw new FirebaseAuthError('USER_CONVERSION_FAILED', error.message || 'Failed to convert user data', error);
   }
 };
 

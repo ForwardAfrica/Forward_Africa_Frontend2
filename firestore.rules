@@ -7,15 +7,18 @@ service cloud.firestore {
     }
 
     function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return userDoc != null && userDoc.data != null ? userDoc.data.role : null;
     }
 
     function isAdmin() {
-      return getUserRole() in ['admin', 'super_admin'];
+      let role = getUserRole();
+      return role != null && role in ['admin', 'super_admin'];
     }
 
     function canManageCourses() {
-      return getUserRole() in ['content_manager', 'admin', 'super_admin'];
+      let role = getUserRole();
+      return role != null && role in ['content_manager', 'admin', 'super_admin'];
     }
 
     function isOwner(userId) {
@@ -24,9 +27,13 @@ service cloud.firestore {
 
     // User profiles
     match /users/{userId} {
-      allow read, write: if isAuthenticated() && isOwner(userId);
-      allow read: if isAuthenticated() && isAdmin();
-      allow write: if isAuthenticated() && isAdmin();
+      // Allow users to read and create their own document
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId);
+      // Allow users to update their own document
+      allow update: if isAuthenticated() && isOwner(userId);
+      // Admins can read and write any user document
+      allow read, write: if isAuthenticated() && isAdmin();
     }
 
     // Courses
