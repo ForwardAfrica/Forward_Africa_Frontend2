@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Permission, UserRole, ROLE_PERMISSIONS } from '../types';
 import { hasPermission as checkPermission, hasAnyPermission, hasAllPermissions } from '../types';
-import { useFirebaseAuth } from './FirebaseAuthContext';
+import { useAuth } from './AuthContext';
 
 interface PermissionContextType {
   userRole: UserRole;
