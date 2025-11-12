@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { useRouter } from 'next/router';
 import { authService, AuthUser, LoginCredentials, RegisterData } from '../lib/auth';
 import { useFirebaseAuth } from './FirebaseAuthContext';
+import { firebaseAuthService, FirebaseUser as FBUser } from '../lib/firebaseAuth';
 
 interface AuthContextType {
   user: AuthUser | null;
