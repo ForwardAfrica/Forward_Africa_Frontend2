@@ -20,12 +20,13 @@ export const useCourses = () => {
     try {
       console.log('📡 useDatabase: Making API call to getAllCourses...');
       const data = await courseAPI.getAllCourses(includeComingSoon);
-      const dataArray = Array.isArray(data) ? data : [];
+      const dataArray: any[] = Array.isArray(data) ? (data as any[]) : ([] as any[]);
+      const first = dataArray[0] as any | undefined;
       console.log('✅ useDatabase: API call successful, received data:', {
         dataLength: dataArray.length,
         dataType: typeof data,
         isArray: Array.isArray(data),
-        firstItem: dataArray[0] ? { id: dataArray[0].id, title: dataArray[0].title, coming_soon: dataArray[0].coming_soon } : null
+        firstItem: first ? { id: first.id, title: first.title, coming_soon: first.coming_soon } : null
       });
 
       // Transform backend data to frontend format with dual fallback logic
@@ -162,7 +163,7 @@ export const useCourses = () => {
   const fetchFeaturedCourses = useCallback(async () => {
     try {
       const data = await courseAPI.getFeaturedCourses();
-      const dataArray = Array.isArray(data) ? data : [];
+      const dataArray: any[] = Array.isArray(data) ? (data as any[]) : ([] as any[]);
 
       // Transform backend data to frontend format with dual fallback logic
       const transformedCourses = dataArray.map((course: any) => {
