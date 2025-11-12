@@ -103,8 +103,9 @@ export const authService = {
   // Check if token exists and is valid
   hasValidToken(): boolean {
     if (typeof document === 'undefined') return false;
-    
-    const token = this.getTokenFromCookie();
+
+    // Check cookie first, then fallback to localStorage
+    const token = this.getToken();
     if (!token) return false;
 
     return !jwtUtils.isTokenExpired(token);
@@ -124,14 +125,33 @@ export const authService = {
     return null;
   },
 
-  // Get token for API requests (from cookie)
+  // Get token from localStorage (backup)
+  getTokenFromStorage(): string | null {
+    if (typeof localStorage === 'undefined') return null;
+    return localStorage.getItem('auth_token');
+  },
+
+  // Set token in localStorage
+  setTokenInStorage(token: string): void {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem('auth_token', token);
+  },
+
+  // Clear token from localStorage
+  clearTokenFromStorage(): void {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.removeItem('auth_token');
+  },
+
+  // Get token for API requests (from cookie, fallback to storage)
   getToken(): string | null {
-    return this.getTokenFromCookie();
+    return this.getTokenFromCookie() || this.getTokenFromStorage();
   },
 
   // Parse token to get user data
   getUserFromToken(): AuthUser | null {
-    const token = this.getTokenFromCookie();
+    // Try cookie first, then fallback to localStorage
+    const token = this.getToken();
     if (!token) return null;
 
     try {
@@ -196,6 +216,11 @@ export const authService = {
       const data: AuthResponse = await response.json();
       console.log('✅ AuthService: Login successful');
 
+      // Store token in localStorage for persistence across hard refresh
+      if (data.token) {
+        this.setTokenInStorage(data.token);
+      }
+
       return data;
     } catch (error) {
       console.error('❌ AuthService: Login error:', error);
@@ -243,6 +268,11 @@ export const authService = {
 
       const data: AuthResponse = await response.json();
       console.log('✅ AuthService: Registration successful');
+
+      // Store token in localStorage for persistence across hard refresh
+      if (data.token) {
+        this.setTokenInStorage(data.token);
+      }
 
       return data;
     } catch (error) {
@@ -295,6 +325,11 @@ export const authService = {
       const data: AuthResponse = await response.json();
       console.log('✅ AuthService: Token refreshed');
 
+      // Store refreshed token in localStorage
+      if (data.token) {
+        this.setTokenInStorage(data.token);
+      }
+
       return data;
     } catch (error) {
       console.error('❌ AuthService: Token refresh error:', error);
@@ -315,9 +350,14 @@ export const authService = {
         console.warn('⚠️ Logout endpoint failed');
       });
 
+      // Clear token from storage
+      this.clearTokenFromStorage();
+
       console.log('✅ AuthService: Logout completed');
     } catch (error) {
       console.warn('⚠️ AuthService: Logout error:', error);
+      // Still clear token even if logout fails
+      this.clearTokenFromStorage();
     }
   },
 
@@ -328,7 +368,7 @@ export const authService = {
 
   // Get token expiry time in milliseconds
   getTokenExpiryMs(): number | null {
-    const token = this.getTokenFromCookie();
+    const token = this.getToken();
     if (!token) return null;
     return jwtUtils.getTokenExpiry(token);
   },
@@ -347,7 +387,7 @@ export const authService = {
 
   // Get token status
   getTokenStatus(): { isValid: boolean; isExpired: boolean; timeUntilExpiry: number | null } {
-    const token = this.getTokenFromCookie();
+    const token = this.getToken();
 
     if (!token) {
       return { isValid: false, isExpired: true, timeUntilExpiry: 0 };
