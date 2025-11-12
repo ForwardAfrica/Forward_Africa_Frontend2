@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app'
 import { useEffect, useState } from 'react'
-import { FirebaseAuthProvider } from '../src/contexts/FirebaseAuthContext'
+import { AuthProvider } from '../src/contexts/AuthContext'
 import { PermissionProvider } from '../src/contexts/PermissionContext'
 import { TokenStatusIndicator } from '../src/components/ui/TokenStatusIndicator'
 import GlobalErrorBoundary from '../src/components/ui/GlobalErrorBoundary'
@@ -104,13 +104,12 @@ const ClientOnlyComponents = () => {
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <GlobalErrorBoundary>
-      <FirebaseAuthProvider>
+      <AuthProvider>
         <PermissionProvider>
-          <FirebaseAuthInitializer />
           <Component {...pageProps} />
           <ClientOnlyComponents />
         </PermissionProvider>
-      </FirebaseAuthProvider>
+      </AuthProvider>
     </GlobalErrorBoundary>
   )
 }
