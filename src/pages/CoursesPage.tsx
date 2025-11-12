@@ -4,6 +4,7 @@ import Layout from '../components/layout/Layout';
 import CourseCard from '../components/ui/CourseCard';
 import { useCourses } from '../hooks/useDatabase';
 import { useAuth } from '../contexts/AuthContext';
+import { hasValidToken } from '../lib/tokenValidator';
 import { Course } from '../types';
 
 const CoursesPage: React.FC = () => {
@@ -12,13 +13,23 @@ const CoursesPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasCheckedToken, setHasCheckedToken] = useState(false);
 
-  // Redirect to login if not authenticated - before rendering anything
+  // Check token synchronously on mount - redirect immediately if no valid token
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (!hasValidToken()) {
+      router.replace('/login');
+      return;
+    }
+    setHasCheckedToken(true);
+  }, [router]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (hasCheckedToken && !authLoading && !isAuthenticated) {
       router.replace('/login');
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [isAuthenticated, authLoading, router, hasCheckedToken]);
 
   // Database hooks - same as HomePage
   const {
