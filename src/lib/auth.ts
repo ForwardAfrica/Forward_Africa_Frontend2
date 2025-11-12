@@ -138,6 +138,11 @@ export const authService = {
           localStorage.setItem(TOKEN_EXPIRY_KEY, expiryTime.toString());
         }
 
+        // Store session timestamps for client-side session policy
+        const now = Date.now();
+        localStorage.setItem('forward_africa_session_start', now.toString());
+        localStorage.setItem('forward_africa_last_activity', now.toString());
+
         console.log('✅ Auth data stored successfully');
       } catch (error) {
         console.error('❌ Failed to store auth data:', error);
