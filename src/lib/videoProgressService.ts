@@ -1,5 +1,6 @@
 import { VideoProgress, VideoAnalytics } from '../types';
 import { apiRequest } from './api';
+import { VideoAnalytics } from '../types';
 
 interface ResumePoint {
   resumeTimeSeconds: number;
@@ -152,8 +153,11 @@ class VideoProgressService {
    */
   async getResumePoint(courseId: string, lessonId: string): Promise<ResumePoint> {
     try {
-      const resumePoint = await apiRequest(`/video-progress/resume-points/${courseId}/${lessonId}`);
-      return resumePoint;
+      const resumePoint: any = await apiRequest(`/video-progress/resume-points/${courseId}/${lessonId}`);
+      if (resumePoint && typeof resumePoint === 'object' && 'resumeTimeSeconds' in resumePoint) {
+        return resumePoint as ResumePoint;
+      }
+      return { resumeTimeSeconds: 0, bufferTimeSeconds: 10 };
     } catch (error) {
       console.error('Error fetching resume point:', error);
       return { resumeTimeSeconds: 0, bufferTimeSeconds: 10 };
@@ -165,8 +169,19 @@ class VideoProgressService {
    */
   async getVideoAnalytics(courseId: string, lessonId: string): Promise<VideoAnalytics> {
     try {
-      const analytics = await apiRequest(`/video-progress/analytics/${courseId}/${lessonId}`);
-      return analytics;
+      const analytics: any = await apiRequest(`/video-progress/analytics/${courseId}/${lessonId}`);
+      if (analytics && typeof analytics === 'object' &&
+          typeof analytics.totalSessions === 'number' &&
+          typeof analytics.totalWatchTime === 'number') {
+        return analytics as VideoAnalytics;
+      }
+      return {
+        totalSessions: 0,
+        totalWatchTime: 0,
+        averageSessionDuration: 0,
+        completionRate: 0,
+        engagementScore: 0
+      };
     } catch (error) {
       console.error('Error fetching video analytics:', error);
       return {
