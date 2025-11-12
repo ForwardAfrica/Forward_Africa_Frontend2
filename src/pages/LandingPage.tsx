@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ChevronRight, Brain, Users, TrendingUp, Globe } from 'lucide-react';
