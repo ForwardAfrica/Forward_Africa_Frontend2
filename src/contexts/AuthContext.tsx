@@ -200,6 +200,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login(credentials);
       setUser(response.user);
       console.log('✅ AuthContext: Sign in successful');
+
+      // Redirect to the page user came from, or home if none specified
+      setTimeout(() => {
+        const redirectPath = router.query.redirect as string;
+        if (redirectPath && !['/login', '/register'].includes(redirectPath)) {
+          router.push(redirectPath);
+        } else {
+          router.push('/home');
+        }
+      }, 100);
     } catch (error) {
       console.error('❌ AuthContext: Sign in error:', error);
 
