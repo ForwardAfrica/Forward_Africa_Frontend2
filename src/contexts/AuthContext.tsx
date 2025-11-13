@@ -168,15 +168,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user, loading, isClient, router]);
 
-  // Redirect authenticated users from auth pages
+  // Redirect authenticated users from auth pages (only after successful sign in)
   useEffect(() => {
     if (!isClient || loading) return;
 
     const authPages = ['/login', '/register'];
     const currentPath = router.pathname;
 
+    // Only redirect if user came from a successful sign in action
+    // Check if there's a redirect query param - if so, redirect to that instead
     if (user && authPages.some(p => currentPath === p)) {
-      router.replace('/home');
+      const redirectPath = router.query.redirect as string;
+      if (redirectPath && !authPages.some(p => redirectPath === p || redirectPath.startsWith(p))) {
+        router.replace(redirectPath);
+      } else if (redirectPath !== currentPath) {
+        // Only redirect if user is on auth page and wasn't redirected there by auth flow
+        // If they're on /login, stay there unless they specifically tried to access a protected page first
+        if (router.query.redirect) {
+          router.replace(redirectPath || '/home');
+        }
+      }
     }
   }, [user, loading, isClient, router]);
 
