@@ -209,9 +209,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const db = admin.firestore();
       const userDoc = await db.collection('users').doc(userRecord.uid).get();
 
+      console.log('🔍 Firestore user lookup:', { uid: userRecord.uid, exists: userDoc.exists, data: userDoc.data() });
+
       if (userDoc.exists) {
         const data = userDoc.data();
         let rawRole = data?.role || 'user';
+        console.log('📋 User document found:', { rawRole, userData: data });
 
         // Normalize role to system format (convert to lowercase and map aliases)
         const normalizeRole = (role: string): string => {
