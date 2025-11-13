@@ -61,34 +61,54 @@ export class AuthError extends Error {
 // JWT Token utilities for client-side verification
 const jwtUtils = {
   base64UrlDecode(str: string): string {
+    // Prepare base64url string for decoding
+    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+
+    // Add padding
+    const paddingNeeded = 4 - (base64.length % 4);
+    if (paddingNeeded && paddingNeeded !== 4) {
+      base64 += '='.repeat(paddingNeeded);
+    }
+
     // Handle both browser and Node.js environments
     if (typeof window !== 'undefined' && window.atob) {
       // Browser environment
-      const decoded = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
-      return decodeURIComponent(
-        decoded
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
+      try {
+        const decoded = atob(base64);
+        // Handle UTF-8 properly
+        return decodeURIComponent(
+          Array.from(decoded)
+            .map(char => '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+      } catch (e) {
+        console.error('Base64 decode error:', e);
+        throw e;
+      }
     } else {
       // Node.js environment (fallback for server-side)
-      str += new Array(5 - str.length % 4).join('=');
-      return Buffer.from(
-        str.replace(/-/g, '+').replace(/_/g, '/'),
-        'base64'
-      ).toString('utf8');
+      try {
+        return Buffer.from(base64, 'base64').toString('utf8');
+      } catch (e) {
+        console.error('Buffer decode error:', e);
+        throw e;
+      }
     }
   },
 
   parseToken(token: string): any {
     try {
-      const payload = token.split('.')[1];
-      if (!payload) throw new Error('Invalid token');
-      return JSON.parse(jwtUtils.base64UrlDecode(payload));
+      const parts = token.split('.');
+      if (parts.length !== 3) throw new Error('Invalid JWT format');
+
+      const payload = parts[1];
+      if (!payload) throw new Error('Missing payload');
+
+      const decoded = jwtUtils.base64UrlDecode(payload);
+      return JSON.parse(decoded);
     } catch (error) {
       console.error('JWT Parse Error:', error);
-      throw new AuthError('INVALID_TOKEN', 'Invalid token format');
+      throw new AuthError('INVALID_TOKEN', `Invalid token format: ${(error as any).message}`);
     }
   },
 
