@@ -11,7 +11,14 @@ const parseJWT = (token: string): any => {
     let decoded = payload.replace(/-/g, '+').replace(/_/g, '/');
     decoded += new Array(5 - (decoded.length % 4)).join('=');
 
-    return JSON.parse(Buffer.from(decoded, 'base64').toString('utf8'));
+    // Use atob for browser compatibility
+    if (typeof window !== 'undefined' && window.atob) {
+      return JSON.parse(window.atob(decoded));
+    } else if (typeof Buffer !== 'undefined') {
+      return JSON.parse(Buffer.from(decoded, 'base64').toString('utf8'));
+    }
+
+    return null;
   } catch (error) {
     return null;
   }
