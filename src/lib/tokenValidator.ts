@@ -4,23 +4,36 @@
 
 const parseJWT = (token: string): any => {
   try {
-    const payload = token.split('.')[1];
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const payload = parts[1];
     if (!payload) return null;
 
-    // Decode base64 with URL-safe padding
-    let decoded = payload.replace(/-/g, '+').replace(/_/g, '/');
+    // Prepare base64url string for decoding
+    let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+
+    // Add padding
+    const paddingNeeded = 4 - (base64.length % 4);
+    if (paddingNeeded && paddingNeeded !== 4) {
+      base64 += '='.repeat(paddingNeeded);
+    }
 
     // Browser-only solution using atob
     if (typeof window !== 'undefined' && window.atob) {
-      const decodedString = atob(decoded);
-      return JSON.parse(
-        decodeURIComponent(
-          decodedString
-            .split('')
+      try {
+        const decodedString = atob(base64);
+        // Handle UTF-8 properly
+        const utf8String = decodeURIComponent(
+          Array.from(decodedString)
             .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
             .join('')
-        )
-      );
+        );
+        return JSON.parse(utf8String);
+      } catch (e) {
+        console.error('Token parse error:', e);
+        return null;
+      }
     }
 
     return null;
