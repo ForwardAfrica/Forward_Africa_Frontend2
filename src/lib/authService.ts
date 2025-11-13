@@ -268,10 +268,8 @@ export const authService = {
       const data: AuthResponse = await response.json();
       console.log('✅ AuthService: Registration successful');
 
-      // Store token in localStorage for persistence across hard refresh
-      if (data.token) {
-        this.setTokenInStorage(data.token);
-      }
+      // Token is stored in cookies by the server
+      // No need to store in localStorage - use cookies only for security
 
       return data;
     } catch (error) {
