@@ -61,20 +61,54 @@ export class AuthError extends Error {
 // JWT Token utilities for client-side verification
 const jwtUtils = {
   base64UrlDecode(str: string): string {
-    str += new Array(5 - str.length % 4).join('=');
-    return Buffer.from(
-      str.replace(/-/g, '+').replace(/_/g, '/'),
-      'base64'
-    ).toString('utf8');
+    // Prepare base64url string for decoding
+    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+
+    // Add padding
+    const paddingNeeded = 4 - (base64.length % 4);
+    if (paddingNeeded && paddingNeeded !== 4) {
+      base64 += '='.repeat(paddingNeeded);
+    }
+
+    // Handle both browser and Node.js environments
+    if (typeof window !== 'undefined' && window.atob) {
+      // Browser environment
+      try {
+        const decoded = atob(base64);
+        // Handle UTF-8 properly
+        return decodeURIComponent(
+          Array.from(decoded)
+            .map(char => '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+      } catch (e) {
+        console.error('Base64 decode error:', e);
+        throw e;
+      }
+    } else {
+      // Node.js environment (fallback for server-side)
+      try {
+        return Buffer.from(base64, 'base64').toString('utf8');
+      } catch (e) {
+        console.error('Buffer decode error:', e);
+        throw e;
+      }
+    }
   },
 
   parseToken(token: string): any {
     try {
-      const payload = token.split('.')[1];
-      if (!payload) throw new Error('Invalid token');
-      return JSON.parse(jwtUtils.base64UrlDecode(payload));
+      const parts = token.split('.');
+      if (parts.length !== 3) throw new Error('Invalid JWT format');
+
+      const payload = parts[1];
+      if (!payload) throw new Error('Missing payload');
+
+      const decoded = jwtUtils.base64UrlDecode(payload);
+      return JSON.parse(decoded);
     } catch (error) {
-      throw new AuthError('INVALID_TOKEN', 'Invalid token format');
+      console.error('JWT Parse Error:', error);
+      throw new AuthError('INVALID_TOKEN', `Invalid token format: ${(error as any).message}`);
     }
   },
 
@@ -117,41 +151,49 @@ export const authService = {
 
     const cookies = document.cookie.split(';');
     for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'auth_token' && value) {
-        return decodeURIComponent(value);
+      const trimmed = cookie.trim();
+      if (trimmed.startsWith('auth_token=')) {
+        const value = trimmed.substring('auth_token='.length);
+        if (value) {
+          try {
+            return decodeURIComponent(value);
+          } catch (e) {
+            return value;
+          }
+        }
       }
     }
     return null;
   },
 
-  // Get token from localStorage (backup)
+  // Get token from localStorage (deprecated - use cookies only)
   getTokenFromStorage(): string | null {
-    if (typeof localStorage === 'undefined') return null;
-    return localStorage.getItem('auth_token');
+    // Deprecated: Only use cookies for authentication
+    return null;
   },
 
-  // Set token in localStorage
+  // Set token in localStorage (deprecated - use cookies only)
   setTokenInStorage(token: string): void {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem('auth_token', token);
+    // Deprecated: Tokens are now stored in cookies only
+    // This method is kept for backward compatibility but does nothing
   },
 
-  // Clear token from localStorage
+  // Clear token from localStorage (deprecated)
   clearTokenFromStorage(): void {
+    // Deprecated: Tokens are stored in cookies only
     if (typeof localStorage === 'undefined') return;
     localStorage.removeItem('auth_token');
   },
 
-  // Get token for API requests (from cookie, fallback to storage)
+  // Get token for API requests (from cookies only)
   getToken(): string | null {
-    return this.getTokenFromCookie() || this.getTokenFromStorage();
+    return this.getTokenFromCookie();
   },
 
   // Parse token to get user data
   getUserFromToken(): AuthUser | null {
-    // Try cookie first, then fallback to localStorage
-    const token = this.getToken();
+    // Use cookies only for token retrieval
+    const token = this.getTokenFromCookie();
     if (!token) return null;
 
     try {
@@ -216,10 +258,8 @@ export const authService = {
       const data: AuthResponse = await response.json();
       console.log('✅ AuthService: Login successful');
 
-      // Store token in localStorage for persistence across hard refresh
-      if (data.token) {
-        this.setTokenInStorage(data.token);
-      }
+      // Token is stored in cookies by the server
+      // No need to store in localStorage - use cookies only for security
 
       return data;
     } catch (error) {
@@ -269,10 +309,8 @@ export const authService = {
       const data: AuthResponse = await response.json();
       console.log('✅ AuthService: Registration successful');
 
-      // Store token in localStorage for persistence across hard refresh
-      if (data.token) {
-        this.setTokenInStorage(data.token);
-      }
+      // Token is stored in cookies by the server
+      // No need to store in localStorage - use cookies only for security
 
       return data;
     } catch (error) {
@@ -325,10 +363,7 @@ export const authService = {
       const data: AuthResponse = await response.json();
       console.log('✅ AuthService: Token refreshed');
 
-      // Store refreshed token in localStorage
-      if (data.token) {
-        this.setTokenInStorage(data.token);
-      }
+      // Token is stored in cookies by the server - no localStorage needed
 
       return data;
     } catch (error) {

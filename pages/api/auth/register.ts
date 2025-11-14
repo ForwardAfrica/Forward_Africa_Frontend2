@@ -197,10 +197,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const jwtToken = JWTManager.createToken(tokenPayload);
     const tokenExpiryMs = JWTManager.getTokenExpiry();
 
-    // Set JWT token in HTTP-only cookie
+    // Set JWT token in cookie (accessible to JavaScript for security checks)
     const cookieOptions = [
       'Path=/',
-      'HttpOnly',
       'SameSite=Strict',
       `Max-Age=${tokenExpiryMs / 1000}`,
       process.env.NODE_ENV === 'production' ? 'Secure' : ''

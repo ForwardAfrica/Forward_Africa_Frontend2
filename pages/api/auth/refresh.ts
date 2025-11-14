@@ -109,11 +109,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     initFirebaseAdmin();
 
-    // Get token from cookie or request body
-    const token = req.cookies.auth_token || req.body.token;
+    // Get token from cookie only (secure approach)
+    const token = req.cookies.auth_token;
 
     if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+      return res.status(401).json({ error: 'No token provided - authentication required' });
     }
 
     // Verify and decode the token
@@ -162,7 +162,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Set new token in cookie
     const cookieOptions = [
       'Path=/',
-      'HttpOnly',
       'SameSite=Strict',
       `Max-Age=${tokenExpiryMs / 1000}`,
       process.env.NODE_ENV === 'production' ? 'Secure' : ''

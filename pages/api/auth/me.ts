@@ -81,18 +81,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     initFirebaseAdmin();
 
-    // Get token from cookie or Authorization header
-    let token = req.cookies.auth_token;
+    // Get token from cookie only (secure approach)
+    const token = req.cookies.auth_token;
 
     if (!token) {
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-      }
-    }
-
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+      return res.status(401).json({ error: 'No token provided - authentication required' });
     }
 
     // Verify token

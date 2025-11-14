@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
-import { hasValidToken } from '@/lib/tokenValidator';
+import { validateTokenInCookie } from '@/lib/validateToken';
 
 export default function CourseIndex() {
   const router = useRouter();
@@ -9,9 +9,11 @@ export default function CourseIndex() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCheckedToken, setHasCheckedToken] = useState(false);
 
-  // Check token synchronously on mount - redirect immediately if no valid token
+  // Check token on mount - redirect immediately if no valid token in cookie
   useEffect(() => {
-    if (!hasValidToken()) {
+    const isTokenValid = validateTokenInCookie();
+    if (!isTokenValid) {
+      console.log('No valid token, redirecting to login');
       router.replace('/login');
       return;
     }

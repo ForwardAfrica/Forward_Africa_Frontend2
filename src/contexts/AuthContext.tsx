@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
   const router = useRouter();
 
   // Check authentication status
@@ -47,30 +48,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       console.log('🔍 AuthContext: Checking authentication status...');
 
-      if (!authService.hasValidToken()) {
-        console.log('🔍 AuthContext: No valid token found');
+      // First, check if there's a token in the cookie
+      const token = authService.getTokenFromCookie();
+      if (!token) {
+        console.log('🔍 AuthContext: No token in cookie');
         setUser(null);
+        setLoading(false);
         return;
       }
 
-      // Try to get user from token first
-      const tokenUser = authService.getUserFromToken();
-      if (tokenUser) {
-        console.log('✅ AuthContext: User loaded from token:', tokenUser.email);
-        setUser(tokenUser);
+      console.log('✅ AuthContext: Token found in cookie, fetching user profile...');
+
+      // Fetch user profile from server
+      try {
+        const profileUser = await authService.getProfile();
+        console.log('✅ AuthContext: User profile loaded:', profileUser.email);
+        setUser(profileUser);
         setError(null);
-        return;
+      } catch (error) {
+        console.error('❌ AuthContext: Failed to fetch profile:', error);
+        // Token might be invalid or expired, clear it
+        setUser(null);
       }
-
-      // If no user from token, fetch from server
-      const profileUser = await authService.getProfile();
-      console.log('✅ AuthContext: User profile loaded:', profileUser.email);
-      setUser(profileUser);
-      setError(null);
     } catch (error) {
       console.error('❌ AuthContext: Auth check error:', error);
       setUser(null);
       setError('Authentication check failed');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -161,24 +166,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const publicPaths = ['/', '/login', '/register'];
       const isPublicPath = publicPaths.some(path => currentPath === path || currentPath.startsWith(path));
 
+      // Only redirect if user is on a protected page
+      // Don't redirect from login/register to prevent logout loop
       if (!isPublicPath) {
-        console.log('🚪 AuthContext: Redirecting unauthenticated user');
+        console.log('🚪 AuthContext: Redirecting unauthenticated user from protected page');
         router.push({ pathname: '/login', query: { redirect: currentPath } });
       }
+      // If on a public page like '/', stay there - don't force redirect
     }
   }, [user, loading, isClient, router]);
 
-  // Redirect authenticated users from auth pages
-  useEffect(() => {
-    if (!isClient || loading) return;
-
-    const authPages = ['/login', '/register'];
-    const currentPath = router.pathname;
-
-    if (user && authPages.some(p => currentPath === p)) {
-      router.replace('/home');
-    }
-  }, [user, loading, isClient, router]);
 
   const signIn = async (credentials: LoginCredentials): Promise<void> => {
     try {
@@ -188,7 +185,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const response = await authService.login(credentials);
       setUser(response.user);
-      console.log('✅ AuthContext: Sign in successful');
+      console.log('✅ AuthContext: Sign in successful, user:', response.user);
+
+      // Redirect to home immediately - don't use setTimeout
+      // Browser will automatically send cookie with the request
+      const redirectPath = router.query.redirect as string;
+      if (redirectPath && !['/login', '/register'].includes(redirectPath)) {
+        console.log('📍 Redirecting to:', redirectPath);
+        router.replace(redirectPath);
+      } else {
+        console.log('📍 Redirecting to: /home');
+        router.replace('/home');
+      }
     } catch (error) {
       console.error('❌ AuthContext: Sign in error:', error);
 
@@ -230,6 +238,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.register(data);
       setUser(response.user);
       console.log('✅ AuthContext: Sign up successful');
+
+      // Redirect to home or onboarding page after successful signup
+      setTimeout(() => {
+        router.push('/home');
+      }, 100);
     } catch (error) {
       console.error('❌ AuthContext: Sign up error:', error);
 

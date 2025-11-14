@@ -81,10 +81,24 @@ const jwtUtils = {
   // Parse JWT token without verification (for client-side expiry check)
   parseToken: (token: string): any => {
     try {
-      const payload = token.split('.')[1];
+      const parts = token.split('.');
+      if (parts.length !== 3) throw new Error('Invalid JWT format');
+
+      let payload = parts[1];
+      if (!payload) throw new Error('Missing payload');
+
+      // Handle URL-safe base64 encoding
+      payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+
+      // Add padding if needed
+      const paddingNeeded = 4 - (payload.length % 4);
+      if (paddingNeeded && paddingNeeded !== 4) {
+        payload += '='.repeat(paddingNeeded);
+      }
+
       return JSON.parse(atob(payload));
     } catch (error) {
-      throw new AuthError('INVALID_TOKEN', 'Invalid token format');
+      throw new AuthError('INVALID_TOKEN', `Invalid token format: ${(error as any).message}`);
     }
   },
 

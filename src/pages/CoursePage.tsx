@@ -7,7 +7,7 @@ import Layout from '../components/layout/Layout';
 import { Course, UserProgress, Certificate } from '../types';
 import { useCertificates } from '../hooks/useCertificates';
 import { useAuth } from '../contexts/AuthContext';
-import { hasValidToken } from '../lib/tokenValidator';
+import { validateTokenInCookie } from '../lib/validateToken';
 import { downloadCertificate } from '../utils/certificateGenerator';
 import Image from 'next/image';
 import CourseProgressDashboard from '../components/ui/CourseProgressDashboard';
@@ -47,9 +47,11 @@ const CoursePage: React.FC = () => {
     setIsClient(true);
   }, []);
 
-  // Check token synchronously on mount - redirect immediately if no valid token
+  // Check token on mount - redirect immediately if no valid token in cookie
   useEffect(() => {
-    if (!hasValidToken()) {
+    const isTokenValid = validateTokenInCookie();
+    if (!isTokenValid) {
+      console.log('No valid token, redirecting to login');
       router.replace('/login');
       return;
     }

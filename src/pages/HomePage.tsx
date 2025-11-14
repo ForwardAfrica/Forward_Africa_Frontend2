@@ -9,10 +9,14 @@ import { CourseProgress, Course } from '../types';
 import { Award, Users, Star, BookOpen } from 'lucide-react';
 import { useCourses, useUserProgress, useAnalytics } from '../hooks/useDatabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useProtectedPage } from '../hooks/useProtectedPage';
 
 const HomePage: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
+
+  // Protect this page - redirect to login if no valid token
+  useProtectedPage();
   const [inProgressCourses, setInProgressCourses] = useState<CourseProgress[]>([]);
 
   // Database hooks

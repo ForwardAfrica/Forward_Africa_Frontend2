@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { usePermissions } from '../../contexts/PermissionContext';
 import { RefreshCw, AlertTriangle } from 'lucide-react';
 import Button from './Button';
+import { validateTokenInCookie } from '../../lib/validateToken';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -38,7 +39,9 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
   }
 
   // Check if user is authenticated
-  if (!user) {
+  // Also check if there's a valid token in cookie - AuthContext might still be loading
+  const isTokenValid = validateTokenInCookie();
+  if (!user && !isTokenValid) {
     if (fallback) {
       return <>{fallback}</>;
     }
