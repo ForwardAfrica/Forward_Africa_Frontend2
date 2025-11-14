@@ -64,13 +64,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
-      // Check if token is expired BEFORE making any API calls
+      // Check if token is expired BEFORE doing anything else
       const tokenStatus = authService.getTokenStatus();
       if (tokenStatus.isExpired) {
         console.log('⏳ AuthContext: Token is expired, attempting refresh...');
         try {
           await authService.refreshToken();
           console.log('✅ AuthContext: Token refreshed successfully');
+          // After refresh, try again to decode the new token
+          const newToken = authService.getTokenFromCookie();
+          if (newToken) {
+            const userFromToken = authService.getUserFromToken();
+            if (userFromToken) {
+              setUser(userFromToken);
+              setError(null);
+              setLoading(false);
+              return;
+            }
+          }
         } catch (refreshError) {
           console.error('❌ AuthContext: Token refresh failed:', refreshError);
           setUser(null);
@@ -79,34 +90,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
 
-      console.log('✅ AuthContext: Token is valid, fetching user profile...');
+      console.log('✅ AuthContext: Token is valid, decoding user data from token...');
 
-      // Fetch user profile from server
-      try {
-        const profileUser = await authService.getProfile();
-        console.log('✅ AuthContext: User profile loaded:', profileUser.email);
-        setUser(profileUser);
+      // Decode user data directly from token - no API call needed
+      const userFromToken = authService.getUserFromToken();
+      if (userFromToken) {
+        console.log('✅ AuthContext: User loaded from token:', userFromToken.email);
+        setUser(userFromToken);
         setError(null);
-      } catch (error) {
-        console.error('❌ AuthContext: Failed to fetch profile:', error);
-
-        // If 401 (UNAUTHORIZED), try refreshing token once and retry
-        if (error instanceof AuthError && error.code === 'UNAUTHORIZED') {
-          console.log('🔄 AuthContext: Got 401, attempting token refresh and retry...');
-          try {
-            await authService.refreshToken();
-            const retryUser = await authService.getProfile();
-            console.log('✅ AuthContext: Profile loaded after token refresh:', retryUser.email);
-            setUser(retryUser);
-            setError(null);
-          } catch (retryError) {
-            console.error('❌ AuthContext: Retry failed after token refresh:', retryError);
-            setUser(null);
-          }
-        } else {
-          // Token might be invalid, clear it
-          setUser(null);
-        }
+      } else {
+        console.log('❌ AuthContext: Could not decode user from token');
+        setUser(null);
       }
     } catch (error) {
       console.error('❌ AuthContext: Auth check error:', error);
