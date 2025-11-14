@@ -813,15 +813,10 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  if (!user) {
-    // Force a complete page reload to clear all cached data
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login';
-      return null;
-    }
-    navigate('/login');
-    return null;
-  }
+  // NOTE: Removed auto-redirect for unauthenticated users
+  // AuthContext now handles redirects to login
+  // If user is not authenticated, AuthContext will redirect them
+  // This component will not be rendered if user is not authenticated
 
   return (
     <Layout key={user?.id || 'no-user'}>

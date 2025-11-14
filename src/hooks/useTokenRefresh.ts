@@ -138,18 +138,17 @@ export const useTokenRefresh = () => {
     if (typeof window === 'undefined') return;
 
     // Setup automatic refresh with proper type annotation
+    // NOTE: This is now handled by AuthContext, so cleanup might be null
     const cleanup: (() => void) | undefined = setupAutomaticRefresh();
     cleanupRef.current = cleanup || null;
 
-    // Update status every 10 seconds
-    intervalRef.current = setInterval(() => {
-      updateTokenStatus();
-    }, 10 * 1000);
-
-    // Initial status check
+    // Update status on mount and when needed
+    // NOTE: Reduced from every 10 seconds to only on mount to avoid excessive state updates
+    // AuthContext now handles the periodic token refresh
     updateTokenStatus();
 
     return () => {
+      // Cleanup interval if it was created
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }

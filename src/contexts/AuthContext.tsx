@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { authService, AuthUser, LoginCredentials, RegisterData, AuthError } from '../lib/authService';
 
@@ -38,12 +38,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
-  const [justLoggedIn, setJustLoggedIn] = useState(false);
   const router = useRouter();
+  
+  // Track redirects to prevent infinite redirect loops
+  const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isRedirectingRef = useRef(false);
+  const authCheckInProgressRef = useRef(false);
 
   // Check authentication status
   const checkAuthStatus = useCallback(async () => {
     if (typeof window === 'undefined') return;
+    if (authCheckInProgressRef.current) return; // Prevent concurrent checks
+
+    authCheckInProgressRef.current = true;
 
     try {
       console.log('🔍 AuthContext: Checking authentication status...');
@@ -75,6 +82,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       setError('Authentication check failed');
     } finally {
+      authCheckInProgressRef.current = false;
       setLoading(false);
     }
   }, []);
@@ -111,7 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsClient(true);
   }, []);
 
-  // Check authentication on mount
+  // Check authentication on mount only
   useEffect(() => {
     if (!isClient) return;
 
@@ -120,17 +128,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
   }, [checkAuthStatus, isClient]);
 
-  // Watch for token expiry and refresh
+  // Single consolidated effect for token management and redirects
   useEffect(() => {
-    if (!isClient || !user) return;
+    if (!isClient || loading) return;
 
-    const checkTokenExpiry = () => {
+    let tokenCheckInterval: NodeJS.Timeout | null = null;
+
+    const performTokenCheck = () => {
       const status = authService.getTokenStatus();
       
       if (status.isExpired) {
         console.log('⏳ Token expired, logging out');
         setUser(null);
-        router.push({ pathname: '/login', query: { redirect: router.pathname } });
+        
+        // Clear any pending redirects
+        if (redirectTimeoutRef.current) {
+          clearTimeout(redirectTimeoutRef.current);
+        }
+        
+        // Redirect to login with a small delay to ensure state is updated
+        if (!isRedirectingRef.current) {
+          isRedirectingRef.current = true;
+          redirectTimeoutRef.current = setTimeout(() => {
+            // Redirect directly to login without query params to prevent loops
+            router.replace('/login');
+            isRedirectingRef.current = false;
+          }, 100);
+        }
       } else if (authService.shouldRefreshToken()) {
         console.log('🔄 Token expiring soon, refreshing...');
         refreshToken().catch(() => {
@@ -139,41 +163,64 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
-    // Check every 30 seconds
-    const interval = setInterval(checkTokenExpiry, 30 * 1000);
+    // Check token every 60 seconds instead of 30 to reduce noise
+    tokenCheckInterval = setInterval(performTokenCheck, 60 * 1000);
 
     // Also check on page visibility change
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        checkTokenExpiry();
+        performTokenCheck();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      clearInterval(interval);
+      if (tokenCheckInterval) clearInterval(tokenCheckInterval);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isClient, user, refreshToken, router]);
+  }, [isClient, loading, refreshToken, router]);
 
-  // Redirect unauthenticated users from protected pages
+  // Redirect unauthenticated users from protected pages - only when user state changes
   useEffect(() => {
     if (!isClient || loading) return;
 
     if (!user) {
       const currentPath = router.pathname;
-      const publicPaths = ['/', '/login', '/register'];
+      const publicPaths = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
       const isPublicPath = publicPaths.some(path => currentPath === path || currentPath.startsWith(path));
 
-      // Only redirect if user is on a protected page
-      // Don't redirect from login/register to prevent logout loop
-      if (!isPublicPath) {
-        console.log('🚪 AuthContext: Redirecting unauthenticated user from protected page');
-        router.push({ pathname: '/login', query: { redirect: currentPath } });
+      // Only redirect if user is on a protected page and not already redirecting
+      if (!isPublicPath && !isRedirectingRef.current) {
+        console.log('🚪 AuthContext: Redirecting unauthenticated user from protected page:', currentPath);
+        isRedirectingRef.current = true;
+
+        // Clear any pending redirects
+        if (redirectTimeoutRef.current) {
+          clearTimeout(redirectTimeoutRef.current);
+        }
+
+        // Don't add redirect query param to prevent loops
+        // Just redirect directly to login
+        redirectTimeoutRef.current = setTimeout(() => {
+          console.log('🚀 Performing redirect to login');
+          router.replace('/login');
+          isRedirectingRef.current = false;
+        }, 100);
       }
-      // If on a public page like '/', stay there - don't force redirect
+    } else {
+      // User is authenticated, clear redirect flag
+      isRedirectingRef.current = false;
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
     }
+
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
   }, [user, loading, isClient, router]);
 
 
@@ -187,8 +234,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
       console.log('✅ AuthContext: Sign in successful, user:', response.user);
 
-      // Redirect to home immediately - don't use setTimeout
-      // Browser will automatically send cookie with the request
+      // Redirect to home or previous page - use replace to avoid history issues
       const redirectPath = router.query.redirect as string;
       if (redirectPath && !['/login', '/register'].includes(redirectPath)) {
         console.log('📍 Redirecting to:', redirectPath);
@@ -239,10 +285,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
       console.log('✅ AuthContext: Sign up successful');
 
-      // Redirect to home or onboarding page after successful signup
-      setTimeout(() => {
-        router.push('/home');
-      }, 100);
+      // Don't auto-redirect - let the page that called signUp decide where to redirect
+      // Usually the page will handle the redirect or let the user proceed naturally
     } catch (error) {
       console.error('❌ AuthContext: Sign up error:', error);
 

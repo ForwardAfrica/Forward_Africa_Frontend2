@@ -271,23 +271,25 @@ export const checkTokenStatus = (): {
 export const setupAutomaticRefresh = (): (() => void) | undefined => {
   if (typeof window === 'undefined') return undefined;
 
-  // Check token status every 30 seconds
-  const interval = setInterval(async () => {
-    try {
-      if (authService.isAuthenticated() && authService.shouldRefreshToken()) {
-        console.log('🔄 Automatic token refresh triggered...');
-        await authService.refreshToken();
-        console.log('✅ Token refreshed automatically');
-      }
-    } catch (error) {
-      console.error('❌ Automatic token refresh failed:', error);
-      // Don't clear auth data immediately, let the user continue
-    }
-  }, 30 * 1000);
+  // NOTE: Automatic token refresh is now handled by AuthContext
+  // Disabling this to prevent conflicts with the new consolidated auth system
+  // Check token status every 30 seconds (DISABLED - handled by AuthContext instead)
+  // const interval = setInterval(async () => {
+  //   try {
+  //     if (authService.isAuthenticated() && authService.shouldRefreshToken()) {
+  //       console.log('🔄 Automatic token refresh triggered...');
+  //       await authService.refreshToken();
+  //       console.log('✅ Token refreshed automatically');
+  //     }
+  //   } catch (error) {
+  //     console.error('❌ Automatic token refresh failed:', error);
+  //     // Don't clear auth data immediately, let the user continue
+  //   }
+  // }, 30 * 1000);
 
   // Cleanup on page unload
   const cleanup = () => {
-    clearInterval(interval);
+    // clearInterval(interval); - disabled
   };
 
   window.addEventListener('beforeunload', cleanup);

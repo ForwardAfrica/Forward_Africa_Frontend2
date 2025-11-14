@@ -81,23 +81,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     initFirebaseAdmin();
 
-    // Get token from cookie only (secure approach)
-    const token = req.cookies.auth_token;
+    // Get token from cookie or Authorization header
+    let token = req.cookies.auth_token;
+
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
 
     if (!token) {
+      console.log('❌ No token provided in cookie or Authorization header');
       return res.status(401).json({ error: 'No token provided - authentication required' });
     }
 
     // Verify token
     let payload;
     try {
+      console.log('🔐 Verifying token...');
       payload = JWTManager.verifyToken(token);
+      console.log('✅ Token verified successfully for user:', payload.userId);
     } catch (error: any) {
-      return res.status(401).json({ error: 'Invalid or expired token' });
+      console.error('❌ Token verification failed:', error.message);
+      return res.status(401).json({ error: 'Invalid or expired token', details: error.message });
     }
 
     // Get user data from Firebase
-    const userRecord = await admin.auth().getUser(payload.userId);
+    let userRecord;
+    try {
+      userRecord = await admin.auth().getUser(payload.userId);
+    } catch (error: any) {
+      console.error('❌ Failed to get user from Firebase:', error.message);
+      return res.status(401).json({ error: 'User not found' });
+    }
 
     // Get user profile from Firestore
     let userData: any = {};
@@ -125,6 +142,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       photoURL: userRecord.photoURL || null,
       role: userRole,
       permissions: userPermissions,
+      onboarding_completed: userData.onboarding_completed || false,
       ...userData
     };
 
@@ -132,7 +150,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   } catch (error: any) {
     console.error('❌ Get user error:', error);
-    return res.status(500).json({ error: 'Failed to fetch user' });
+    return res.status(500).json({ error: 'Failed to fetch user', details: process.env.NODE_ENV === 'development' ? error.message : undefined });
   }
 }
 

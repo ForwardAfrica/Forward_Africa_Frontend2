@@ -25,16 +25,17 @@ export const TokenStatusIndicator: React.FC<TokenStatusIndicatorProps> = ({
 
   const [shouldRedirectToLogin, setShouldRedirectToLogin] = useState(false);
 
-  // Handle expired token redirect
-  useEffect(() => {
-    if (tokenStatus.isExpired && tokenStatus.isAuthenticated) {
-      setShouldRedirectToLogin(true);
-      const timer = setTimeout(() => {
-        window.location.href = '/login';
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [tokenStatus.isExpired, tokenStatus.isAuthenticated]);
+  // NOTE: Token expiry redirects are now handled by AuthContext
+  // This component only displays status, it doesn't redirect anymore
+  // useEffect(() => {
+  //   if (tokenStatus.isExpired && tokenStatus.isAuthenticated) {
+  //     setShouldRedirectToLogin(true);
+  //     const timer = setTimeout(() => {
+  //       window.location.href = '/login';
+  //     }, 3000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [tokenStatus.isExpired, tokenStatus.isAuthenticated]);
 
   const handleRefresh = async () => {
     try {
