@@ -133,19 +133,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!isClient || loading) return;
 
     let tokenCheckInterval: NodeJS.Timeout | null = null;
+    let lastRefreshAttempt = 0;
 
     const performTokenCheck = () => {
       const status = authService.getTokenStatus();
-      
+
       if (status.isExpired) {
         console.log('⏳ Token expired, logging out');
         setUser(null);
-        
+
         // Clear any pending redirects
         if (redirectTimeoutRef.current) {
           clearTimeout(redirectTimeoutRef.current);
         }
-        
+
         // Redirect to login with a small delay to ensure state is updated
         if (!isRedirectingRef.current) {
           isRedirectingRef.current = true;
@@ -155,11 +156,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             isRedirectingRef.current = false;
           }, 100);
         }
-      } else if (authService.shouldRefreshToken()) {
-        console.log('🔄 Token expiring soon, refreshing...');
-        refreshToken().catch(() => {
-          console.error('Failed to refresh token');
-        });
+      } else if (status.isValid && authService.shouldRefreshToken()) {
+        // Prevent rapid refresh attempts (debounce refresh to every 30 seconds minimum)
+        const now = Date.now();
+        if (now - lastRefreshAttempt >= 30 * 1000) {
+          console.log('🔄 Token expiring soon, refreshing...');
+          lastRefreshAttempt = now;
+          refreshToken().catch((error) => {
+            console.error('❌ Failed to refresh token:', error);
+          });
+        }
       }
     };
 
@@ -169,6 +175,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Also check on page visibility change
     const handleVisibilityChange = () => {
       if (!document.hidden) {
+        console.log('📱 Page became visible, checking token...');
         performTokenCheck();
       }
     };
