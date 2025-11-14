@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const initializeUserFromToken = useCallback(() => {
     try {
       console.log('🔍 AuthContext: Initializing user from JWT token...');
-      
+
       const token = authService.getTokenFromCookie();
       if (!token) {
         console.log('🔍 AuthContext: No token in cookie');
@@ -55,20 +55,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
+      console.log('🔍 AuthContext: Token found in cookie, validating...');
+
       // Check if token is expired
-      if (authService.getTokenStatus().isExpired) {
+      const tokenStatus = authService.getTokenStatus();
+      console.log('🔍 AuthContext: Token status:', tokenStatus);
+
+      if (tokenStatus.isExpired) {
         console.log('⏳ AuthContext: Token is expired');
         setUser(null);
         return;
       }
 
       // Decode user from token
-      const userFromToken = authService.getUserFromToken();
-      if (userFromToken) {
-        console.log('✅ AuthContext: User loaded from token:', userFromToken.email);
-        setUser(userFromToken);
-      } else {
-        console.log('❌ AuthContext: Could not decode user from token');
+      try {
+        const userFromToken = authService.getUserFromToken();
+        if (userFromToken) {
+          console.log('✅ AuthContext: User loaded from token:', userFromToken);
+          setUser(userFromToken);
+        } else {
+          console.log('❌ AuthContext: getUserFromToken() returned null');
+          setUser(null);
+        }
+      } catch (decodeError) {
+        console.error('❌ AuthContext: Error decoding user from token:', decodeError);
         setUser(null);
       }
     } catch (error) {
