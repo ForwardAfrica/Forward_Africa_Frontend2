@@ -8,8 +8,15 @@ export default function StorageManagerPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
 
+  // Redirect to login if not authenticated (using useEffect to avoid synchronous redirect)
+  React.useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/login');
+    }
+  }, [authLoading, user, router]);
+
   // Show loading state while checking authentication
-  if (authLoading) {
+  if (authLoading || !user) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
@@ -18,12 +25,6 @@ export default function StorageManagerPage() {
         </div>
       </div>
     );
-  }
-
-  // Redirect to login if not authenticated
-  if (!user) {
-    router.replace('/login');
-    return null;
   }
 
   return (
