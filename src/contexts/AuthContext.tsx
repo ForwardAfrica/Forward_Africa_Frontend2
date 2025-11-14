@@ -139,13 +139,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setError('Session expired. Please log in again.');
     } catch (error) {
       console.error('❌ AuthContext: Token refresh failed:', error);
-      // Only log out if it's an auth error, not a network error
-      if (error instanceof Error && error.message.includes('Session expired')) {
-        setUser(null);
-        setError('Session expired. Please log in again.');
-      } else {
-        console.warn('⚠️ Token refresh failed but not logging out (might be network error):', error);
-        // Keep user logged in and retry next time
+      // Clear user and show error for auth failures
+      setUser(null);
+
+      if (error instanceof Error) {
+        if (error.message.includes('Session expired') || error.message.includes('Unauthorized') || error.message.includes('401')) {
+          setError('Session expired. Please log in again.');
+        } else {
+          console.warn('⚠️ Token refresh failed with error:', error.message);
+          // For other errors, still show expired message as fallback
+          setError('Session expired. Please log in again.');
+        }
       }
     }
   }, []);
@@ -255,7 +259,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Don't add redirect query param to prevent loops
         // Just redirect directly to login
         redirectTimeoutRef.current = setTimeout(() => {
-          console.log('🚀 Performing redirect to login');
+          console.log('�� Performing redirect to login');
           router.replace('/login');
           isRedirectingRef.current = false;
         }, 100);
@@ -290,7 +294,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('📍 Redirecting to: /home');
       router.replace('/home');
     } catch (error) {
-      console.error('�� AuthContext: Sign in error:', error);
+      console.error('❌ AuthContext: Sign in error:', error);
 
       let errorMessage = 'Sign in failed';
 
