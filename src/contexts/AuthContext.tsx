@@ -234,13 +234,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('📝 AuthContext: Signing up...');
 
       const response = await authService.register(data);
-      
-      // Token is now in cookies from server
-      // Decode and set user immediately
-      const userFromToken = authService.getUserFromToken();
-      if (userFromToken) {
-        setUser(userFromToken);
-        console.log('✅ User signed up:', userFromToken.email);
+
+      // Use user data from response
+      if (response.user) {
+        setUser(response.user);
+        console.log('✅ User signed up:', response.user.email);
       }
     } catch (error) {
       console.error('❌ Sign up error:', error);
