@@ -285,8 +285,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
       console.log('✅ AuthContext: Sign up successful');
 
-      // Redirect to home after successful signup
-      router.replace('/home');
+      // Don't auto-redirect - let the page that called signUp decide where to redirect
+      // Usually the page will handle the redirect or let the user proceed naturally
     } catch (error) {
       console.error('❌ AuthContext: Sign up error:', error);
 
