@@ -181,6 +181,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     let lastRefreshAttempt = 0;
 
     const performTokenCheck = () => {
+      // Skip token check if we're in the middle of a redirect (e.g., from login)
+      if (isRedirectingRef.current) {
+        console.log('⏳ Skipping token check - redirect in progress');
+        return;
+      }
+
       const status = authService.getTokenStatus();
 
       if (status.isExpired) {
@@ -214,9 +220,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
-    // Run token check immediately to catch expiration on page load
-    console.log('🔍 AuthContext: Running immediate token check...');
-    performTokenCheck();
+    // Run token check immediately to catch expiration on page load (but not during redirect)
+    if (!isRedirectingRef.current) {
+      console.log('🔍 AuthContext: Running immediate token check...');
+      performTokenCheck();
+    }
 
     // Check token every 30 seconds (more frequently to catch expirations sooner)
     tokenCheckInterval = setInterval(performTokenCheck, 30 * 1000);
