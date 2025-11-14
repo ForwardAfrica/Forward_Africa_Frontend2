@@ -290,9 +290,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
       console.log('✅ AuthContext: Sign in successful, user:', response.user);
 
+      // Set a flag to prevent immediate token checks from interfering with redirect
+      isRedirectingRef.current = true;
+
       // Redirect to home after successful login
       console.log('📍 Redirecting to: /home');
-      router.replace('/home');
+      await router.replace('/home');
+
+      // Clear the redirecting flag after navigation completes
+      setTimeout(() => {
+        isRedirectingRef.current = false;
+      }, 500);
     } catch (error) {
       console.error('❌ AuthContext: Sign in error:', error);
 
@@ -319,6 +327,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       setError(errorMessage);
+      isRedirectingRef.current = false;
       throw error;
     } finally {
       setLoading(false);
