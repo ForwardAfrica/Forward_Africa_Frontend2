@@ -257,12 +257,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const cookieString = [
       `auth_token=${jwtToken}`,
-      'Path=/',
-      'SameSite=Lax',
-      `Max-Age=${maxAge}`,
-      isProduction ? 'Secure' : ''
-      // CRITICAL: Omitting Domain and HttpOnly - Domain prevents JS access, HttpOnly blocks reading
-    ].filter(Boolean).join('; ');
+      "Path=/",
+      // When in production OR inside Builder.io iframe → must use None; Secure
+      isProduction ? "SameSite=None" : "SameSite=Lax",
+      isProduction ? "Secure" : "",
+      `Max-Age=${maxAge}`
+    ].filter(Boolean).join("; ");
 
     console.log(`🔐 Login: Setting auth_token cookie (max-age: ${maxAge}s, secure: ${isProduction})`);
     res.setHeader('Set-Cookie', cookieString);
