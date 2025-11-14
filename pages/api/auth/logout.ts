@@ -6,20 +6,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   // Clear auth_token cookie by setting it to an empty value with past expiration
-  // Match the cookie format used in login (SameSite=Lax, no HttpOnly flag for JavaScript accessibility)
-
-  // Check if request is HTTPS (set Secure flag if so)
-  const isHttps = req.headers['x-forwarded-proto'] === 'https' ||
-                  req.headers['x-proto'] === 'https' ||
-                  req.connection.encrypted ||
-                  process.env.NODE_ENV === 'production';
-
+  // Match the cookie format used in login (SameSite=Lax, no HttpOnly flag, Secure flag)
   const cookieOptions = [
     'Path=/',
     'SameSite=Lax',
     'Max-Age=0', // Immediately expires the cookie
-    isHttps ? 'Secure' : ''
-  ].filter(Boolean).join('; ');
+    'Secure' // Match the login endpoint
+  ].join('; ');
 
   res.setHeader('Set-Cookie', `auth_token=; ${cookieOptions}`);
 
