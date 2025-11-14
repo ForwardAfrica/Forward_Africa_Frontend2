@@ -248,28 +248,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     // Set JWT token in cookie (accessible to JavaScript)
-    // Configuration: NO HttpOnly flag (allows JS to read), sameSite=Lax, Secure, Domain for subdomain compatibility
+    // Critical: DO NOT set Domain attribute - let browser use current domain only
+    // This ensures document.cookie can access the token
     const maxAge = Math.floor(tokenExpiryMs / 1000); // Convert ms to seconds
-
-    // Get current domain from request
-    const host = req.headers.host || 'localhost';
-    // Remove port for domain (e.g., localhost:3000 -> localhost)
-    const domain = host.split(':')[0];
-    const isDevelopment = domain === 'localhost' || domain.includes('127.0.0.1');
-
-    console.log(`🔐 Setting cookie for domain: ${domain}, isDevelopment: ${isDevelopment}`);
+    const isProduction = process.env.NODE_ENV === 'production' ||
+                         req.headers.host?.includes('fly.dev') ||
+                         req.headers['x-forwarded-proto'] === 'https';
 
     const cookieString = [
       `auth_token=${jwtToken}`,
       'Path=/',
-      isDevelopment ? '' : `Domain=${domain}`, // Only set Domain in production (fly.dev, etc.)
-      'SameSite=Lax', // Lax allows same-site requests and navigation
-      `Max-Age=${maxAge}`, // Ensures cookie persists after page refresh (1 hour)
-      isDevelopment ? '' : 'Secure' // Secure flag required for HTTPS (production domains)
-      // NOTE: Omitting HttpOnly flag allows JavaScript to read this cookie via document.cookie
+      'SameSite=Lax',
+      `Max-Age=${maxAge}`,
+      isProduction ? 'Secure' : ''
+      // CRITICAL: Omitting Domain and HttpOnly - Domain prevents JS access, HttpOnly blocks reading
     ].filter(Boolean).join('; ');
 
-    console.log(`🔐 Set-Cookie header: ${cookieString.substring(0, 100)}...`);
+    console.log(`🔐 Login: Setting auth_token cookie (max-age: ${maxAge}s, secure: ${isProduction})`);
     res.setHeader('Set-Cookie', cookieString);
 
     rateLimit.recordAttempt(email, true);
