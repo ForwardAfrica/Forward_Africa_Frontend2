@@ -4,7 +4,6 @@ import Layout from '../components/layout/Layout';
 import CourseCard from '../components/ui/CourseCard';
 import { useCourses } from '../hooks/useDatabase';
 import { useAuth } from '../contexts/AuthContext';
-import { hasValidToken } from '../lib/tokenValidator';
 import { Course } from '../types';
 
 const CoursesPage: React.FC = () => {
