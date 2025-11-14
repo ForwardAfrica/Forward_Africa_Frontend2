@@ -89,6 +89,16 @@ export default function LessonPage() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
+  // Check token in cookie first
+  useEffect(() => {
+    const isTokenValid = validateTokenInCookie();
+    if (!isTokenValid) {
+      DEBUG.warn('⚠️ No valid token in cookie, redirecting to login');
+      router.replace('/login');
+      return;
+    }
+  }, [router]);
+
   // Authentication check - improved to prevent navigation loops
   useEffect(() => {
     DEBUG.log('🔐 Authentication Check', {
