@@ -7,7 +7,7 @@ import Layout from '../components/layout/Layout';
 import { Course, UserProgress, Certificate } from '../types';
 import { useCertificates } from '../hooks/useCertificates';
 import { useAuth } from '../contexts/AuthContext';
-import { hasValidToken } from '../lib/tokenValidator';
+import { validateTokenInCookie } from '../lib/validateToken';
 import { downloadCertificate } from '../utils/certificateGenerator';
 import Image from 'next/image';
 import CourseProgressDashboard from '../components/ui/CourseProgressDashboard';
