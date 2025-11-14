@@ -60,10 +60,7 @@ export const useAuthEnhanced = () => {
 
       if (isOnProtectedPath) {
         console.log('🚪 Redirecting from protected path:', currentPath);
-        router.push({
-          pathname: '/login',
-          query: { redirect: currentPath }
-        });
+        router.push('/login');
       }
     }
   }, [auth.user, auth.loading, router]);

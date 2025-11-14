@@ -234,15 +234,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
       console.log('✅ AuthContext: Sign in successful, user:', response.user);
 
-      // Redirect to home or previous page - use replace to avoid history issues
-      const redirectPath = router.query.redirect as string;
-      if (redirectPath && !['/login', '/register'].includes(redirectPath)) {
-        console.log('📍 Redirecting to:', redirectPath);
-        router.replace(redirectPath);
-      } else {
-        console.log('📍 Redirecting to: /home');
-        router.replace('/home');
-      }
+      // Redirect to home after successful login
+      console.log('📍 Redirecting to: /home');
+      router.replace('/home');
     } catch (error) {
       console.error('❌ AuthContext: Sign in error:', error);
 
