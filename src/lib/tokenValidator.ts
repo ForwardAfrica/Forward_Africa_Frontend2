@@ -1,90 +1,27 @@
 // Synchronous token validation without waiting for auth context
 // This allows immediate redirects before any component renders
-// Uses JWT tokens from cookies
-
-const parseJWT = (token: string): any => {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-
-    const payload = parts[1];
-    if (!payload) return null;
-
-    // Prepare base64url string for decoding
-    let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-
-    // Add padding
-    const paddingNeeded = 4 - (base64.length % 4);
-    if (paddingNeeded && paddingNeeded !== 4) {
-      base64 += '='.repeat(paddingNeeded);
-    }
-
-    // Browser-only solution using atob
-    if (typeof window !== 'undefined' && window.atob) {
-      try {
-        const decodedString = atob(base64);
-        // Handle UTF-8 properly
-        const utf8String = decodeURIComponent(
-          Array.from(decodedString)
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
-        );
-        return JSON.parse(utf8String);
-      } catch (e) {
-        console.error('Token parse error:', e);
-        return null;
-      }
-    }
-
-    return null;
-  } catch (error) {
-    console.error('JWT Parse Error in tokenValidator:', error);
-    return null;
-  }
-};
-
-const isTokenExpired = (token: string): boolean => {
-  try {
-    const payload = parseJWT(token);
-    if (!payload || !payload.exp) return true;
-
-    const expiryTime = payload.exp * 1000; // Convert to milliseconds
-    return Date.now() > expiryTime;
-  } catch (error) {
-    return true;
-  }
-};
+// Uses JWT tokens from cookies - SIMPLE APPROACH: just check if cookie exists
 
 const getTokenFromCookie = (): string | null => {
   if (typeof document === 'undefined') return null;
 
   try {
     const cookies = document.cookie;
-    console.log('🍪 Raw document.cookie:', cookies);
-
     const cookieArray = cookies.split(';');
-    console.log('🍪 Cookies count:', cookieArray.length);
 
     for (const cookie of cookieArray) {
       const trimmed = cookie.trim();
-      console.log('🍪 Checking cookie:', trimmed.substring(0, 30) + '...');
-
       if (trimmed.startsWith('auth_token=')) {
         const value = trimmed.substring('auth_token='.length);
-        console.log('🍪 Found auth_token, length:', value.length);
-
         if (value) {
           try {
             return decodeURIComponent(value);
           } catch (e) {
-            console.log('🍪 Could not decode, returning raw value');
             return value;
           }
         }
       }
     }
-
-    console.log('🍪 auth_token cookie NOT found in', cookieArray.length, 'cookies');
   } catch (error) {
     console.error('❌ Error reading cookie:', error);
   }
@@ -95,31 +32,16 @@ export const hasValidToken = (): boolean => {
   if (typeof window === 'undefined') return false;
 
   try {
+    // Simple check: if auth_token cookie exists, consider it valid
+    // Server will validate the token when making API requests
     const token = getTokenFromCookie();
 
     if (!token) {
-      console.log('🔍 No auth_token cookie found');
-      // Log all cookies for debugging
-      console.log('📦 Available cookies:', document.cookie);
+      console.log('❌ No auth_token cookie found');
       return false;
     }
 
-    console.log('📝 Token found in cookie, length:', token.length);
-
-    // Try to parse and validate
-    try {
-      if (isTokenExpired(token)) {
-        console.log('⏳ Token is expired');
-        return false;
-      }
-    } catch (parseError) {
-      // If parsing fails, still consider token as valid if it exists
-      // Let server handle validation
-      console.warn('⚠️ Could not parse token, but cookie exists:', parseError);
-      return true;
-    }
-
-    console.log('✅ Valid token found in cookies');
+    console.log('✅ auth_token cookie found, token is present');
     return true;
   } catch (error) {
     console.error('Error checking token:', error);
@@ -134,14 +56,32 @@ export const getStoredUser = () => {
     const token = getTokenFromCookie();
     if (!token) return null;
 
-    const payload = parseJWT(token);
-    if (!payload || isTokenExpired(token)) return null;
+    // Try to parse, but don't fail if parsing doesn't work
+    try {
+      const payload = token.split('.')[1];
+      if (!payload) return null;
 
-    return {
-      uid: payload.userId,
-      email: payload.email,
-      displayName: payload.displayName || ''
-    };
+      // Simple base64 decode without complex UTF-8 handling
+      let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const padding = (4 - (base64.length % 4)) % 4;
+      if (padding) base64 += '='.repeat(padding);
+
+      if (typeof window !== 'undefined' && window.atob) {
+        const decoded = atob(base64);
+        const parsed = JSON.parse(decoded);
+
+        return {
+          uid: parsed.userId,
+          email: parsed.email,
+          displayName: parsed.displayName || ''
+        };
+      }
+    } catch (parseError) {
+      console.warn('Could not parse token for user data');
+      return null;
+    }
+
+    return null;
   } catch (error) {
     console.error('Error getting stored user:', error);
     return null;
