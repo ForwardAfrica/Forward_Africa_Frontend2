@@ -179,14 +179,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('🔐 AuthContext: Signing in...');
 
       const response = await authService.login(credentials);
-      
-      // Token is now in cookies from server
-      // Decode and set user immediately
-      const userFromToken = authService.getUserFromToken();
-      if (userFromToken) {
-        setUser(userFromToken);
-        console.log('✅ User signed in:', userFromToken.email);
-        
+
+      // Use user data from response instead of decoding token
+      // The response contains the decoded user object from the server
+      if (response.user) {
+        setUser(response.user);
+        console.log('✅ User signed in:', response.user.email);
+
         // Set redirect flag to prevent interference
         isRedirectingRef.current = true;
         await router.replace('/home');
@@ -194,7 +193,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           isRedirectingRef.current = false;
         }, 500);
       } else {
-        throw new AuthError('LOGIN_FAILED', 'Failed to decode user token');
+        throw new AuthError('LOGIN_FAILED', 'No user data in login response');
       }
     } catch (error) {
       console.error('❌ Sign in error:', error);
