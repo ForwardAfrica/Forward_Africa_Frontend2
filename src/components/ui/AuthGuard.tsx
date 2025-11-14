@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePermissions } from '../../contexts/PermissionContext';
 import { RefreshCw, AlertTriangle } from 'lucide-react';
@@ -16,6 +17,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
   requiredRole = 'user',
   fallback
 }) => {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { userRole } = usePermissions();
   const [isClient, setIsClient] = useState(false);
@@ -54,7 +56,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
           <p className="text-gray-400 mb-6">Please log in to access this page.</p>
           <Button
             variant="primary"
-            onClick={() => window.location.href = '/login'}
+            onClick={() => router.push('/login')}
             className="flex items-center mx-auto"
           >
             Go to Login
@@ -102,7 +104,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
           <p className="text-gray-500 text-sm mb-4">Required: {requiredRole}, Your role: {userRole}</p>
           <Button
             variant="outline"
-            onClick={() => window.location.href = '/admin'}
+            onClick={() => router.push('/admin')}
             className="flex items-center mx-auto"
           >
             Back to Dashboard

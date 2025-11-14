@@ -64,7 +64,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
               <Button
                 variant="primary"
                 onClick={() => {
-                  window.location.href = '/admin/login';
+                  // Navigate to admin login - will be handled by context
                 }}
               >
                 Return to Login
