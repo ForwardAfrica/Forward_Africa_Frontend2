@@ -109,7 +109,10 @@ class GlobalErrorBoundary extends Component<Props, State> {
   };
 
   private handleGoHome = () => {
-    window.location.href = '/';
+    // Navigate to home - reload page to reset error state
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   };
 
   private handleGoBack = () => {

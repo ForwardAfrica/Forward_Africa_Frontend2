@@ -54,10 +54,13 @@ class ErrorBoundary extends Component<Props, State> {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.location.href = '/admin'}
+                onClick={() => {
+                  // Reload page to reset the error boundary
+                  window.location.reload();
+                }}
                 className="flex items-center mx-auto"
               >
-                Back to Dashboard
+                Reload Page
               </Button>
             </div>
           </div>
