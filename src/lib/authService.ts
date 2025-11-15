@@ -210,7 +210,7 @@ export const authService = {
   clearTokenFromStorage(): void {
     // Deprecated: Tokens are stored in cookies only
     if (typeof localStorage === 'undefined') return;
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('app_user');
   },
 
   // Get token for API requests (from cookies only)

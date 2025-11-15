@@ -32,7 +32,7 @@ export const hasValidToken = (): boolean => {
   if (typeof window === 'undefined') return false;
 
   try {
-    // Simple check: if auth_token cookie exists, consider it valid
+    // Simple check: if app_user cookie exists, consider it valid
     // Server will validate the token when making API requests
     const token = getTokenFromCookie();
 
