@@ -58,34 +58,6 @@ export class AuthError extends Error {
   }
 }
 
-// Role normalization utility
-const normalizeRole = (role: any): 'user' | 'content_manager' | 'community_manager' | 'user_support' | 'super_admin' => {
-  if (!role) return 'user';
-
-  const roleStr = String(role).toLowerCase().trim();
-
-  // Map various role formats to the standard format
-  const roleMap: Record<string, 'user' | 'content_manager' | 'community_manager' | 'user_support' | 'super_admin'> = {
-    'super_admin': 'super_admin',
-    'superadmin': 'super_admin',
-    'super admin': 'super_admin',
-    'admin': 'super_admin', // Treat 'admin' as 'super_admin' for backwards compatibility
-    'content_manager': 'content_manager',
-    'contentmanager': 'content_manager',
-    'content manager': 'content_manager',
-    'community_manager': 'community_manager',
-    'communitymanager': 'community_manager',
-    'community manager': 'community_manager',
-    'user_support': 'user_support',
-    'usersupport': 'user_support',
-    'user support': 'user_support',
-    'support': 'user_support',
-    'user': 'user'
-  };
-
-  return roleMap[roleStr] || 'user';
-};
-
 // JWT Token utilities for client-side verification
 const jwtUtils = {
   base64UrlDecode(str: string): string {
