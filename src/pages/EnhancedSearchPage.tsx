@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { useSearchParams } from '../lib/router';
 import { Search as SearchIcon, X, Filter, SortAsc, SortDesc } from 'lucide-react';
 import { courseAPI, categoryAPI, instructorAPI } from '../lib/api';
