@@ -329,7 +329,7 @@ export const authService = {
         throw new AuthError('WEAK_PASSWORD', 'Password must be at least 6 characters');
       }
 
-      console.log('📝 AuthService: Registering user...');
+      console.log('�� AuthService: Registering user...');
 
       const response = await fetch('/api/auth/register', {
         method: 'POST',

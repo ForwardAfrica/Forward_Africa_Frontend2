@@ -26,7 +26,7 @@ const DatabaseManagementPage: React.FC = () => {
   });
 
   // Check if user is super admin
-  const isSuperAdmin = userRole === 'super_admin';
+  const isSuperAdmin = userRole === 'super_admin' || userRole === 'Super Admin';
 
   // Redirect if not super admin
   useEffect(() => {
