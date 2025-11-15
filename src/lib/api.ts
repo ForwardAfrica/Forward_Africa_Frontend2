@@ -143,14 +143,6 @@ export const categoryAPI = {
 
 // Instructor API
 // Uses Firestore for persistence instead of HTTP backend
-import {
-  getAllInstructorsFromFirestore,
-  getInstructorFromFirestore,
-  createInstructorInFirestore,
-  updateInstructorInFirestore,
-  deleteInstructorFromFirestore
-} from './firestoreInstructors';
-
 export const instructorAPI = {
   // Get all instructors
   getAllInstructors: async () => {
