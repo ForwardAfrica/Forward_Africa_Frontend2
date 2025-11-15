@@ -71,7 +71,7 @@ const jwtUtils = {
     }
 
     // Handle both browser and Node.js environments
-    if (typeof window !== 'undefined' && window.atob) {
+    if (typeof window !== 'undefined') {
       // Browser environment
       try {
         const decoded = atob(base64);
@@ -457,7 +457,7 @@ export const authService = {
   shouldRefreshToken(): boolean {
     const expiry = this.getTokenExpiryMs();
     if (!expiry) {
-      console.warn('⚠️ AuthService: Could not determine token expiry');
+      console.warn('⚠�� AuthService: Could not determine token expiry');
       return false; // Don't auto-refresh if we can't determine expiry
     }
 
