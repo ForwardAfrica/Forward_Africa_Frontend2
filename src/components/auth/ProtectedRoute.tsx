@@ -42,19 +42,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check for required role
   if (requiredRole) {
-    // Normalize user role for hierarchy lookup
-    let normalizedUserRole = user?.role as UserRole;
-    if (normalizedUserRole === 'Super Admin' || normalizedUserRole === 'Admin') {
-      normalizedUserRole = 'super_admin' as UserRole;
-    } else if (normalizedUserRole === 'Content Manager') {
-      normalizedUserRole = 'content_manager' as UserRole;
-    } else if (normalizedUserRole === 'Community Manager') {
-      normalizedUserRole = 'community_manager' as UserRole;
-    } else if (normalizedUserRole === 'User Support') {
-      normalizedUserRole = 'user_support' as UserRole;
-    }
-
-    const userRoleLevel = ROLE_HIERARCHY[normalizedUserRole] || 0;
+    const userRoleLevel = ROLE_HIERARCHY[user.role] || 0;
     const requiredRoleLevel = ROLE_HIERARCHY[requiredRole] || 0;
 
     if (userRoleLevel < requiredRoleLevel) {
