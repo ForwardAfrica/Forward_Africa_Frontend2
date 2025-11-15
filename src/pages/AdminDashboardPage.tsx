@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
   const activeUsers = users.filter(user => user.onboardingCompleted).length;
 
   // Check if user is super admin
-  const isSuperAdmin = userRole === 'super_admin' || userRole === 'Super Admin';
+  const isSuperAdmin = userRole === 'super_admin';
 
   // Show loading state during SSR
   if (!isClient) {
