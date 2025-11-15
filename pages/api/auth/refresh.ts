@@ -168,7 +168,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const cookieString = [
       `auth_token=${newToken}`,
       'Path=/',
-      'SameSite=Lax',
+      isProduction ? "SameSite=None" : "SameSite=Lax",
       `Max-Age=${maxAge}`,
       isProduction ? 'Secure' : ''
       // CRITICAL: Omitting Domain and HttpOnly - Domain prevents JS access, HttpOnly blocks reading

@@ -13,7 +13,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const cookieOptions = [
     'Path=/',
-    'SameSite=Lax',
+    isProduction ? "SameSite=None" : "SameSite=Lax",
     'Max-Age=0', // Immediately expires the cookie
     isProduction ? 'Secure' : ''
   ].filter(Boolean).join('; ');
