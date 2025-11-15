@@ -66,7 +66,7 @@ export const getStoredUser = () => {
       const padding = (4 - (base64.length % 4)) % 4;
       if (padding) base64 += '='.repeat(padding);
 
-      if (typeof window !== 'undefined' && window.atob) {
+      if (typeof window !== 'undefined') {
         const decoded = atob(base64);
         const parsed = JSON.parse(decoded);
 
