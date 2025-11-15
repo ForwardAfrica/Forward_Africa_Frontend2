@@ -200,6 +200,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw error;
     }
 
+    // Role normalization utility
+    const normalizeRole = (role: any): string => {
+      if (!role) return 'user';
+
+      const roleStr = String(role).toLowerCase().trim();
+
+      // Map various role formats to the standard format
+      const roleMap: Record<string, string> = {
+        'super_admin': 'super_admin',
+        'superadmin': 'super_admin',
+        'super admin': 'super_admin',
+        'admin': 'super_admin', // Treat 'admin' as 'super_admin' for backwards compatibility
+        'content_manager': 'content_manager',
+        'contentmanager': 'content_manager',
+        'content manager': 'content_manager',
+        'community_manager': 'community_manager',
+        'communitymanager': 'community_manager',
+        'community manager': 'community_manager',
+        'user_support': 'user_support',
+        'usersupport': 'user_support',
+        'user support': 'user_support',
+        'support': 'user_support',
+        'user': 'user'
+      };
+
+      return roleMap[roleStr] || 'user';
+    };
+
     // Get user's role and permissions from Firestore
     let userRole = 'user';
     let userPermissions: string[] = [];
@@ -213,8 +241,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (userDoc.exists) {
         const data = userDoc.data();
-        userRole = data?.role || 'user';
-        console.log('📋 User document found:', { role: userRole, userData: data });
+        const rawRole = data?.role || 'user';
+        userRole = normalizeRole(rawRole);
+        console.log('📋 User document found:', { rawRole, normalizedRole: userRole, userData: data });
         userPermissions = data?.permissions || [];
         userData = data || {};
       }
@@ -222,7 +251,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.warn('Could not fetch user role from Firestore:', error);
     }
 
-    // Create JWT token with user information and role
+    // Create JWT token with user information and normalized role
     const tokenPayload = {
       userId: userRecord.uid,
       email: userRecord.email,
