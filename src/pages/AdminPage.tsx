@@ -726,7 +726,7 @@ const AdminPage: React.FC = () => {
           </div>
 
           {/* Super Admin Features */}
-          {(userRole === 'super_admin' || userRole === 'Super Admin') && (
+          {userRole === 'super_admin' && (
             <div className="bg-gray-800 rounded-lg p-6">
               <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
                 <Crown className="h-5 w-5 mr-2 text-yellow-500" />

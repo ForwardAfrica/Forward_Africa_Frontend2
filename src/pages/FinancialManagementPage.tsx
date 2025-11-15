@@ -26,7 +26,7 @@ const FinancialManagementPage: React.FC = () => {
   });
 
   // Check if user is super admin
-  const isSuperAdmin = userRole === 'super_admin' || userRole === 'Super Admin';
+  const isSuperAdmin = userRole === 'super_admin';
 
   // Redirect if not super admin
   useEffect(() => {
