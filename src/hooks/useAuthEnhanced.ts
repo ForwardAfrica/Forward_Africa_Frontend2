@@ -65,34 +65,9 @@ export const useAuthEnhanced = () => {
     }
   }, [auth.user, auth.loading, router]);
 
-  // Monitor token expiration
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const checkTokenExpiration = () => {
-      if (auth.isAuthenticated && authService.isTokenExpired()) {
-        console.log('⚠️ Token expired, logging out user');
-        enhancedSignOut();
-      }
-    };
-
-    // Check every 5 minutes
-    const interval = setInterval(checkTokenExpiration, 5 * 60 * 1000);
-
-    // Also check when the page becomes visible
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        checkTokenExpiration();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [auth.isAuthenticated, enhancedSignOut]);
+  // Token expiration is handled by AuthContext (auto-refresh before expiry)
+  // Tokens are only cleared when user manually clicks logout button
+  // Removed automatic logout on visibility change to prevent premature logouts
 
   return {
     ...auth,
