@@ -33,7 +33,7 @@ const CommunicationCenterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   // Check if user is super admin
-  const isSuperAdmin = userRole === 'super_admin';
+  const isSuperAdmin = userRole === 'super_admin' || userRole === 'Super Admin';
 
   // Load data when component mounts
   useEffect(() => {
