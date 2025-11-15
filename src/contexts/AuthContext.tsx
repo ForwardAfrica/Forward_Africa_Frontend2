@@ -111,9 +111,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
 
+    const handleWindowFocus = () => {
+      console.log('🔍 AuthContext: Window focused, checking auth status...');
+      initializeUserFromToken();
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleWindowFocus);
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleWindowFocus);
     };
   }, [isClient, initializeUserFromToken]);
 
