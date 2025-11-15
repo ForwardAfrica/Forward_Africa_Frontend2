@@ -1,7 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 
-const CategoryPage = dynamic(() => import('../../src/pages/CategoryPage'), {
+const CategoryPage = dynamic(() => import('@/pages/CategoryPage'), {
   ssr: false
 })
 

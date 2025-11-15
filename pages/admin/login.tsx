@@ -1,7 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 
-const AdminLoginPage = dynamic(() => import('../../src/pages/AdminLoginPage'), {
+const AdminLoginPage = dynamic(() => import('@/pages/AdminLoginPage'), {
   ssr: false
 })
 

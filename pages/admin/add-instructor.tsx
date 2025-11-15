@@ -1,7 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 
-const AddFacilitatorPage = dynamic(() => import('../../src/pages/AddFacilitatorPage'), {
+const AddFacilitatorPage = dynamic(() => import('@/pages/AddFacilitatorPage'), {
   ssr: false
 })
 
