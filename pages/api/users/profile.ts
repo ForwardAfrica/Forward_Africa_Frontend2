@@ -82,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     initFirebaseAdmin();
 
     // Get token from cookie or Authorization header
-    let token = req.cookies.auth_token;
+    let token = req.cookies.app_user;
 
     if (!token) {
       const authHeader = req.headers.authorization;

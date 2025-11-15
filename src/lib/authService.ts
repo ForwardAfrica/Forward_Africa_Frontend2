@@ -168,9 +168,9 @@ export const authService = {
         const trimmed = cookie.trim();
         console.log(`🔍 AuthService: checking cookie: "${trimmed.substring(0, 30)}..."`);
 
-        if (trimmed.startsWith('auth_token=')) {
-          const value = trimmed.substring('auth_token='.length);
-          console.log(`✅ AuthService: Found auth_token, length: ${value.length}`);
+        if (trimmed.startsWith('app_user=')) {
+          const value = trimmed.substring('app_user='.length);
+          console.log(`✅ AuthService: Found app_user, length: ${value.length}`);
 
           if (value) {
             try {
@@ -186,7 +186,7 @@ export const authService = {
         }
       }
 
-      console.log('🔍 AuthService: auth_token cookie not found');
+      console.log('🔍 AuthService: app_user cookie not found');
       return null;
     } catch (error) {
       console.error('❌ AuthService: Error reading cookies:', error);
@@ -210,7 +210,7 @@ export const authService = {
   clearTokenFromStorage(): void {
     // Deprecated: Tokens are stored in cookies only
     if (typeof localStorage === 'undefined') return;
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('app_user');
   },
 
   // Get token for API requests (from cookies only)

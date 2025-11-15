@@ -256,7 +256,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                          req.headers['x-forwarded-proto'] === 'https';
 
     const cookieString = [
-      `auth_token=${jwtToken}`,
+      `app_user=${jwtToken}`,
       "Path=/",
       // When in production OR inside Builder.io iframe → must use None; Secure
       isProduction ? "SameSite=None" : "SameSite=Lax",
@@ -264,7 +264,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       `Max-Age=${maxAge}`
     ].filter(Boolean).join("; ");
 
-    console.log(`🔐 Login: Setting auth_token cookie (max-age: ${maxAge}s, secure: ${isProduction})`);
+    console.log(`🔐 Login: Setting app_user cookie (max-age: ${maxAge}s, secure: ${isProduction})`);
     res.setHeader('Set-Cookie', cookieString);
 
     rateLimit.recordAttempt(email, true);

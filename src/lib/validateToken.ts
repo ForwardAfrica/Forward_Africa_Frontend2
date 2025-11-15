@@ -8,8 +8,8 @@ export const validateTokenInCookie = (): boolean => {
     
     for (const cookie of cookies) {
       const trimmed = cookie.trim();
-      if (trimmed.startsWith('auth_token=')) {
-        const value = trimmed.substring('auth_token='.length);
+      if (trimmed.startsWith('app_user=')) {
+        const value = trimmed.substring('app_user='.length);
         // If token exists and has content, it's valid
         if (value && value.length > 0) {
           console.log('✅ Valid token found in cookie');

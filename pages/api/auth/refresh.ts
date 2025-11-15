@@ -110,7 +110,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     initFirebaseAdmin();
 
     // Get token from cookie only (secure approach)
-    const token = req.cookies.auth_token;
+    const token = req.cookies.app_user;
 
     if (!token) {
       return res.status(401).json({ error: 'No token provided - authentication required' });
@@ -166,7 +166,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                          req.headers['x-forwarded-proto'] === 'https';
 
     const cookieString = [
-      `auth_token=${newToken}`,
+      `app_user=${newToken}`,
       'Path=/',
       isProduction ? "SameSite=None" : "SameSite=Lax",
       `Max-Age=${maxAge}`,

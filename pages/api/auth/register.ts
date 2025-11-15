@@ -205,7 +205,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       process.env.NODE_ENV === 'production' ? 'Secure' : ''
     ].filter(Boolean).join('; ');
 
-    res.setHeader('Set-Cookie', `auth_token=${jwtToken}; ${cookieOptions}`);
+    res.setHeader('Set-Cookie', `app_user=${jwtToken}; ${cookieOptions}`);
 
     console.log('✅ Registration successful for:', email);
 

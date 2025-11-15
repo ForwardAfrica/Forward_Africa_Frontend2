@@ -5,7 +5,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Clear auth_token cookie by setting it to an empty value with past expiration
+  // Clear app_user cookie by setting it to an empty value with past expiration
   // Match the cookie format used in login (SameSite=Lax, no HttpOnly flag, no Domain)
   const isProduction = process.env.NODE_ENV === 'production' ||
                        req.headers.host?.includes('fly.dev') ||
@@ -18,7 +18,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     isProduction ? 'Secure' : ''
   ].filter(Boolean).join('; ');
 
-  res.setHeader('Set-Cookie', `auth_token=; ${cookieOptions}`);
+  res.setHeader('Set-Cookie', `app_user=; ${cookieOptions}`);
 
   return res.status(200).json({
     message: 'Logged out successfully'
