@@ -2,7 +2,7 @@ import React from 'react'
 import dynamic from 'next/dynamic'
 import AuthGuard from '../../src/components/ui/AuthGuard'
 
-const AdminDashboardPage = dynamic(() => import('../../src/pages/AdminDashboardPage'), {
+const AdminDashboardPage = dynamic(() => import('@/pages/AdminDashboardPage'), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">

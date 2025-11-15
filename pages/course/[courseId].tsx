@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic'
 
 // Dynamically import CoursePage to avoid SSR issues
-const CoursePage = dynamic(() => import('../../src/pages/CoursePage'), {
+const CoursePage = dynamic(() => import('@/pages/CoursePage'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center min-h-screen">
