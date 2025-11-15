@@ -58,6 +58,12 @@ service firebase.storage {
       allow write: if isAuthenticated() && canManageCourses();
     }
 
+    // Instructors (for instructor profile images and data)
+    match /instructors/{instructorId}/{allPaths=**} {
+      allow read: if true; // Public read for instructor images
+      allow write: if isAuthenticated() && canManageCourses();
+    }
+
     // Temporary uploads (for processing)
     match /temp/{userId}/{allPaths=**} {
       allow read, write: if isAuthenticated() && isOwner(userId);
