@@ -1007,7 +1007,7 @@ const RegisterPage: React.FC = () => {
               variant="primary"
               size="lg"
               className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg mt-2"
-              disabled={loading}
+              disabled={loading || !emailVerified}
             >
               {loading ? (
                 <div className="flex items-center justify-center space-x-2">
