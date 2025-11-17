@@ -34,6 +34,14 @@ const RegisterPage: React.FC = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showHelp, setShowHelp] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [showOTPInput, setShowOTPInput] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [otpSuccess, setOtpSuccess] = useState('');
+  const [otpTimer, setOtpTimer] = useState(0);
+  const [attemptsRemaining, setAttemptsRemaining] = useState(5);
 
   const educationLevels = [
     'High School',
