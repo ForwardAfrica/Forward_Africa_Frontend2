@@ -34,6 +34,14 @@ const RegisterPage: React.FC = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showHelp, setShowHelp] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [showOTPInput, setShowOTPInput] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+  const [otpSuccess, setOtpSuccess] = useState('');
+  const [otpTimer, setOtpTimer] = useState(0);
+  const [attemptsRemaining, setAttemptsRemaining] = useState(5);
 
   const educationLevels = [
     'High School',
@@ -176,6 +184,38 @@ const RegisterPage: React.FC = () => {
     }
   }, [success]);
 
+  // OTP timer countdown
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (otpTimer > 0) {
+      timer = setInterval(() => {
+        setOtpTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [otpTimer]);
+
+  // Clear OTP messages after 3 seconds
+  useEffect(() => {
+    if (otpSuccess) {
+      const timer = setTimeout(() => {
+        setOtpSuccess('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [otpSuccess]);
+
+  useEffect(() => {
+    if (otpError) {
+      const timer = setTimeout(() => {
+        setOtpError('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [otpError]);
+
   const handleTopicToggle = (topic: string) => {
     const newTopics = formData.topics_of_interest.includes(topic)
       ? formData.topics_of_interest.filter(t => t !== topic)
@@ -231,6 +271,88 @@ const RegisterPage: React.FC = () => {
     }
 
     return true;
+  };
+
+  const handleSendOTP = async () => {
+    setOtpError('');
+    setOtpSuccess('');
+
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.isValid) {
+      setOtpError(emailValidation.message);
+      return;
+    }
+
+    setOtpLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setOtpError(data.error || 'Failed to send OTP');
+        return;
+      }
+
+      setOtpSuccess('OTP sent successfully! Check your email.');
+      setShowOTPInput(true);
+      setOtpTimer(600);
+      setOtp('');
+      setAttemptsRemaining(5);
+    } catch (error: any) {
+      console.error('Error sending OTP:', error);
+      setOtpError(error.message || 'Failed to send OTP');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    setOtpError('');
+    setOtpSuccess('');
+
+    if (!otp || otp.length !== 6) {
+      setOtpError('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    setOtpLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setAttemptsRemaining(data.attemptsRemaining || 0);
+        setOtpError(data.error || 'Failed to verify OTP');
+        return;
+      }
+
+      setOtpSuccess('Email verified successfully!');
+      setEmailVerified(true);
+      setShowOTPInput(false);
+      setOtp('');
+      setOtpTimer(0);
+    } catch (error: any) {
+      console.error('Error verifying OTP:', error);
+      setOtpError(error.message || 'Failed to verify OTP');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    await handleSendOTP();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -335,7 +457,7 @@ const RegisterPage: React.FC = () => {
               {/* Email */}
               <div className="space-y-1">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                  Email Address *
+                  Email Address * {emailVerified && <span className="text-green-400 text-xs ml-1">(Verified)</span>}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -347,8 +469,9 @@ const RegisterPage: React.FC = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    className={`block w-full pl-10 pr-4 py-2.5 bg-gray-700/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 ${
-                      validationErrors.email ? 'border-red-500' : 'border-gray-600'
+                    disabled={emailVerified}
+                    className={`block w-full pl-10 pr-4 py-2.5 bg-gray-700/50 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${
+                      validationErrors.email ? 'border-red-500' : emailVerified ? 'border-green-500' : 'border-gray-600'
                     }`}
                     placeholder="Enter your email"
                     value={formData.email}
@@ -366,11 +489,111 @@ const RegisterPage: React.FC = () => {
                     className="mt-1"
                   />
                 )}
+                {emailVerified && (
+                  <ValidationMessage
+                    message="Email verified successfully"
+                    type="success"
+                    className="mt-1"
+                  />
+                )}
               </div>
             </div>
 
+            {/* OTP Verification Section */}
+            {!emailVerified && (
+              <div className="bg-gray-700/30 border border-gray-600 rounded-lg p-4">
+                {!showOTPInput ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-300">Verify your email address before proceeding</p>
+                    <button
+                      type="button"
+                      onClick={handleSendOTP}
+                      disabled={otpLoading || !formData.email || validationErrors.email !== undefined}
+                      className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                    >
+                      {otpLoading ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Sending OTP...</span>
+                        </div>
+                      ) : (
+                        'Send OTP to Email'
+                      )}
+                    </button>
+                    {otpSuccess && <ValidationMessage message={otpSuccess} type="success" />}
+                    {otpError && <ValidationMessage message={otpError} type="error" />}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label htmlFor="otp" className="block text-sm font-medium text-gray-300 mb-1">Enter OTP Code</label>
+                      <input
+                        id="otp"
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        placeholder="000000"
+                        className="w-full px-4 py-2.5 bg-gray-700/50 border border-gray-600 rounded-lg text-white text-center tracking-widest text-2xl font-bold placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        value={otp}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                          setOtp(value);
+                        }}
+                        disabled={otpLoading}
+                      />
+                      <div className="flex justify-between mt-2 text-xs text-gray-400">
+                        <span>{otpTimer > 0 ? `Expires in: ${Math.floor(otpTimer / 60)}:${(otpTimer % 60).toString().padStart(2, '0')}` : 'OTP expired'}</span>
+                        <span>{attemptsRemaining > 0 ? `${attemptsRemaining} attempts left` : 'No attempts remaining'}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleVerifyOTP}
+                        disabled={otpLoading || otp.length !== 6 || otpTimer === 0}
+                        className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        {otpLoading ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <span>Verifying...</span>
+                          </div>
+                        ) : (
+                          'Verify OTP'
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowOTPInput(false);
+                          setOtp('');
+                          setOtpError('');
+                          setOtpSuccess('');
+                        }}
+                        className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        Back
+                      </button>
+                    </div>
+                    {otpTimer > 0 && otpTimer < 300 && (
+                      <button
+                        type="button"
+                        onClick={handleResendOTP}
+                        disabled={otpLoading}
+                        className="w-full text-red-400 hover:text-red-300 text-sm font-medium transition-colors duration-200"
+                      >
+                        Didn't receive the code? Resend OTP
+                      </button>
+                    )}
+                    {otpSuccess && <ValidationMessage message={otpSuccess} type="success" />}
+                    {otpError && <ValidationMessage message={otpError} type="error" />}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Password Fields - 2 columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-opacity duration-200 ${!emailVerified ? 'opacity-50 pointer-events-none' : ''}`}>
               {/* Password */}
               <div className="space-y-1">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-300">
@@ -487,7 +710,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             {/* Professional Information - 2 columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-opacity duration-200 ${!emailVerified ? 'opacity-50 pointer-events-none' : ''}`}>
               {/* Education Level */}
               <div className="space-y-1">
                 <label htmlFor="education_level" className="block text-sm font-medium text-gray-300">
@@ -610,7 +833,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             {/* Geographic Location - 3 columns */}
-            <div className="space-y-2">
+            <div className={`space-y-2 transition-opacity duration-200 ${!emailVerified ? 'opacity-50 pointer-events-none' : ''}`}>
               <label className="block text-sm font-medium text-gray-300">
                 Geographic Location
               </label>
@@ -684,7 +907,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             {/* Topics of Interest - Custom Multi-select Dropdown */}
-            <div className="space-y-2">
+            <div className={`space-y-2 transition-opacity duration-200 ${!emailVerified ? 'opacity-50 pointer-events-none' : ''}`}>
               <label className="block text-sm font-medium text-gray-300">
                 Topics of Interest * (Select at least one)
               </label>
@@ -784,7 +1007,7 @@ const RegisterPage: React.FC = () => {
               variant="primary"
               size="lg"
               className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg mt-2"
-              disabled={loading}
+              disabled={loading || !emailVerified}
             >
               {loading ? (
                 <div className="flex items-center justify-center space-x-2">
