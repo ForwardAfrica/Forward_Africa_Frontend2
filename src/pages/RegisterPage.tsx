@@ -907,7 +907,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             {/* Topics of Interest - Custom Multi-select Dropdown */}
-            <div className="space-y-2">
+            <div className={`space-y-2 transition-opacity duration-200 ${!emailVerified ? 'opacity-50 pointer-events-none' : ''}`}>
               <label className="block text-sm font-medium text-gray-300">
                 Topics of Interest * (Select at least one)
               </label>
