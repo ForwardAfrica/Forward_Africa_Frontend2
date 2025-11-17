@@ -60,52 +60,47 @@ const LandingPage: React.FC = () => {
 
         {/* Main Content */}
         <main className="relative z-10">
-          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-32">
-            <div className="text-center mb-16">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 md:pt-40 pb-16">
+            {/* Hero Section */}
+            <div className="text-center mb-20 md:mb-24 py-12 md:py-16">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 md:mb-8">
               Get Smarter, Faster
               </h1>
-              <p className="text-xl md:text-3xl text-brand-primary font-semibold mb-6">
+              <p className="text-xl md:text-3xl lg:text-4xl text-brand-primary font-semibold mb-8 md:mb-10">
               Acquire the Skills to Move Forward.
               </p>
-              {/* <p className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto mb-4">
-                We believe in the boundless potential of Africa. We have built to Empower Africa's Workforce,
-                Advance Careers and to Move Africa Forward.
-              </p>
-              <p className="text-lg text-gray-400 max-w-4xl mx-auto mb-10">
-                Every career deserves precise, actionable knowledge rooted in African realities.
-                FWD App delivers the mastery, community, and credentials to advance your craft with confidence.
-              </p> */}
 
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleGoogleSignIn}
-                disabled={isSigningIn}
-                className="group"
-              >
-                {isSigningIn ? 'Preparing...' : 'Start Learning Today'}
-                <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <div className="mb-8 md:mb-10">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={handleGoogleSignIn}
+                  disabled={isSigningIn}
+                  className="group"
+                >
+                  {isSigningIn ? 'Preparing...' : 'Start Learning Today'}
+                  <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </div>
 
-              <p className="text-lg text-gray-400 max-w-4xl mx-auto mb-10">
-              We have built to Empower Africa’s Workforce, Advance Careers and to Move Africa Forward.
+              <p className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto">
+              We have built to Empower Africa's Workforce, Advance Careers and to Move Africa Forward.
               </p>
 
             </div>
 
             {/* Membership Value Section */}
-            <section className="bg-brand-surface/80 border border-white/10 rounded-3xl p-10 backdrop-blur-sm">
-              <div className="text-center mb-12">
-                <p className="text-sm uppercase tracking-[0.2em] text-brand-primary mb-3">
+            <section className="bg-brand-surface/80 border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 backdrop-blur-sm mb-20 md:mb-24">
+              <div className="text-center mb-12 md:mb-16">
+                <p className="text-sm md:text-base uppercase tracking-[0.2em] text-brand-primary mb-4 md:mb-5">
                   A Platform Engineered for Growth and Mastery
                 </p>
-                <h2 className="text-3xl md:text-4xl font-bold text-white">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
                   A Forward Membership Gets You
                 </h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
+                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-4 md:gap-5">
                   <div className="flex items-center gap-3">
                     <Brain className="h-7 w-7 text-brand-primary" />
                     <h3 className="text-white text-xl font-semibold">Expert Instructors</h3>
@@ -115,7 +110,7 @@ const LandingPage: React.FC = () => {
                     ensuring relevance, credibility, and local context for every lesson.
                   </p>
                 </div>
-                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
+                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-4 md:gap-5">
                   <div className="flex items-center gap-3">
                     <TrendingUp className="h-7 w-7 text-brand-primary" />
                     <h3 className="text-white text-xl font-semibold">Courses</h3>
@@ -125,7 +120,7 @@ const LandingPage: React.FC = () => {
                     Complete courses to earn verifiable FWD App Certifications that elevate your professional profile.
                   </p>
                 </div>
-                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
+                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-4 md:gap-5">
                   <div className="flex items-center gap-3">
                     <Globe className="h-7 w-7 text-brand-primary" />
                     <h3 className="text-white text-xl font-semibold">Akira</h3>
@@ -135,7 +130,7 @@ const LandingPage: React.FC = () => {
                     and cultural nuances across Africa, acting as your trusted, all-in-one local expert.
                   </p>
                 </div>
-                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
+                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-4 md:gap-5">
                   <div className="flex items-center gap-3">
                     <Users className="h-7 w-7 text-brand-primary" />
                     <h3 className="text-white text-xl font-semibold">Community</h3>
@@ -149,11 +144,11 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* Reasons Section */}
-            <div className="mt-16">
-              <p className="text-center text-sm uppercase tracking-[0.3em] text-brand-primary mb-6">
+            <div className="py-12 md:py-16">
+              <p className="text-center text-sm md:text-base uppercase tracking-[0.3em] text-brand-primary mb-8 md:mb-10">
                 More Reasons to Join
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                 {[
                   { value: '10+', label: 'Certified Core Courses' },
                   { value: '50+', label: 'Hours of Expert Video Content for immediate, practical learning' },
@@ -162,7 +157,7 @@ const LandingPage: React.FC = () => {
                 ].map((item) => (
                   <div
                     key={item.value}
-                    className="bg-brand-surface-muted/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center"
+                    className="bg-brand-surface-muted/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6 md:p-8 text-center"
                   >
                     <div className="text-4xl font-extrabold text-brand-primary mb-3">{item.value}</div>
                     <div className="text-gray-300 text-sm leading-relaxed">{item.label}</div>
@@ -174,11 +169,11 @@ const LandingPage: React.FC = () => {
         </main>
 
         {/* Mission Section */}
-        <section className="relative z-10 bg-brand-background/90 backdrop-blur-sm py-20">
-          <div className="max-w-screen-xl mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center mb-20">
-              <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
-              <p className="text-xl text-gray-300 leading-relaxed mb-8">
+        <section className="relative z-10 bg-brand-background/90 backdrop-blur-sm py-16 md:py-24 lg:py-32">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto text-center mb-16 md:mb-20 lg:mb-24 py-8 md:py-12">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 md:mb-8">Our Mission</h2>
+              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-8 md:mb-10">
               Expert Education to build the African Workforce, for precise advancement strategies of careers and Africa.
               </p>
               <Button
@@ -194,16 +189,16 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* Precision Learning Section */}
-            <div className="bg-brand-surface/70 border border-white/10 rounded-3xl p-10">
-              <h3 className="text-3xl font-bold text-white mb-4">
+            <div className="bg-brand-surface/70 border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16">
+              <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 md:mb-8">
                 Precision-Engineered Learning for African Success.
               </h3>
-              <p className="text-lg text-gray-300 mb-10 max-w-4xl">
+              <p className="text-lg md:text-xl text-gray-300 mb-10 md:mb-12 max-w-4xl mx-auto">
                 We believe the future of Africa is built by masters of their craft. FWD App is designed to drive that growth,
                 providing accessible, actionable knowledge that delivers measurable results for professionals, entrepreneurs,
                 and the organizations powering Africa's workforce.
               </p>
-              <div className="space-y-4">
+              <div className="space-y-4 md:space-y-5">
                 {[
                   {
                     title: 'Context-First Curriculum',
@@ -227,7 +222,7 @@ const LandingPage: React.FC = () => {
                   >
                     <button
                       onClick={() => setExpandedCard(expandedCard === index ? null : index)}
-                      className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
+                      className="w-full flex items-center justify-between p-6 md:p-8 text-left hover:bg-white/5 transition-colors"
                     >
                       <h4 className="text-white text-xl font-semibold pr-4">{item.title}</h4>
                       <ChevronDown
@@ -237,14 +232,14 @@ const LandingPage: React.FC = () => {
                       />
                     </button>
                     {expandedCard === index && (
-                      <div className="px-6 pb-6 pt-0">
-                        <p className="text-gray-300 leading-relaxed">{item.description}</p>
+                      <div className="px-6 md:px-8 pb-6 md:pb-8 pt-0">
+                        <p className="text-gray-300 leading-relaxed text-base md:text-lg">{item.description}</p>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-              <div className="mt-10">
+              <div className="mt-10 md:mt-12 lg:mt-16 text-center">
                 <Button
                   variant="primary"
                   size="lg"
@@ -261,12 +256,12 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Call to Action */}
-        <section className="relative z-10 bg-gradient-to-t from-brand-background to-transparent py-20">
-          <div className="max-w-screen-xl mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+        <section className="relative z-10 bg-gradient-to-t from-brand-background to-transparent py-16 md:py-24 lg:py-32">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 md:mb-8">
               Join Us in Shaping Africa's Future
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8 md:mb-10">
               Be part of a movement that's empowering entrepreneurs to build thriving,
               sustainable businesses that contribute to a prosperous African future.
             </p>
