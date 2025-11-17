@@ -135,9 +135,9 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
   // Show loading state while banner config is loading
   if (loadingBannerConfig) {
     return (
-      <div className="relative w-full h-[70vh] min-h-[500px] overflow-hidden bg-gray-900">
+      <div className="relative w-full h-[70vh] min-h-[500px] overflow-hidden bg-brand-background">
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
         </div>
       </div>
     );
@@ -278,7 +278,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
 
         {/* Overlay - use custom opacity if available */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-brand-background via-brand-background/70 to-transparent"
           style={shouldUseCustomBanner && bannerConfig?.homepage_banner_overlay_opacity !== undefined ? {
             backgroundColor: `rgba(0, 0, 0, ${bannerConfig.homepage_banner_overlay_opacity})`
           } : {}}
@@ -290,7 +290,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
           // Custom banner content
           <>
             {bannerConfig?.homepage_banner_subtitle && (
-              <span className="text-sm md:text-base text-red-500 font-semibold mb-2">
+              <span className="text-sm md:text-base text-brand-primary font-semibold mb-2">
                 {bannerConfig.homepage_banner_subtitle}
               </span>
             )}
@@ -303,7 +303,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
         ) : (
           // Default course content
           <>
-            <span className="text-sm md:text-base text-red-500 font-semibold mb-2">FEATURED MASTER CLASS</span>
+            <span className="text-sm md:text-base text-brand-primary font-semibold mb-2">FEATURED MASTER CLASS</span>
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">{course.title || 'Featured Course'}</h1>
           </>
         )}

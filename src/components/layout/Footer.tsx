@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-black text-gray-400">
+    <footer className="bg-gradient-to-b from-brand-background via-brand-background to-black text-gray-400">
       {/* Main Footer Content */}
       <div className="max-w-screen-xl mx-auto pt-16 pb-8 px-4 sm:px-6 lg:px-8">
         {/* Top Section */}
@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
           <div>
             <Link href="/" className="flex items-center mb-6">
               <div className="flex items-center">
-                <span className="text-red-600 font-bold text-2xl">FORWARD</span>
+                <span className="text-brand-primary font-bold text-2xl">FORWARD</span>
                 <span className="text-white font-bold text-2xl">AFRICA</span>
               </div>
             </Link>
@@ -28,16 +28,16 @@ const Footer: React.FC = () => {
               Empowering African professionals through expert-led courses and cutting-edge learning experiences.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-red-500 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-brand-primary transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-red-500 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-brand-primary transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-red-500 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-brand-primary transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-red-500 transition-colors">
+              <a href="#" className="text-gray-400 hover:text-brand-primary transition-colors">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -48,25 +48,25 @@ const Footer: React.FC = () => {
             <h3 className="text-white text-lg font-semibold mb-6">Quick Links</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/courses" className="hover:text-red-500 transition-colors flex items-center">
+                <Link href="/courses" className="hover:text-brand-primary transition-colors flex items-center">
                   <Globe className="h-4 w-4 mr-2" />
                   Browse Courses
                 </Link>
               </li>
               <li>
-                <Link href="/afri-sage" className="hover:text-red-500 transition-colors flex items-center">
+                <Link href="/afri-sage" className="hover:text-brand-primary transition-colors flex items-center">
                   <Globe className="h-4 w-4 mr-2" />
                   Afri-Sage
                 </Link>
               </li>
               <li>
-                <Link href="/community" className="hover:text-red-500 transition-colors flex items-center">
+                <Link href="/community" className="hover:text-brand-primary transition-colors flex items-center">
                   <Globe className="h-4 w-4 mr-2" />
                   Community
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-red-500 transition-colors flex items-center">
+                <Link href="/about" className="hover:text-brand-primary transition-colors flex items-center">
                   <Globe className="h-4 w-4 mr-2" />
                   About Us
                 </Link>
@@ -79,22 +79,22 @@ const Footer: React.FC = () => {
             <h3 className="text-white text-lg font-semibold mb-6">Categories</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/category/business" className="hover:text-red-500 transition-colors">
+                <Link href="/category/business" className="hover:text-brand-primary transition-colors">
                   Business
                 </Link>
               </li>
               <li>
-                <Link href="/category/entrepreneurship" className="hover:text-red-500 transition-colors">
+                <Link href="/category/entrepreneurship" className="hover:text-brand-primary transition-colors">
                   Entrepreneurship
                 </Link>
               </li>
               <li>
-                <Link href="/category/finance" className="hover:text-red-500 transition-colors">
+                <Link href="/category/finance" className="hover:text-brand-primary transition-colors">
                   Finance
                 </Link>
               </li>
               <li>
-                <Link href="/category/personal-development" className="hover:text-red-500 transition-colors">
+                <Link href="/category/personal-development" className="hover:text-brand-primary transition-colors">
                   Personal Development
                 </Link>
               </li>
@@ -106,15 +106,15 @@ const Footer: React.FC = () => {
             <h3 className="text-white text-lg font-semibold mb-6">Contact Us</h3>
             <ul className="space-y-4">
               <li className="flex items-center">
-                <MapPin className="h-5 w-5 mr-3 text-red-500" />
+                <MapPin className="h-5 w-5 mr-3 text-brand-primary" />
                 <span>123 Innovation Hub, Digital City, Africa</span>
               </li>
               <li className="flex items-center">
-                <Phone className="h-5 w-5 mr-3 text-red-500" />
+                <Phone className="h-5 w-5 mr-3 text-brand-primary" />
                 <span>+234 123 456 7890</span>
               </li>
               <li className="flex items-center">
-                <Mail className="h-5 w-5 mr-3 text-red-500" />
+                <Mail className="h-5 w-5 mr-3 text-brand-primary" />
                 <span>support@forwardafrica.com</span>
               </li>
             </ul>
@@ -132,11 +132,11 @@ const Footer: React.FC = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-3 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="flex-1 px-4 py-3 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary"
               />
               <button
                 type="submit"
-                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
+                className="bg-brand-gradient text-white px-6 py-3 rounded-lg hover:shadow-brand-glow transition-all"
               >
                 Subscribe
               </button>
@@ -151,21 +151,21 @@ const Footer: React.FC = () => {
               &copy; {new Date().getFullYear()} Forward Africa. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center md:justify-end gap-4 text-sm">
-              <Link href="/terms" className="hover:text-red-500 transition-colors">
+              <Link href="/terms" className="hover:text-brand-primary transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/privacy" className="hover:text-red-500 transition-colors">
+              <Link href="/privacy" className="hover:text-brand-primary transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/cookies" className="hover:text-red-500 transition-colors">
+              <Link href="/cookies" className="hover:text-brand-primary transition-colors">
                 Cookie Policy
               </Link>
-              <Link href="/accessibility" className="hover:text-red-500 transition-colors">
+              <Link href="/accessibility" className="hover:text-brand-primary transition-colors">
                 Accessibility
               </Link>
               <button
                 onClick={handleAdminLogin}
-                className="hover:text-red-500 transition-colors flex items-center"
+                className="hover:text-brand-primary transition-colors flex items-center"
               >
                 <Lock className="h-3 w-3 mr-1" />
                 Admin Login

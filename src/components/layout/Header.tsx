@@ -52,7 +52,7 @@ const Header: React.FC = () => {
   return (
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-black/95 backdrop-blur-sm' : 'bg-gradient-to-b from-black/80 to-transparent'
+        isScrolled ? 'bg-brand-background/95 backdrop-blur-sm' : 'bg-gradient-to-b from-brand-background/90 via-brand-background/50 to-transparent'
       }`}
     >
       <nav className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -61,7 +61,7 @@ const Header: React.FC = () => {
           <Link href="/home" className="flex items-center flex-shrink-0">
             <div className="flex items-center">
               <Image src="/images/logo/logo2.png" alt="Forward Africa Logo" width={32} height={32} className="mr-3" />
-              <span className="text-red-600 font-bold text-xl lg:text-2xl tracking-tight">FORWARD</span>
+              <span className="text-brand-primary font-bold text-xl lg:text-2xl tracking-tight">FORWARD</span>
               <span className="text-white font-bold text-xl lg:text-2xl tracking-tight">AFRICA</span>
             </div>
           </Link>
@@ -70,13 +70,13 @@ const Header: React.FC = () => {
           <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
             <Link
               href="/home"
-              className="text-white hover:text-red-500 px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-800/50"
+              className="text-white hover:text-brand-primary px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
             >
               Home
             </Link>
             <Link
               href="/courses"
-              className="text-white hover:text-red-500 px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-800/50"
+              className="text-white hover:text-brand-primary px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
             >
               Courses
             </Link>
@@ -85,7 +85,7 @@ const Header: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsResourcesOpen(!isResourcesOpen)}
-                className="flex items-center text-white hover:text-red-500 px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-800/50"
+                className="flex items-center text-white hover:text-brand-primary px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
               >
                 Resources
                 <ChevronDown className="h-4 w-4 ml-1" />
@@ -111,7 +111,7 @@ const Header: React.FC = () => {
 
             <Link
               href="/about"
-              className="text-white hover:text-red-500 px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-800/50"
+              className="text-white hover:text-brand-primary px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
             >
               About
             </Link>
@@ -123,7 +123,7 @@ const Header: React.FC = () => {
               <>
                 <Link
                   href="/search"
-                  className="text-white hover:text-red-500 p-2 rounded-full hover:bg-gray-800/50"
+                  className="text-white hover:text-brand-primary p-2 rounded-full hover:bg-white/5"
                 >
                   <Search className="h-5 w-5" />
                 </Link>
@@ -132,11 +132,11 @@ const Header: React.FC = () => {
                 <div className="relative">
                   <button
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="text-white hover:text-red-500 p-2 rounded-full hover:bg-gray-800/50 relative"
+                    className="text-white hover:text-brand-primary p-2 rounded-full hover:bg-white/5 relative"
                   >
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-brand-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                         {unreadCount}
                       </span>
                     )}
@@ -155,7 +155,7 @@ const Header: React.FC = () => {
                 <div className="relative">
                   <button
                     onClick={toggleProfileDropdown}
-                    className="flex items-center text-white hover:text-red-500 p-2 rounded-full hover:bg-gray-800/50 transition-colors"
+                    className="flex items-center text-white hover:text-brand-primary p-2 rounded-full hover:bg-white/5 transition-colors"
                     aria-expanded={isProfileOpen}
                     aria-haspopup="true"
                   >
@@ -175,7 +175,7 @@ const Header: React.FC = () => {
 
                   {/* Simple dropdown - no backdrop, no complex logic */}
                   {isProfileOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl py-2 border border-gray-700 z-50">
+                    <div className="absolute top-full right-0 mt-2 w-56 brand-surface rounded-lg shadow-xl py-2 border border-white/10 z-50">
                       <div className="px-4 py-3 border-b border-gray-700">
                         <p className="text-sm font-medium text-white">
                           {profile?.full_name || user?.email || 'User'}
@@ -187,7 +187,7 @@ const Header: React.FC = () => {
                       <div className="py-1">
                         <Link
                           href="/profile"
-                          className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                          className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
                           onClick={() => setIsProfileOpen(false)}
                         >
                           <User className="h-4 w-4 mr-3" />
@@ -196,7 +196,7 @@ const Header: React.FC = () => {
                         {canAccessAdmin && (
                           <Link
                             href="/admin"
-                            className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                            className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
                             onClick={() => setIsProfileOpen(false)}
                           >
                             <Settings className="h-4 w-4 mr-3" />
@@ -205,7 +205,7 @@ const Header: React.FC = () => {
                         )}
                         <button
                           onClick={handleSignOut}
-                          className="w-full flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                          className="w-full flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
                         >
                           <LogOut className="h-4 w-4 mr-3" />
                           Sign Out
@@ -218,7 +218,7 @@ const Header: React.FC = () => {
             ) : (
               <Link
                 href="/login"
-                className="text-white bg-red-600 hover:bg-red-700 px-4 py-2 text-sm font-medium rounded-md transition-colors"
+                className="text-white bg-brand-gradient px-4 py-2 text-sm font-medium rounded-md transition-transform hover:scale-[1.02]"
               >
                 Login
               </Link>
@@ -226,7 +226,7 @@ const Header: React.FC = () => {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden text-white hover:text-red-500 p-2 rounded-full hover:bg-gray-800/50"
+              className="md:hidden text-white hover:text-brand-primary p-2 rounded-full hover:bg-white/5"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -237,29 +237,29 @@ const Header: React.FC = () => {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-black/95 backdrop-blur-sm border-t border-gray-800">
+        <div className="md:hidden bg-brand-background/95 backdrop-blur-sm border-t border-white/10">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link
               href="/home"
-              className="text-white hover:bg-gray-800 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
             >
               Home
             </Link>
             <Link
               href="/courses"
-              className="text-white hover:bg-gray-800 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
             >
               Courses
             </Link>
             <Link
               href="/afri-sage"
-              className="text-white hover:bg-gray-800 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
             >
               Afri-Sage AI
             </Link>
             <Link
               href="/community"
-              className="text-white hover:bg-gray-800 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
             >
               Community
             </Link>
@@ -272,7 +272,7 @@ const Header: React.FC = () => {
             {user && (
               <button
                 onClick={handleSignOut}
-                className="w-full text-left text-white hover:bg-gray-800 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
+                className="w-full text-left text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
               >
                 Sign Out
               </button>

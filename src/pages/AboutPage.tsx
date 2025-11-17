@@ -3,111 +3,214 @@ import { BookOpen, Users, Brain, Globe } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 
 const AboutPage: React.FC = () => {
-  // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
-  const features = [
+  const metrics = [
+    { value: '10+', label: 'Certified Core Courses' },
     {
-      icon: <BookOpen className="h-8 w-8 text-red-500" />,
-      title: "Courses",
-      description: "High-quality, practical, on-demand business education covering essential topics from marketing and finance to supply chain management and scaling strategies."
+      value: '50+',
+      label: 'Hours of Expert Video Content',
+      helper: 'Immediate depth of practical, high-impact learning'
     },
     {
-      icon: <Users className="h-8 w-8 text-red-500" />,
-      title: "Community",
-      description: "A vibrant and supportive network where entrepreneurs can connect, share experiences, collaborate on projects, and find peer support."
+      value: '54+',
+      label: 'African Countries Covered by Afrisage Data',
+      helper: 'Unparalleled local context for decisions'
     },
     {
-      icon: <Brain className="h-8 w-8 text-red-500" />,
-      title: "Afrisage",
-      description: "Our revolutionary AI assistant draws on critical information to provide unparalleled business insight and guidance for African entrepreneurs."
+      value: '5+',
+      label: 'Industry-Specific Forums',
+      helper: 'Instant access to peers and coaches'
+    },
+    { value: '12k+', label: 'Active Learners Across Africa' },
+    { value: '650+', label: 'Subject-Matter Experts & Coaches' }
+  ];
+
+  const membershipBenefits = [
+    {
+      icon: <Users className="h-8 w-8 text-brand-primary" />,
+      title: 'Expert Instructors',
+      description:
+        'Learn directly from vetted business minds and proven experts across Africa for unmatched relevance and credibility.'
     },
     {
-      icon: <Globe className="h-8 w-8 text-red-500" />,
-      title: "Market Insights",
-      description: "Access to crucial market data, regulatory information, and cultural insights across African markets to make informed business decisions."
+      icon: <BookOpen className="h-8 w-8 text-brand-primary" />,
+      title: 'Courses',
+      description:
+        'High-quality, practical, on-demand business education delivering verifiable FWD App certifications that strengthen your profile.'
+    },
+    {
+      icon: <Brain className="h-8 w-8 text-brand-primary" />,
+      title: 'Akira',
+      description:
+        'Our AI assistant and coach delivers market data, regulatory insight, and cultural nuance—your trusted local expert on demand.'
+    },
+    {
+      icon: <Globe className="h-8 w-8 text-brand-primary" />,
+      title: 'Community',
+      description:
+        'A vibrant network for professionals and entrepreneurs to collaborate, share experiences, and build high-value support systems.'
+    }
+  ];
+
+  const precisionHighlights = [
+    {
+      title: 'Context-First Curriculum',
+      copy:
+        'Practical, results-driven training rooted in African economic, regulatory, and cultural realities with strategies that work here.'
+    },
+    {
+      title: 'Master Future-Proof Skills & Earn Credentials',
+      copy:
+        'Build the leadership, technology, finance, and professional excellence needed to navigate a dynamic landscape and graduate with a verifiable Forward Africa Certification.'
+    },
+    {
+      title: 'Tangible Results, Guaranteed',
+      copy:
+        'Apply your learning immediately to daily work and ventures, ensuring measurable impact on career trajectory and business growth.'
     }
   ];
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
+      <div className="min-h-screen bg-brand-gradient">
         <div className="max-w-screen-xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-          {/* Hero Section */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Empowering Africa's Entrepreneurs
+          <section className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.3em] text-gray-400 mb-4">
+              About Forward Africa
+            </p>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Master Your Craft, Move Forward
             </h1>
-            <div className="text-2xl md:text-3xl text-red-500 font-bold mb-8">
-              We don&apos;t train entrepreneurs, We build Systems
-            </div>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              At FWD App, we believe in the boundless potential of African entrepreneurs. We&apos;re bridging the gap between brilliant ideas and thriving businesses through quality education and market insights.
+            <p className="text-2xl text-brand-primary font-semibold mb-6">
+              Acquire the Skills for Growth.
             </p>
-          </div>
-
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-            <div className="bg-gray-800/50 rounded-lg p-6 text-center backdrop-blur-sm border border-gray-700">
-              <div className="text-3xl font-bold text-red-500 mb-2">90%+</div>
-              <div className="text-gray-300">of African Businesses are SMEs</div>
-            </div>
-            <div className="bg-gray-800/50 rounded-lg p-6 text-center backdrop-blur-sm border border-gray-700">
-              <div className="text-3xl font-bold text-red-500 mb-2">50%+</div>
-              <div className="text-gray-300">GDP Contribution</div>
-            </div>
-            <div className="bg-gray-800/50 rounded-lg p-6 text-center backdrop-blur-sm border border-gray-700">
-              <div className="text-3xl font-bold text-red-500 mb-2">63%</div>
-              <div className="text-gray-300">Employment Rate</div>
-            </div>
-            <div className="bg-gray-800/50 rounded-lg p-6 text-center backdrop-blur-sm border border-gray-700">
-              <div className="text-3xl font-bold text-red-500 mb-2">54</div>
-              <div className="text-gray-300">Countries Covered</div>
-            </div>
-          </div>
-
-          {/* Mission Section */}
-          <div className="bg-gradient-to-r from-red-900/20 to-gray-800/20 rounded-2xl p-8 mb-16 backdrop-blur-sm border border-gray-700">
-            <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
-            <p className="text-gray-300 text-lg leading-relaxed">
-              To democratize business education and unlock the full economic potential of Africa by providing entrepreneurs with accessible knowledge, expert mentorship, a supportive community, and cutting-edge AI-powered insights.
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
+              We believe in the boundless potential of Africa. We built the FWD App to
+              empower Africa’s workforce, advance careers, and move the continent
+              forward with precision-engineered learning.
             </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700"
-              >
-                <div className="bg-red-500/10 rounded-lg p-3 inline-block mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-white text-xl font-semibold mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-400">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Call to Action */}
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-6">
-              Join Us in Shaping Africa's Future
-            </h2>
-            <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-              Be part of a movement that&apos;s empowering entrepreneurs to build thriving, sustainable businesses that contribute to a prosperous African future.
-            </p>
-            <button className="bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700 transition-colors text-lg font-medium">
+            <button className="bg-brand-gradient text-white px-8 py-4 rounded-lg hover:shadow-brand-glow transition-colors text-lg font-semibold">
               Start Learning Today
             </button>
-          </div>
+          </section>
+
+          <section className="bg-brand-surface/70 border border-white/10 rounded-3xl p-8 mb-16 backdrop-blur">
+            <h2 className="text-3xl font-bold text-white mb-6">Metrics</h2>
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {metrics.map((metric, index) => (
+                <div
+                  key={metric.label}
+                  className="bg-brand-surface-muted/60 border border-white/10 rounded-2xl p-6"
+                >
+                  <div className="text-4xl font-extrabold text-brand-primary mb-3">
+                    {metric.value}
+                  </div>
+                  <div className="text-white text-lg font-semibold mb-2">
+                    {metric.label}
+                  </div>
+                  {metric.helper && (
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {metric.helper}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <button className="bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
+                Visit Platform
+              </button>
+              <button className="border border-brand-primary/50 text-white px-6 py-3 rounded-lg font-semibold hover:border-white transition-colors">
+                Learn More
+              </button>
+            </div>
+          </section>
+
+          <section className="bg-gradient-to-r from-brand-primary/20 to-brand-background/40 rounded-3xl border border-white/10 p-8 mb-16">
+            <h2 className="text-3xl font-bold text-white mb-5">Our Mission</h2>
+            <p className="text-gray-300 text-lg leading-relaxed">
+              To democratize access to actionable expertise for specific results, build
+              and empower a future-ready African workforce, and ensure every professional
+              and entrepreneur has the tools to precisely advance their career and move
+              the continent forward.
+            </p>
+            <p className="text-brand-primary text-xl font-semibold mt-8">
+              Precision-Engineered Learning for African Success.
+            </p>
+            <p className="text-gray-300 text-lg leading-relaxed mt-4">
+              The future of Africa is built by masters of their craft. FWD App is
+              designed to drive that growth with accessible, actionable knowledge that
+              translates directly into measurable results for professionals,
+              entrepreneurs, and the organizations powering Africa’s workforce.
+            </p>
+          </section>
+
+          <section className="mb-16">
+            <div className="grid gap-8">
+              {precisionHighlights.map((item) => (
+                <div
+                  key={item.title}
+                  className="bg-brand-surface/70 border border-white/10 rounded-2xl p-6"
+                >
+                  <h3 className="text-white text-xl font-semibold mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-400 text-base leading-relaxed">
+                    {item.copy}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mb-16">
+            <h2 className="text-3xl font-bold text-white mb-8">
+              A Platform Engineered for Growth and Mastery
+            </h2>
+            <p className="text-gray-300 text-lg mb-8 max-w-3xl">
+              A Forward membership provides the infrastructure, people, and tools you
+              need to master your craft and see measurable outcomes quickly.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {membershipBenefits.map((benefit) => (
+                <div
+                  key={benefit.title}
+                  className="bg-brand-surface/70 border border-white/10 rounded-2xl p-6"
+                >
+                  <div className="bg-brand-primary/10 rounded-lg p-3 inline-flex mb-4">
+                    {benefit.icon}
+                  </div>
+                  <h3 className="text-white text-2xl font-semibold mb-3">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-gray-400 text-base leading-relaxed">
+                    {benefit.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="text-center bg-brand-surface/80 border border-white/10 rounded-3xl p-10">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Ready to Move Forward?
+            </h2>
+            <p className="text-gray-300 text-lg mb-8 max-w-3xl mx-auto">
+              Expert instructors, transformative curriculum, Akira AI co-pilot, and a
+              thriving community—all inside one membership made for Africa’s builders.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <button className="bg-brand-gradient text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-brand-glow transition-colors">
+                Reach Out to Us
+              </button>
+              <button className="border border-brand-primary/50 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:border-white transition-colors">
+                Start Learning Today
+              </button>
+            </div>
+          </section>
         </div>
       </div>
     </Layout>

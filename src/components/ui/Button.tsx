@@ -1,9 +1,9 @@
 /**
  * Button Component
- * 
+ *
  * A reusable button component with multiple variants and sizes.
  * Supports all standard button HTML attributes plus custom styling options.
- * 
+ *
  * @component
  * @example
  * ```tsx
@@ -34,23 +34,23 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50';
-  
+  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-brand-background disabled:opacity-50 disabled:cursor-not-allowed';
+
   const variantStyles = {
-    primary: 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500',
-    secondary: 'bg-gray-800 text-white hover:bg-gray-700 focus-visible:ring-gray-500',
-    outline: 'border border-gray-300 bg-transparent hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 dark:text-white',
-    ghost: 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white',
+    primary: 'bg-brand-gradient text-white shadow-brand-glow hover:scale-[1.01]',
+    secondary: 'brand-surface text-gray-100 border border-white/10 hover:border-brand-primary/60',
+    outline: 'border border-brand-primary/60 text-brand-primary hover:bg-brand-primary/10',
+    ghost: 'text-brand-primary hover:bg-white/5',
   };
-  
+
   const sizeStyles = {
     sm: 'h-8 px-3 text-xs',
     md: 'h-10 px-4 py-2',
     lg: 'h-12 px-6 text-lg',
   };
-  
+
   const widthStyles = fullWidth ? 'w-full' : '';
-  
+
   return (
     <button
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} ${className}`}

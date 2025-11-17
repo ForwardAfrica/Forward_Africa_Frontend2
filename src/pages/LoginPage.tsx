@@ -86,32 +86,32 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-brand-gradient">
       <div className="max-w-md w-full">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-red-600 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+          <div className="mx-auto w-16 h-16 bg-brand-gradient rounded-2xl flex items-center justify-center mb-4 shadow-brand-glow">
             <span className="text-white text-2xl font-bold">FA</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">
             Welcome Back
           </h2>
-          <p className="text-gray-400">
+          <p className="text-gray-200">
             Sign in to continue your learning journey
           </p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 shadow-2xl">
+        <div className="bg-brand-surface/80 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-brand-glow">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-200">
                 Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-brand-primary" />
                 </div>
                 <input
                   id="email"
@@ -119,8 +119,8 @@ const LoginPage: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className={`block w-full pl-10 pr-4 py-3 bg-gray-700/50 border rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 ${
-                    validationErrors.email ? 'border-red-500' : 'border-gray-600'
+                  className={`block w-full pl-10 pr-4 py-3 bg-brand-surface-muted/70 border rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all duration-200 ${
+                    validationErrors.email ? 'border-red-500' : 'border-white/10'
                   }`}
                   placeholder="Enter your email"
                   value={email}
@@ -142,12 +142,12 @@ const LoginPage: React.FC = () => {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-200">
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-brand-primary" />
                 </div>
                 <input
                   id="password"
@@ -155,20 +155,20 @@ const LoginPage: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
-                  className="block w-full pl-10 pr-12 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                  className="block w-full pl-10 pr-12 py-3 bg-brand-surface-muted/70 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all duration-200"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                    <EyeOff className="h-5 w-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                    <Eye className="h-5 w-5" />
                   )}
                 </button>
               </div>
@@ -198,12 +198,12 @@ const LoginPage: React.FC = () => {
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
+              className="w-full text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02]"
               disabled={loading}
             >
               {loading ? (
                 <div className="flex items-center justify-center space-x-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
                   <span>Signing in...</span>
                 </div>
               ) : (
@@ -216,11 +216,11 @@ const LoginPage: React.FC = () => {
           </form>
 
           {/* Demo Accounts */}
-          <div className="mt-8 p-4 bg-gray-700/30 rounded-xl border border-gray-600/30">
-            <p className="text-sm font-medium text-gray-300 mb-3 text-center">
+        <div className="mt-8 p-4 bg-brand-surface-muted/40 rounded-xl border border-white/10">
+          {/* <p className="text-sm font-medium text-gray-200 mb-3 text-center">
               Demo Accounts
-            </p>
-            <div className="space-y-2 text-xs text-gray-400">
+            </p> */}
+          {/* <div className="space-y-2 text-xs text-gray-300">
               <div className="flex justify-between">
                 <span>Admin:</span>
                 <span>admin@forwardafrica.com / admin123</span>
@@ -233,18 +233,18 @@ const LoginPage: React.FC = () => {
                 <span>Manager:</span>
                 <span>jane.smith@example.com / password123</span>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Helpful Links */}
           <div className="mt-6 space-y-4">
             {/* Register Link */}
             <div className="text-center">
-              <p className="text-gray-400">
+              <p className="text-gray-300">
                 Don't have an account?{' '}
                 <button
                   onClick={() => router.push('/register')}
-                  className="text-red-400 hover:text-red-300 font-medium transition-colors duration-200"
+                  className="text-brand-primary hover:text-brand-primary/80 font-medium transition-colors duration-200"
                 >
                   Create one now
                 </button>
@@ -253,11 +253,11 @@ const LoginPage: React.FC = () => {
 
             {/* Forgot Password Link */}
             <div className="text-center">
-              <p className="text-gray-400">
+              <p className="text-gray-300">
                 Forgot your password?{' '}
                 <button
                   onClick={() => router.push('/forgot-password')}
-                  className="text-red-400 hover:text-red-300 font-medium transition-colors duration-200"
+                  className="text-brand-primary hover:text-brand-primary/80 font-medium transition-colors duration-200"
                 >
                   Reset it here
                 </button>
@@ -268,7 +268,7 @@ const LoginPage: React.FC = () => {
             <div className="text-center">
               <button
                 onClick={() => setShowHelp(!showHelp)}
-                className="inline-flex items-center space-x-1 text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                className="inline-flex items-center space-x-1 text-gray-400 hover:text-gray-200 transition-colors duration-200"
               >
                 <HelpCircle className="h-4 w-4" />
                 <span className="text-sm">Need help?</span>
@@ -277,9 +277,9 @@ const LoginPage: React.FC = () => {
 
             {/* Help Content */}
             {showHelp && (
-              <div className="bg-gray-700/30 rounded-xl p-4 border border-gray-600/30">
-                <h4 className="text-sm font-medium text-gray-300 mb-2">Login Tips:</h4>
-                <ul className="text-xs text-gray-400 space-y-1">
+              <div className="bg-brand-surface-muted/40 rounded-xl p-4 border border-white/10">
+                <h4 className="text-sm font-medium text-gray-200 mb-2">Login Tips:</h4>
+                <ul className="text-xs text-gray-300 space-y-1">
                   <li>• Make sure your email address is correct</li>
                   <li>• Check that your password is entered correctly</li>
                   <li>• If you forgot your password, use the reset link above</li>
