@@ -273,6 +273,88 @@ const RegisterPage: React.FC = () => {
     return true;
   };
 
+  const handleSendOTP = async () => {
+    setOtpError('');
+    setOtpSuccess('');
+
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.isValid) {
+      setOtpError(emailValidation.message);
+      return;
+    }
+
+    setOtpLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setOtpError(data.error || 'Failed to send OTP');
+        return;
+      }
+
+      setOtpSuccess('OTP sent successfully! Check your email.');
+      setShowOTPInput(true);
+      setOtpTimer(600);
+      setOtp('');
+      setAttemptsRemaining(5);
+    } catch (error: any) {
+      console.error('Error sending OTP:', error);
+      setOtpError(error.message || 'Failed to send OTP');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    setOtpError('');
+    setOtpSuccess('');
+
+    if (!otp || otp.length !== 6) {
+      setOtpError('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    setOtpLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setAttemptsRemaining(data.attemptsRemaining || 0);
+        setOtpError(data.error || 'Failed to verify OTP');
+        return;
+      }
+
+      setOtpSuccess('Email verified successfully!');
+      setEmailVerified(true);
+      setShowOTPInput(false);
+      setOtp('');
+      setOtpTimer(0);
+    } catch (error: any) {
+      console.error('Error verifying OTP:', error);
+      setOtpError(error.message || 'Failed to verify OTP');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    await handleSendOTP();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
