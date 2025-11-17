@@ -710,7 +710,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             {/* Professional Information - 2 columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-opacity duration-200 ${!emailVerified ? 'opacity-50 pointer-events-none' : ''}`}>
               {/* Education Level */}
               <div className="space-y-1">
                 <label htmlFor="education_level" className="block text-sm font-medium text-gray-300">
