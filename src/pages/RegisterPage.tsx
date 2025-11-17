@@ -184,6 +184,38 @@ const RegisterPage: React.FC = () => {
     }
   }, [success]);
 
+  // OTP timer countdown
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (otpTimer > 0) {
+      timer = setInterval(() => {
+        setOtpTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [otpTimer]);
+
+  // Clear OTP messages after 3 seconds
+  useEffect(() => {
+    if (otpSuccess) {
+      const timer = setTimeout(() => {
+        setOtpSuccess('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [otpSuccess]);
+
+  useEffect(() => {
+    if (otpError) {
+      const timer = setTimeout(() => {
+        setOtpError('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [otpError]);
+
   const handleTopicToggle = (topic: string) => {
     const newTopics = formData.topics_of_interest.includes(topic)
       ? formData.topics_of_interest.filter(t => t !== topic)
