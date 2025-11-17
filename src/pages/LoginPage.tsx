@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import ErrorDisplay from '../components/ui/ErrorDisplay';
@@ -90,8 +91,15 @@ const LoginPage: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-brand-gradient rounded-2xl flex items-center justify-center mb-4 shadow-brand-glow">
-            <span className="text-white text-2xl font-bold">FA</span>
+          <div className="mx-auto w-24 h-24 relative mb-4 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
+            <Image
+              src="/images/12TH LOGO-08-08.png"
+              alt="Forward Africa logo"
+              fill
+              className="object-contain"
+              sizes="96px"
+              priority
+            />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">
             Welcome Back

@@ -36,7 +36,7 @@ const LandingPage: React.FC = () => {
                 {/* Logo */}
                 <Link href="/home" className="flex items-center flex-shrink-0">
                   <div className="flex items-center">
-                    <Image src="/images/logo/logo2.png" alt="Forward Africa Logo" width={32} height={32} className="mr-3" />
+                    <Image src="/images/12TH LOGO-08-08.png" alt="Forward Africa Logo" width={32} height={32} className="mr-3" />
                     <span className="text-brand-primary font-bold text-xl lg:text-2xl tracking-tight">FORWARD</span>
                     <span className="text-white font-bold text-xl lg:text-2xl tracking-tight">AFRICA</span>
                   </div>
@@ -54,22 +54,9 @@ const LandingPage: React.FC = () => {
           </div>
         </header>
 
-        {/* Background Image with Gradient Overlay */}
-        <div className="fixed inset-0">
-          <img
-            src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg"
-            alt="Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black"></div>
-        </div>
-
-        {/* Spacer for fixed header */}
-        <div className="h-250 mt-64"></div>
-
         {/* Main Content */}
         <main className="relative z-10">
-          <div className="max-w-screen-xl mx-auto px-4 pt-16 pb-32">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-32">
             <div className="text-center mb-16">
               <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
                 Master Your Craft, Move Forward

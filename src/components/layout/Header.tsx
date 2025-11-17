@@ -60,7 +60,7 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link href="/home" className="flex items-center flex-shrink-0">
             <div className="flex items-center">
-              <Image src="/images/logo/logo2.png" alt="Forward Africa Logo" width={32} height={32} className="mr-3" />
+              <Image src="/images/12TH LOGO-08-08.png" alt="Forward Africa Logo" width={32} height={32} className="mr-3" />
               <span className="text-brand-primary font-bold text-xl lg:text-2xl tracking-tight">FORWARD</span>
               <span className="text-white font-bold text-xl lg:text-2xl tracking-tight">AFRICA</span>
             </div>
