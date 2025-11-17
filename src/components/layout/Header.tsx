@@ -56,10 +56,17 @@ const Header: React.FC = () => {
       }`}
     >
       <nav className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-24 md:h-28">
           {/* Logo */}
           <Link href="/home" className="flex items-center flex-shrink-0">
-            <Image src="/images/chosen.png" alt="Forward Africa Logo" width={32} height={32} />
+            <Image
+              src="/images/chosen.png"
+              alt="Forward Africa Logo"
+              width={200}
+              height={200}
+              className="w-32 h-32 md:w-40 md:h-40 object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}

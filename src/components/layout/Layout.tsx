@@ -38,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Header />
 
       {/* Main content area with padding for fixed header */}
-      <main className="flex-grow pt-16">
+      <main className="flex-grow pt-24 md:pt-28">
         {children}
       </main>
 

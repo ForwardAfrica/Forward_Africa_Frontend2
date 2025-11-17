@@ -1,17 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Notification } from '../components/ui/NotificationsDropdown';
 
-// Safe localStorage access for SSR
+// Safe localStorage access for SSR and security-restricted contexts
 const getLocalStorage = (key: string) => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem(key);
+  if (typeof window === 'undefined') {
+    return null;
   }
-  return null;
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    // Handle SecurityError or other localStorage access issues
+    console.warn('localStorage access denied:', error);
+    return null;
+  }
 };
 
 const setLocalStorage = (key: string, value: string) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  try {
     localStorage.setItem(key, value);
+  } catch (error) {
+    // Handle SecurityError or other localStorage access issues
+    console.warn('localStorage write denied:', error);
   }
 };
 
