@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { ChevronRight, Brain, Users, TrendingUp, Globe } from 'lucide-react';
+import { ChevronRight, ChevronDown, Brain, Users, TrendingUp, Globe } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Image from 'next/image';
 import Footer from '../components/layout/Footer';
@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const LandingPage: React.FC = () => {
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const router = useRouter();
   const { loading: authLoading } = useAuth();
 
@@ -35,11 +36,7 @@ const LandingPage: React.FC = () => {
               <div className="flex items-center justify-between h-16">
                 {/* Logo */}
                 <Link href="/home" className="flex items-center flex-shrink-0">
-                  <div className="flex items-center">
-                    <Image src="/images/chosen.png" alt="Forward Africa Logo" width={32} height={32} className="mr-3" />
-                    <span className="text-brand-primary font-bold text-xl lg:text-2xl tracking-tight">FORWARD</span>
-                    <span className="text-white font-bold text-xl lg:text-2xl tracking-tight">AFRICA</span>
-                  </div>
+                  <Image src="/images/chosen.png" alt="Forward Africa Logo" width={32} height={32} />
                 </Link>
 
                 {/* Login Button */}
@@ -199,33 +196,47 @@ const LandingPage: React.FC = () => {
                 providing accessible, actionable knowledge that delivers measurable results for professionals, entrepreneurs,
                 and the organizations powering Africa's workforce.
               </p>
-              <ul className="space-y-6">
+              <div className="space-y-4">
                 {[
                   {
                     title: 'Context-First Curriculum',
                     description:
-                      'Access practical, results-driven training rooted in African economic, regulatory, and cultural realities. Learn the strategies that work here.',
+                      'Practical, results-driven training rooted in African economic, regulatory, and cultural realities with strategies that work here.',
                   },
                   {
                     title: 'Master Future-Proof Skills & Earn Credentials',
                     description:
-                      'Develop vital business skills across leadership, technology, finance, and professional excellence, culminating in a verifiable Forward Africa Certification.',
+                      'Build the leadership, technology, finance, and professional excellence needed to navigate a dynamic landscape and graduate with a verifiable Forward Africa Certification.',
                   },
                   {
                     title: 'Tangible Results, Guaranteed',
                     description:
-                      'Apply your learnings immediately to your work or venture and see measurable impact on your career trajectory and business growth.',
+                      'Apply your learning immediately to daily work and ventures, ensuring measurable impact on career trajectory and business growth.',
                   },
-                ].map((item) => (
-                  <li key={item.title} className="flex items-start gap-4">
-                    <span className="mt-2 h-3 w-3 rounded-full bg-brand-primary flex-shrink-0"></span>
-                    <div>
-                      <p className="text-white text-xl font-semibold">{item.title}</p>
-                      <p className="text-gray-300">{item.description}</p>
-                    </div>
-                  </li>
+                ].map((item, index) => (
+                  <div
+                    key={item.title}
+                    className="bg-brand-surface-muted/60 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300"
+                  >
+                    <button
+                      onClick={() => setExpandedCard(expandedCard === index ? null : index)}
+                      className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
+                    >
+                      <h4 className="text-white text-xl font-semibold pr-4">{item.title}</h4>
+                      <ChevronDown
+                        className={`h-5 w-5 text-brand-primary flex-shrink-0 transition-transform duration-300 ${
+                          expandedCard === index ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                    {expandedCard === index && (
+                      <div className="px-6 pb-6 pt-0">
+                        <p className="text-gray-300 leading-relaxed">{item.description}</p>
+                      </div>
+                    )}
+                  </div>
                 ))}
-              </ul>
+              </div>
               <div className="mt-10">
                 <Button
                   variant="primary"

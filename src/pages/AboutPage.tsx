@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
-import { BookOpen, Users, Brain, Globe } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { BookOpen, Users, Brain, Globe, ChevronDown } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 
 const AboutPage: React.FC = () => {
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
@@ -149,18 +151,32 @@ const AboutPage: React.FC = () => {
           </section>
 
           <section className="mb-16">
-            <div className="grid gap-8">
-              {precisionHighlights.map((item) => (
+            <div className="space-y-4">
+              {precisionHighlights.map((item, index) => (
                 <div
                   key={item.title}
-                  className="bg-brand-surface/70 border border-white/10 rounded-2xl p-6"
+                  className="bg-brand-surface/70 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300"
                 >
-                  <h3 className="text-white text-xl font-semibold mb-3">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-400 text-base leading-relaxed">
-                    {item.copy}
-                  </p>
+                  <button
+                    onClick={() => setExpandedCard(expandedCard === index ? null : index)}
+                    className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
+                  >
+                    <h3 className="text-white text-xl font-semibold pr-4">
+                      {item.title}
+                    </h3>
+                    <ChevronDown
+                      className={`h-5 w-5 text-brand-primary flex-shrink-0 transition-transform duration-300 ${
+                        expandedCard === index ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {expandedCard === index && (
+                    <div className="px-6 pb-6 pt-0">
+                      <p className="text-gray-300 text-base leading-relaxed">
+                        {item.copy}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
