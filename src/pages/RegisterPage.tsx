@@ -499,8 +499,101 @@ const RegisterPage: React.FC = () => {
               </div>
             </div>
 
+            {/* OTP Verification Section */}
+            {!emailVerified && (
+              <div className="bg-gray-700/30 border border-gray-600 rounded-lg p-4">
+                {!showOTPInput ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-300">Verify your email address before proceeding</p>
+                    <button
+                      type="button"
+                      onClick={handleSendOTP}
+                      disabled={otpLoading || !formData.email || validationErrors.email !== undefined}
+                      className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                    >
+                      {otpLoading ? (
+                        <div className="flex items-center justify-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Sending OTP...</span>
+                        </div>
+                      ) : (
+                        'Send OTP to Email'
+                      )}
+                    </button>
+                    {otpSuccess && <ValidationMessage message={otpSuccess} type="success" />}
+                    {otpError && <ValidationMessage message={otpError} type="error" />}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label htmlFor="otp" className="block text-sm font-medium text-gray-300 mb-1">Enter OTP Code</label>
+                      <input
+                        id="otp"
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        placeholder="000000"
+                        className="w-full px-4 py-2.5 bg-gray-700/50 border border-gray-600 rounded-lg text-white text-center tracking-widest text-2xl font-bold placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                        value={otp}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                          setOtp(value);
+                        }}
+                        disabled={otpLoading}
+                      />
+                      <div className="flex justify-between mt-2 text-xs text-gray-400">
+                        <span>{otpTimer > 0 ? `Expires in: ${Math.floor(otpTimer / 60)}:${(otpTimer % 60).toString().padStart(2, '0')}` : 'OTP expired'}</span>
+                        <span>{attemptsRemaining > 0 ? `${attemptsRemaining} attempts left` : 'No attempts remaining'}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleVerifyOTP}
+                        disabled={otpLoading || otp.length !== 6 || otpTimer === 0}
+                        className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        {otpLoading ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <span>Verifying...</span>
+                          </div>
+                        ) : (
+                          'Verify OTP'
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowOTPInput(false);
+                          setOtp('');
+                          setOtpError('');
+                          setOtpSuccess('');
+                        }}
+                        className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        Back
+                      </button>
+                    </div>
+                    {otpTimer > 0 && otpTimer < 300 && (
+                      <button
+                        type="button"
+                        onClick={handleResendOTP}
+                        disabled={otpLoading}
+                        className="w-full text-red-400 hover:text-red-300 text-sm font-medium transition-colors duration-200"
+                      >
+                        Didn't receive the code? Resend OTP
+                      </button>
+                    )}
+                    {otpSuccess && <ValidationMessage message={otpSuccess} type="success" />}
+                    {otpError && <ValidationMessage message={otpError} type="error" />}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Password Fields - 2 columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 transition-opacity duration-200 ${!emailVerified ? 'opacity-50 pointer-events-none' : ''}`}>
               {/* Password */}
               <div className="space-y-1">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-300">
