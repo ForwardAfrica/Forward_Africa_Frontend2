@@ -404,13 +404,13 @@ const RegisterPage: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Login</span>
           </button>
-          <div className="mx-auto w-28 h-28 relative mb-4 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
+          <div className="mx-auto w-48 h-48 md:w-56 md:h-56 relative mb-6 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
             <Image
-              src="/images/12TH LOGO-08-08.png"
+              src="/images/chosen.png"
               alt="Forward Africa logo"
               fill
               className="object-contain"
-              sizes="112px"
+              sizes="(max-width: 768px) 192px, 224px"
               priority
             />
           </div>
