@@ -90,14 +90,14 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-brand-gradient">
       <div className="max-w-md w-full">
         {/* Logo/Brand Section */}
-        <div className="text-center mb-8">
-          <div className="mx-auto w-48 h-48 md:w-56 md:h-56 relative mb-6 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
+        <div className="text-center mb-4">
+          <div className="mx-auto w-64 h-64 md:w-72 md:h-72 relative mb-4 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
             <Image
               src="/images/chosen.png"
               alt="Forward Africa logo"
               fill
               className="object-contain"
-              sizes="(max-width: 768px) 192px, 224px"
+              sizes="(max-width: 768px) 256px, 288px"
               priority
             />
           </div>

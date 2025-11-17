@@ -82,19 +82,22 @@ const AboutPage: React.FC = () => {
               About Forward Africa
             </p>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Master Your Craft, Move Forward
-            </h1>
+            Get Smarter, Faster            </h1>
             <p className="text-2xl text-brand-primary font-semibold mb-6">
-              Acquire the Skills for Growth.
+            Acquire the Skills to Move Forward.
             </p>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
               We believe in the boundless potential of Africa. We built the FWD App to
               empower Africa’s workforce, advance careers, and move the continent
               forward with precision-engineered learning.
             </p>
-            <button className="bg-brand-gradient text-white px-8 py-4 rounded-lg hover:shadow-brand-glow transition-colors text-lg font-semibold">
+            <button className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 hover:shadow-lg text-white px-8 py-4 rounded-lg transition-colors text-lg font-semibold">
               Start Learning Today
             </button>
+
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
+            We have built to Empower Africa’s Workforce, Advance Careers and to Move Africa Forward.
+            </p>
           </section>
 
           <section className="bg-brand-surface/70 border border-white/10 rounded-3xl p-8 mb-16 backdrop-blur">
@@ -132,10 +135,7 @@ const AboutPage: React.FC = () => {
           <section className="bg-gradient-to-r from-brand-primary/20 to-brand-background/40 rounded-3xl border border-white/10 p-8 mb-16">
             <h2 className="text-3xl font-bold text-white mb-5">Our Mission</h2>
             <p className="text-gray-300 text-lg leading-relaxed">
-              To democratize access to actionable expertise for specific results, build
-              and empower a future-ready African workforce, and ensure every professional
-              and entrepreneur has the tools to precisely advance their career and move
-              the continent forward.
+            Expert Education to build the African Workforce, for precise advancement strategies of careers and Africa.
             </p>
             <p className="text-brand-primary text-xl font-semibold mt-8">
               Precision-Engineered Learning for African Success.
@@ -203,7 +203,7 @@ const AboutPage: React.FC = () => {
               thriving community—all inside one membership made for Africa’s builders.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="bg-brand-gradient text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-brand-glow transition-colors">
+              <button className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 hover:shadow-lg text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors">
                 Reach Out to Us
               </button>
               <button className="border border-brand-primary/50 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:border-white transition-colors">

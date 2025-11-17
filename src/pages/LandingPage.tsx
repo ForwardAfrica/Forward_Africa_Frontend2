@@ -45,7 +45,7 @@ const LandingPage: React.FC = () => {
                 {/* Login Button */}
                 <Link
                   href="/login"
-                  className="text-white bg-brand-gradient hover:shadow-brand-glow px-4 py-2 text-sm font-medium rounded-md transition-transform hover:scale-[1.02]"
+                  className="text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 hover:shadow-lg px-4 py-2 text-sm font-medium rounded-md transition-transform hover:scale-[1.02]"
                 >
                   Login
                 </Link>
@@ -59,19 +59,19 @@ const LandingPage: React.FC = () => {
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-32">
             <div className="text-center mb-16">
               <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-                Master Your Craft, Move Forward
+              Get Smarter, Faster
               </h1>
               <p className="text-xl md:text-3xl text-brand-primary font-semibold mb-6">
-                Acquire the Skills for Growth.
+              Acquire the Skills to Move Forward.
               </p>
-              <p className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto mb-4">
+              {/* <p className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto mb-4">
                 We believe in the boundless potential of Africa. We have built to Empower Africa's Workforce,
                 Advance Careers and to Move Africa Forward.
               </p>
               <p className="text-lg text-gray-400 max-w-4xl mx-auto mb-10">
                 Every career deserves precise, actionable knowledge rooted in African realities.
                 FWD App delivers the mastery, community, and credentials to advance your craft with confidence.
-              </p>
+              </p> */}
 
               <Button
                 variant="primary"
@@ -83,6 +83,11 @@ const LandingPage: React.FC = () => {
                 {isSigningIn ? 'Preparing...' : 'Start Learning Today'}
                 <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
+
+              <p className="text-lg text-gray-400 max-w-4xl mx-auto mb-10">
+              We have built to Empower Africa’s Workforce, Advance Careers and to Move Africa Forward.
+              </p>
+
             </div>
 
             {/* Membership Value Section */}
@@ -170,8 +175,7 @@ const LandingPage: React.FC = () => {
             <div className="max-w-3xl mx-auto text-center mb-20">
               <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
               <p className="text-xl text-gray-300 leading-relaxed mb-8">
-                To democratize access to Actionable Expertise for specific results, building and empowering a
-                future-ready African workforce so every professional and entrepreneur can precisely advance their career.
+              Expert Education to build the African Workforce, for precise advancement strategies of careers and Africa.
               </p>
               <Button
                 variant="primary"

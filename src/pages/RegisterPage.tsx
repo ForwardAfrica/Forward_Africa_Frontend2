@@ -396,7 +396,7 @@ const RegisterPage: React.FC = () => {
     <div className="min-h-screen bg-brand-gradient py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <button
             onClick={() => router.push('/login')}
             className="inline-flex items-center space-x-2 text-gray-200 hover:text-white mb-4 transition-colors"
@@ -404,13 +404,13 @@ const RegisterPage: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Login</span>
           </button>
-          <div className="mx-auto w-48 h-48 md:w-56 md:h-56 relative mb-6 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
+          <div className="mx-auto w-64 h-64 md:w-72 md:h-72 relative mb-4 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
             <Image
               src="/images/chosen.png"
               alt="Forward Africa logo"
               fill
               className="object-contain"
-              sizes="(max-width: 768px) 192px, 224px"
+              sizes="(max-width: 768px) 256px, 288px"
               priority
             />
           </div>
@@ -517,7 +517,7 @@ const RegisterPage: React.FC = () => {
                       type="button"
                       onClick={handleSendOTP}
                       disabled={otpLoading || !formData.email || validationErrors.email !== undefined}
-                      className="w-full bg-brand-gradient hover:shadow-brand-glow disabled:bg-brand-surface-muted disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-all duration-200"
+                      className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 hover:shadow-lg disabled:bg-brand-surface-muted disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-all duration-200"
                     >
                       {otpLoading ? (
                         <div className="flex items-center justify-center space-x-2">
@@ -559,7 +559,7 @@ const RegisterPage: React.FC = () => {
                         type="button"
                         onClick={handleVerifyOTP}
                         disabled={otpLoading || otp.length !== 6 || otpTimer === 0}
-                        className="flex-1 bg-brand-gradient hover:shadow-brand-glow disabled:bg-brand-surface-muted disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-all duration-200"
+                        className="flex-1 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 hover:shadow-lg disabled:bg-brand-surface-muted disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-all duration-200"
                       >
                         {otpLoading ? (
                           <div className="flex items-center justify-center space-x-2">
