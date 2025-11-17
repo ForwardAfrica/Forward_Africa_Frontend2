@@ -34,7 +34,7 @@ export default async function handler(
     }
 
     const otpStatus = otpService.getOTPStatus(email);
-    if (otpStatus.exists && otpStatus.timeRemainingSeconds > 0) {
+    if (otpStatus.exists && otpStatus.timeRemainingSeconds !== undefined && otpStatus.timeRemainingSeconds > 0) {
       return res.status(429).json({
         error: `Please wait ${otpStatus.timeRemainingSeconds} seconds before requesting a new OTP`,
         timeRemainingSeconds: otpStatus.timeRemainingSeconds,
