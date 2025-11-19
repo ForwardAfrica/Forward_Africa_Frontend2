@@ -32,25 +32,25 @@ const AboutPage: React.FC = () => {
 
   const membershipBenefits = [
     {
-      icon: <Users className="h-8 w-8 text-brand-primary" />,
+      icon: <Users className="h-8 w-8 text-red-500" />,
       title: 'Expert Instructors',
       description:
         'Learn directly from vetted business minds and proven experts across Africa for unmatched relevance and credibility.'
     },
     {
-      icon: <BookOpen className="h-8 w-8 text-brand-primary" />,
+      icon: <BookOpen className="h-8 w-8 text-red-500" />,
       title: 'Courses',
       description:
         'High-quality, practical, on-demand business education delivering verifiable FWD App certifications that strengthen your profile.'
     },
     {
-      icon: <Brain className="h-8 w-8 text-brand-primary" />,
+      icon: <Brain className="h-8 w-8 text-red-500" />,
       title: 'Akira',
       description:
         'Our AI assistant and coach delivers market data, regulatory insight, and cultural nuance—your trusted local expert on demand.'
     },
     {
-      icon: <Globe className="h-8 w-8 text-brand-primary" />,
+      icon: <Globe className="h-8 w-8 text-red-500" />,
       title: 'Community',
       description:
         'A vibrant network for professionals and entrepreneurs to collaborate, share experiences, and build high-value support systems.'
@@ -77,15 +77,14 @@ const AboutPage: React.FC = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-brand-gradient">
-        <div className="max-w-screen-xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-          <section className="text-center mb-16">
-            <p className="text-sm uppercase tracking-[0.3em] text-gray-400 mb-4">
+      <div className="max-w-screen-xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+          <section className="text-center mt-8 md:mt-12 lg:mt-16 mb-16">
+            <p className="text-lg md:text-xl uppercase tracking-[0.3em] text-white mb-4">
               About Forward Africa
             </p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4">
             Get Smarter, Faster            </h1>
-            <p className="text-2xl text-brand-primary font-semibold mb-6">
+            <p className="text-3xl md:text-4xl lg:text-5xl text-red-500 font-semibold mb-6">
             Acquire the Skills to Move Forward.
             </p>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
@@ -93,13 +92,15 @@ const AboutPage: React.FC = () => {
               empower Africa’s workforce, advance careers, and move the continent
               forward with precision-engineered learning.
             </p>
-            <button className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 hover:shadow-lg text-white px-8 py-4 rounded-lg transition-colors text-lg font-semibold">
+            <button className="bg-[#ef4444] hover:bg-[#dc2626] hover:shadow-lg text-white px-8 py-4 rounded-lg transition-colors text-lg font-semibold">
               Start Learning Today
             </button>
 
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
-            We have built to Empower Africa’s Workforce, Advance Careers and to Move Africa Forward.
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mt-8 mb-10">
+            We have built to Empower Africa's Workforce, Advance Careers and to Move Africa Forward.
             </p>
+          </section>
+          <section>
           </section>
 
           <section className="bg-brand-surface/70 border border-white/10 rounded-3xl p-8 mb-16 backdrop-blur">
@@ -110,7 +111,7 @@ const AboutPage: React.FC = () => {
                   key={metric.label}
                   className="bg-brand-surface-muted/60 border border-white/10 rounded-2xl p-6"
                 >
-                  <div className="text-4xl font-extrabold text-brand-primary mb-3">
+                  <div className="text-4xl font-extrabold text-red-500 mb-3">
                     {metric.value}
                   </div>
                   <div className="text-white text-lg font-semibold mb-2">
@@ -125,10 +126,10 @@ const AboutPage: React.FC = () => {
               ))}
             </div>
             <div className="mt-10 flex flex-wrap gap-4">
-              <button className="bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
+              <button className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                 Visit Platform
               </button>
-              <button className="border border-brand-primary/50 text-white px-6 py-3 rounded-lg font-semibold hover:border-white transition-colors">
+              <button className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                 Learn More
               </button>
             </div>
@@ -139,7 +140,7 @@ const AboutPage: React.FC = () => {
             <p className="text-gray-300 text-lg leading-relaxed">
             Expert Education to build the African Workforce, for precise advancement strategies of careers and Africa.
             </p>
-            <p className="text-brand-primary text-xl font-semibold mt-8">
+            <p className="text-red-500 text-xl font-semibold mt-8">
               Precision-Engineered Learning for African Success.
             </p>
             <p className="text-gray-300 text-lg leading-relaxed mt-4">
@@ -159,13 +160,13 @@ const AboutPage: React.FC = () => {
                 >
                   <button
                     onClick={() => setExpandedCard(expandedCard === index ? null : index)}
-                    className="w-full flex items-center justify-between p-6 text-left hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center justify-between p-6 text-left hover:bg-[#ef4444]/10 transition-colors"
                   >
                     <h3 className="text-white text-xl font-semibold pr-4">
                       {item.title}
                     </h3>
                     <ChevronDown
-                      className={`h-5 w-5 text-brand-primary flex-shrink-0 transition-transform duration-300 ${
+                      className={`h-5 w-5 text-red-500 flex-shrink-0 transition-transform duration-300 ${
                         expandedCard === index ? 'rotate-180' : ''
                       }`}
                     />
@@ -219,16 +220,15 @@ const AboutPage: React.FC = () => {
               thriving community—all inside one membership made for Africa’s builders.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <button className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 hover:shadow-lg text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors">
+              <button className="bg-[#ef4444] hover:bg-[#dc2626] hover:shadow-lg text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors">
                 Reach Out to Us
               </button>
-              <button className="border border-brand-primary/50 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:border-white transition-colors">
+              <button className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors">
                 Start Learning Today
               </button>
             </div>
           </section>
         </div>
-      </div>
     </Layout>
   );
 };

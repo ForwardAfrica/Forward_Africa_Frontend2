@@ -121,18 +121,18 @@ const ResetPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-brand-background/90">
       <div className="max-w-md w-full">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <button
             onClick={() => router.push('/forgot-password')}
-            className="inline-flex items-center space-x-2 text-gray-400 hover:text-white mb-4 transition-colors"
+            className="inline-flex items-center space-x-2 text-gray-400 hover:text-white mb-3 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Forgot Password</span>
           </button>
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-red-600 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-red-600 to-red-500 rounded-2xl flex items-center justify-center mb-2 shadow-lg">
             <span className="text-white text-2xl font-bold">FA</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">
@@ -314,7 +314,7 @@ const ResetPasswordPage: React.FC = () => {
                 type="submit"
                 variant="primary"
                 size="lg"
-                className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
+                className="w-full bg-[#ef4444] hover:bg-[#dc2626] text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
                 disabled={loading}
               >
                 {loading ? (
@@ -344,7 +344,7 @@ const ResetPasswordPage: React.FC = () => {
                 onClick={() => router.push('/login')}
                 variant="primary"
                 size="lg"
-                className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
+                className="w-full bg-[#ef4444] hover:bg-[#dc2626] text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
               >
                 Go to Login
               </Button>

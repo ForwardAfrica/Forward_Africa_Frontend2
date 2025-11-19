@@ -290,7 +290,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
           // Custom banner content
           <>
             {bannerConfig?.homepage_banner_subtitle && (
-              <span className="text-sm md:text-base text-brand-primary font-semibold mb-2">
+              <span className="text-sm md:text-base text-red-500 font-semibold mb-2">
                 {bannerConfig.homepage_banner_subtitle}
               </span>
             )}
@@ -303,7 +303,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
         ) : (
           // Default course content
           <>
-            <span className="text-sm md:text-base text-brand-primary font-semibold mb-2">FEATURED MASTER CLASS</span>
+            <span className="text-sm md:text-base text-red-500 font-semibold mb-2">FEATURED MASTER CLASS</span>
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">{course.title || 'Featured Course'}</h1>
           </>
         )}

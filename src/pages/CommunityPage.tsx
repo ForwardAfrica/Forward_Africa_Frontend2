@@ -583,7 +583,7 @@ const CommunityPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-brand-background/90">
       {/* Mobile Header - Highest z-index to stay on top */}
       <div className="lg:hidden bg-gray-800/95 backdrop-blur-sm border-b border-gray-700/50 p-4 sticky top-0 z-[9999]">
         <div className="flex items-center justify-between">
@@ -665,7 +665,7 @@ const CommunityPage: React.FC = () => {
                   onClick={() => setActiveTab(tab)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                     activeTab === tab
-                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/25'
+                      ? 'bg-[#ef4444] text-white shadow-lg'
                       : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
                   }`}
                   aria-label={`Show ${getTabLabel(tab).toLowerCase()}`}
@@ -704,7 +704,7 @@ const CommunityPage: React.FC = () => {
                 <p className="text-gray-400">{filteredGroups.length} communities available</p>
               </div>
               <button
-                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 flex items-center space-x-2 shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transform hover:scale-105"
+                className="bg-[#ef4444] text-white px-6 py-3 rounded-xl hover:bg-[#dc2626] transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
                 aria-label="Create new community"
               >
                 <Plus className="h-5 w-5" />
@@ -825,7 +825,7 @@ const CommunityPage: React.FC = () => {
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 transform hover:scale-105 ${
                         group.joined
                             ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50'
-                            : 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg shadow-red-500/25'
+                            : 'bg-[#ef4444] text-white hover:bg-[#dc2626] shadow-lg'
                         } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       aria-label={group.joined ? `Leave ${group.name}` : `Join ${group.name}`}
                     >
@@ -960,7 +960,7 @@ const CommunityPage: React.FC = () => {
                     <div className={`flex-1 max-w-[70%] ${message.senderId === currentUser.id ? 'order-first' : ''}`}>
                       <div className={`rounded-2xl p-4 shadow-lg ${
                         message.senderId === currentUser.id
-                          ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
+                          ? 'bg-[#ef4444] text-white'
                           : 'bg-gray-700/50 backdrop-blur-sm'
                       }`}>
                         {message.senderId !== currentUser.id && (
@@ -1048,7 +1048,7 @@ const CommunityPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={!messageInput.trim() || isSendingMessage}
-                    className="p-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                    className="p-3 bg-[#ef4444] text-white rounded-xl hover:bg-[#dc2626] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
                     aria-label="Send message"
                   >
                     {isSendingMessage ? (

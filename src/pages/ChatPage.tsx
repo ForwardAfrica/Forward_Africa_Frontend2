@@ -187,7 +187,7 @@ const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-900">
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-brand-background/90">
       {/* Chat Header */}
       <div className="bg-gray-800 px-4 py-3 flex items-center border-b border-gray-700">
         <div className="flex-1">

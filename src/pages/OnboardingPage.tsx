@@ -596,7 +596,7 @@ const OnboardingPage: React.FC = () => {
                       disabled={!canProceed() || isSubmitting}
                       className={`flex items-center px-6 py-2 rounded-lg transition-all ${
                         canProceed() && !isSubmitting
-                          ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg shadow-red-500/25'
+                          ? 'bg-[#ef4444] hover:bg-[#dc2626] shadow-lg'
                           : 'bg-gray-600 cursor-not-allowed'
                       }`}
                     >
@@ -618,7 +618,7 @@ const OnboardingPage: React.FC = () => {
                       disabled={!canProceed() || isSubmitting}
                       className={`flex items-center px-6 py-2 rounded-lg transition-all ${
                         canProceed() && !isSubmitting
-                          ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg shadow-green-500/25'
+                          ? 'bg-[#ef4444] hover:bg-[#dc2626] shadow-lg'
                           : 'bg-gray-600 cursor-not-allowed'
                       }`}
                     >

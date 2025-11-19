@@ -116,7 +116,7 @@ const AfrisagePage: React.FC = () => {
   // Show error if component fails to load
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-900">
+      <div className="flex flex-col min-h-screen bg-brand-background/90">
         <Header />
         <main className="flex-grow pt-16">
           <div className="flex items-center justify-center min-h-screen">
@@ -138,7 +138,7 @@ const AfrisagePage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-brand-background/90">
       {/* Fixed header */}
       <Header />
 
@@ -151,7 +151,7 @@ const AfrisagePage: React.FC = () => {
             <div className="p-6 border-b border-gray-700">
               <h1 className="text-2xl font-bold text-white mb-4">FWD AFRICA AI</h1>
               <div className="flex space-x-2">
-                <button className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-red-700 transition-colors">
+                <button className="flex-1 bg-[#ef4444] text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#dc2626] transition-colors">
                   <Plus className="w-4 h-4" />
                   <span>New chat</span>
                 </button>

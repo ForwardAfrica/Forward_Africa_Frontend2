@@ -34,13 +34,13 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-background disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ef4444] focus-visible:ring-offset-2 focus-visible:ring-offset-brand-background disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantStyles = {
-    primary: 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg hover:from-red-700 hover:to-red-600 hover:scale-[1.01]',
-    secondary: 'brand-surface text-gray-100 border border-white/10 hover:border-red-500/60',
-    outline: 'border border-red-500/60 text-red-500 hover:bg-red-500/10',
-    ghost: 'text-red-500 hover:bg-white/5',
+    primary: 'bg-[#ef4444] text-white shadow-lg hover:bg-[#dc2626] hover:scale-[1.01]',
+    secondary: 'brand-surface text-gray-100 border border-white/10 hover:border-[#ef4444]/60',
+    outline: 'border border-[#ef4444]/60 text-[#ef4444] hover:bg-[#ef4444]/10',
+    ghost: 'text-[#ef4444] hover:bg-white/5',
   };
 
   const sizeStyles = {

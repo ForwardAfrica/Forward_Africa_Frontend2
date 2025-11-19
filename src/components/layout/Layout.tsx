@@ -33,12 +33,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-brand-background">
+    <div
+      className="flex flex-col min-h-screen bg-brand-background/90"
+    >
       {/* Fixed header */}
       <Header />
 
-      {/* Main content area with padding for fixed header */}
-      <main className="flex-grow pt-24 md:pt-28">
+      {/* Main content area */}
+      <main className="flex-grow">
         {children}
       </main>
 

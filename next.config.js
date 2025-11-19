@@ -34,6 +34,18 @@ const nextConfig = {
     // Configure unoptimized images for local static files
     unoptimized: false,
   },
+  // Webpack configuration to handle Windows file system issues
+  webpack: (config, { isServer }) => {
+    // Workaround for Windows file system issues with react-loadable-manifest
+    if (process.platform === 'win32') {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: ['**/node_modules/**', '**/.git/**'],
+        poll: 1000, // Check for changes every second
+      };
+    }
+    return config;
+  },
   // Enable static exports if needed
   // output: 'export',
   // trailingSlash: true,

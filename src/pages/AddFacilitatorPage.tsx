@@ -504,7 +504,7 @@ const AddInstructorPage: React.FC = () => {
                     type="submit"
                     variant="primary"
                     disabled={isSubmitting}
-                    className={`flex items-center ${!isFormValid ? 'bg-blue-600 hover:bg-blue-700' : ''}`}
+                    className={`flex items-center ${!isFormValid ? 'bg-[#ef4444] hover:bg-[#dc2626]' : ''}`}
                   >
                     {isSubmitting ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />

@@ -344,8 +344,8 @@ export default function AdminDashboardPage() {
             <h4 className="text-white font-semibold mb-2">Quick Links</h4>
             <ul className="text-gray-400 text-sm space-y-1">
               <li>Browse Courses</li>
-              <li>Afri-Sage</li>
-              <li>Community</li>
+              <li>Akira Ai</li>
+              <li>Forums</li>
               <li>About Us</li>
             </ul>
           </div>
@@ -363,7 +363,7 @@ export default function AdminDashboardPage() {
             <ul className="text-gray-400 text-sm space-y-1">
               <li>123 Innovation Hub, Digital City, Africa</li>
               <li>+234 123 456 7890</li>
-              <li>support@forwardafrica.com</li>
+              <li>Support@forwardafrica.tech</li>
             </ul>
           </div>
         </div>
@@ -374,7 +374,7 @@ export default function AdminDashboardPage() {
               placeholder="Enter your email"
               className="px-4 py-2 rounded-l bg-gray-700 text-white border-none focus:ring-2 focus:ring-red-500"
             />
-            <button className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-r text-white font-medium">
+            <button className="bg-[#ef4444] hover:bg-[#dc2626] px-4 py-2 rounded-r text-white font-medium">
               Subscribe
             </button>
           </form>

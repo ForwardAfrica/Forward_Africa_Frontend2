@@ -87,24 +87,26 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-brand-gradient">
+    <div
+      className="min-h-screen flex items-center justify-center pt-1 pb-12 px-4 sm:px-6 lg:px-8 bg-brand-background/90"
+    >
       <div className="max-w-md w-full">
         {/* Logo/Brand Section */}
-        <div className="text-center mb-4">
-          <div className="mx-auto w-64 h-64 md:w-72 md:h-72 relative mb-4 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
+        <div className="text-center mb-0">
+          <div className="mx-auto w-48 h-48 md:w-56 md:h-56 relative mb-2 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
             <Image
-              src="/images/chosen.png"
+              src="/images/chosen2.png"
               alt="Forward Africa logo"
               fill
               className="object-contain"
-              sizes="(max-width: 768px) 256px, 288px"
+              sizes="(max-width: 768px) 192px, 224px"
               priority
             />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">
             Welcome Back
           </h2>
-          <p className="text-gray-200">
+          <p className="text-gray-200 mb-4">
             Sign in to continue your learning journey
           </p>
         </div>
@@ -119,7 +121,7 @@ const LoginPage: React.FC = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-brand-primary" />
+                  <Mail className="h-5 w-5 text-red-500" />
                 </div>
                 <input
                   id="email"
@@ -155,7 +157,7 @@ const LoginPage: React.FC = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-brand-primary" />
+                  <Lock className="h-5 w-5 text-red-500" />
                 </div>
                 <input
                   id="password"
@@ -206,7 +208,7 @@ const LoginPage: React.FC = () => {
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02]"
+              className="w-full bg-[#ef4444] hover:bg-[#dc2626] text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02]"
               disabled={loading}
             >
               {loading ? (
@@ -252,7 +254,7 @@ const LoginPage: React.FC = () => {
                 Don't have an account?{' '}
                 <button
                   onClick={() => router.push('/register')}
-                  className="text-brand-primary hover:text-brand-primary/80 font-medium transition-colors duration-200"
+                  className="text-red-500 hover:text-red-500/80 font-medium transition-colors duration-200"
                 >
                   Create one now
                 </button>
@@ -265,7 +267,7 @@ const LoginPage: React.FC = () => {
                 Forgot your password?{' '}
                 <button
                   onClick={() => router.push('/forgot-password')}
-                  className="text-brand-primary hover:text-brand-primary/80 font-medium transition-colors duration-200"
+                  className="text-red-500 hover:text-red-500/80 font-medium transition-colors duration-200"
                 >
                   Reset it here
                 </button>

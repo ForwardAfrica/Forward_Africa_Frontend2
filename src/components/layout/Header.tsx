@@ -51,16 +51,14 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-brand-background/95 backdrop-blur-sm' : 'bg-gradient-to-b from-brand-background/90 via-brand-background/50 to-transparent'
-      }`}
+      className="relative w-full z-50 transition-all duration-300"
     >
       <nav className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24 md:h-28">
           {/* Logo */}
           <Link href="/home" className="flex items-center flex-shrink-0">
             <Image
-              src="/images/chosen.png"
+              src="/images/chosen2.png"
               alt="Forward Africa Logo"
               width={200}
               height={200}
@@ -73,13 +71,13 @@ const Header: React.FC = () => {
           <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
             <Link
               href="/home"
-              className="text-white hover:text-brand-primary px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
+              className="text-white hover:text-red-500 px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
             >
               Home
             </Link>
             <Link
               href="/courses"
-              className="text-white hover:text-brand-primary px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
+              className="text-white hover:text-red-500 px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
             >
               Courses
             </Link>
@@ -88,7 +86,7 @@ const Header: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsResourcesOpen(!isResourcesOpen)}
-                className="flex items-center text-white hover:text-brand-primary px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
+                className="flex items-center text-white hover:text-red-500 px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
               >
                 Resources
                 <ChevronDown className="h-4 w-4 ml-1" />
@@ -100,13 +98,13 @@ const Header: React.FC = () => {
                     href="/afri-sage"
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
                   >
-                    Afri-Sage AI
+                    Akira Ai
                   </Link>
                   <Link
                     href="/community"
                     className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
                   >
-                    Community
+                    Forums
                   </Link>
                 </div>
               )}
@@ -114,7 +112,7 @@ const Header: React.FC = () => {
 
             <Link
               href="/about"
-              className="text-white hover:text-brand-primary px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
+              className="text-white hover:text-red-500 px-3 py-2 text-sm font-medium rounded-md hover:bg-white/5"
             >
               About
             </Link>
@@ -126,7 +124,7 @@ const Header: React.FC = () => {
               <>
                 <Link
                   href="/search"
-                  className="text-white hover:text-brand-primary p-2 rounded-full hover:bg-white/5"
+                  className="text-white hover:text-red-500 p-2 rounded-full hover:bg-white/5"
                 >
                   <Search className="h-5 w-5" />
                 </Link>
@@ -135,7 +133,7 @@ const Header: React.FC = () => {
                 <div className="relative">
                   <button
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="text-white hover:text-brand-primary p-2 rounded-full hover:bg-white/5 relative"
+                    className="text-white hover:text-red-500 p-2 rounded-full hover:bg-white/5 relative"
                   >
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
@@ -158,7 +156,7 @@ const Header: React.FC = () => {
                 <div className="relative">
                   <button
                     onClick={toggleProfileDropdown}
-                    className="flex items-center text-white hover:text-brand-primary p-2 rounded-full hover:bg-white/5 transition-colors"
+                    className="flex items-center text-white hover:text-red-500 p-2 rounded-full hover:bg-white/5 transition-colors"
                     aria-expanded={isProfileOpen}
                     aria-haspopup="true"
                   >
@@ -221,7 +219,7 @@ const Header: React.FC = () => {
             ) : (
               <Link
                 href="/login"
-                className="text-white bg-brand-gradient px-4 py-2 text-sm font-medium rounded-md transition-transform hover:scale-[1.02]"
+                className="text-white bg-[#ef4444] hover:bg-[#dc2626] px-4 py-2 text-sm font-medium rounded-md transition-transform hover:scale-[1.02]"
               >
                 Login
               </Link>
@@ -229,7 +227,7 @@ const Header: React.FC = () => {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden text-white hover:text-brand-primary p-2 rounded-full hover:bg-white/5"
+              className="md:hidden text-white hover:text-red-500 p-2 rounded-full hover:bg-white/5"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -240,31 +238,31 @@ const Header: React.FC = () => {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-brand-background/95 backdrop-blur-sm border-t border-white/10">
+        <div className="md:hidden border-t border-white/10">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link
               href="/home"
-              className="text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:bg-white/5 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
             >
               Home
             </Link>
             <Link
               href="/courses"
-              className="text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:bg-white/5 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
             >
               Courses
             </Link>
             <Link
               href="/afri-sage"
-              className="text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:bg-white/5 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
             >
-              Afri-Sage AI
+              Akira Ai
             </Link>
             <Link
               href="/community"
-              className="text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:bg-white/5 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
             >
-              Community
+              Forums
             </Link>
             <Link
               href="/about"
@@ -275,7 +273,7 @@ const Header: React.FC = () => {
             {user && (
               <button
                 onClick={handleSignOut}
-                className="w-full text-left text-white hover:bg-white/5 hover:text-brand-primary block px-3 py-2 rounded-md text-base font-medium"
+                className="w-full text-left text-white hover:bg-white/5 hover:text-red-500 block px-3 py-2 rounded-md text-base font-medium"
               >
                 Sign Out
               </button>
