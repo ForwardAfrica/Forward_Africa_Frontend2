@@ -88,12 +88,12 @@ const LoginPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center pt-1 pb-12 px-4 sm:px-6 lg:px-8 bg-brand-background/90"
+      className="min-h-screen flex items-center justify-center pt-1 pb-12 px-4 sm:px-6 lg:px-8 bg-brand-background/90 py-8"
     >
       <div className="max-w-md w-full">
         {/* Logo/Brand Section */}
         <div className="text-center mb-0">
-          <div className="mx-auto w-48 h-48 md:w-56 md:h-56 relative mb-2 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
+          <div className="mx-auto w-48 h-48 md:w-56 md:h-56 relative mb-1 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
             <Image
               src="/images/chosen2.png"
               alt="Forward Africa logo"
@@ -103,16 +103,16 @@ const LoginPage: React.FC = () => {
               priority
             />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="text-3xl font-bold text-white mb-1">
             Welcome Back
           </h2>
-          <p className="text-gray-200 mb-4">
+          <p className="text-gray-200 mb-3">
             Sign in to continue your learning journey
           </p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-brand-surface/80 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-brand-glow">
+        <div className="bg-brand-surface/80 backdrop-blur-sm rounded-2xl p-8 border border-white/10 shadow-brand-glow -mt-2">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div className="space-y-2">

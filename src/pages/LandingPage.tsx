@@ -98,7 +98,7 @@ const mockTrendingCourses: Course[] = [
     title: 'Tech Innovation in Africa',
     instructor: {
       id: 'instructor-4',
-      name: 'James Kariuki',
+      name: 'James Wayne',
       title: 'Tech Entrepreneur',
       image: '/images/placeholder-avatar.jpg',
       bio: 'Founder of multiple successful tech startups in East Africa',
@@ -253,9 +253,9 @@ const LandingPage: React.FC = () => {
     >
         {/* Simple Header with Logo and Login */}
         <header className="relative w-full z-50">
-          <div className="mb-10">
+          <div className="mb-6 sm:mb-8 md:mb-10">
             <nav className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center justify-between h-24 md:h-28">
+              <div className="flex items-center justify-between h-16 sm:h-20 md:h-24 lg:h-28">
                 {/* Logo */}
                 <Link href="/home" className="flex items-center flex-shrink-0">
                   <Image
@@ -263,7 +263,7 @@ const LandingPage: React.FC = () => {
                     alt="Forward Africa Logo"
                     width={200}
                     height={200}
-                    className="w-32 h-32 md:w-40 md:h-40 object-contain"
+                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 object-contain"
                     priority
                   />
                 </Link>
@@ -271,7 +271,7 @@ const LandingPage: React.FC = () => {
                 {/* Login Button */}
                 <Link
                   href="/login"
-                  className="text-white bg-[#ef4444] hover:bg-[#dc2626] hover:shadow-lg px-4 py-2 text-sm font-medium rounded-md transition-transform hover:scale-[1.02]"
+                  className="text-white bg-[#ef4444] hover:bg-[#dc2626] hover:shadow-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-transform hover:scale-[1.02]"
                 >
                   Login
                 </Link>
@@ -282,63 +282,63 @@ const LandingPage: React.FC = () => {
 
         {/* Main Content */}
         <main className="relative z-10">
-          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
             {/* Hero Section */}
-            <div className="text-center mb-20 md:mb-24 py-12 md:py-16">
-              <h1 className="text-7xl md:text-9xl lg:text-[8rem] font-bold text-white mb-6 md:mb-8">
+            <div className="text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24 py-6 sm:py-8 md:py-12 lg:py-16">
+              <h1 className="text-[5.0rem] font-black text-white mb-4 sm:mb-5 md:mb-6 lg:mb-8 leading-tight">
               Get Smarter, Faster.
               </h1>
-              <p className="text-xl md:text-3xl lg:text-4xl text-red-500 font-semibold mb-8 md:mb-10">
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-red-500 font-semibold mb-6 sm:mb-7 md:mb-8 lg:mb-10 px-4">
               Acquire the Skills to Move Forward.
               </p>
 
-              <div className="mb-8 md:mb-10">
+              <div className="mb-6 sm:mb-7 md:mb-8 lg:mb-10 px-4">
                 <Button
                   variant="primary"
                   size="lg"
                   onClick={handleGoogleSignIn}
                   disabled={isSigningIn}
-                  className="group"
+                  className="group w-full sm:w-auto"
                 >
                   {isSigningIn ? 'Preparing...' : 'Start Learning Today'}
-                  <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
             </div>
 
             {/* Mission Statement Section */}
-            <section className="mb-20 md:mb-24">
-              <div className="text-center mb-12 md:mb-16">
-                <p className="text-xl md:text-2xl lg:text-3xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+            <section className="-mt-4 sm:-mt-6 md:-mt-8 lg:-mt-10 mb-12 sm:mb-16 md:mb-20 lg:mb-24">
+              <div className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-16 px-4">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
                   We have built to Empower Africa's Workforce, Advance Careers and to Move Africa Forward.
                 </p>
               </div>
 
               {/* Trending Courses Section */}
-              <div className="mb-12 md:mb-16">
-                <div className="flex items-center justify-between mb-6 md:mb-8">
-                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">Trending Courses</h2>
-                  <div className="flex items-center gap-4">
+              <div className="mb-8 sm:mb-10 md:mb-12 lg:mb-16">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-5 md:mb-6 lg:mb-8 gap-3 sm:gap-4">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white">Trending Courses</h2>
+                  <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
                     <Link
                       href="/courses"
-                      className="text-sm md:text-base text-gray-400 hover:text-red-500 transition-colors"
+                      className="text-xs sm:text-sm md:text-base text-gray-400 hover:text-red-500 transition-colors"
                     >
                       See all
                     </Link>
                     <div className="flex gap-2">
                       <button
                         onClick={scrollLeft}
-                        className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-all hover:scale-110"
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-all hover:scale-110"
                         aria-label="Scroll left"
                       >
-                        <ChevronLeft className="h-5 w-5 text-white" />
+                        <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                       </button>
                       <button
                         onClick={scrollRight}
-                        className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-all hover:scale-110"
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-all hover:scale-110"
                         aria-label="Scroll right"
                       >
-                        <ChevronRight className="h-5 w-5 text-white" />
+                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                       </button>
                     </div>
                   </div>
@@ -348,103 +348,108 @@ const LandingPage: React.FC = () => {
                   <div className="relative">
                     <div
                       ref={scrollContainerRef}
-                      className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
+                      className="flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
                       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
-                      {trendingCourses.map((course) => (
+                      {trendingCourses.map((course, index) => {
+                        // Use p1, p2, p3 as image templates for trending courses
+                        const templateImages = ['/images/p1.jpeg', '/images/p2.jpeg', '/images/p3.jpeg'];
+                        const templateImage = templateImages[index % templateImages.length];
+                        // Prioritize template images for trending courses, only use course thumbnail if it's not a placeholder
+                        const courseImage = (course.thumbnail && !course.thumbnail.includes('placeholder'))
+                          ? course.thumbnail
+                          : templateImage;
+
+                        return (
                         <Link
                           key={course.id}
                           href={`/course/${course.id}`}
-                          className="flex-shrink-0 w-64 md:w-72 group"
+                          className="flex-shrink-0 w-56 sm:w-64 md:w-72 group"
                         >
-                          <div className="relative rounded-2xl overflow-hidden border border-white/10 group-hover:border-white/30 transition-all h-[420px] flex flex-col">
-                            <div className="relative h-64 flex-shrink-0 overflow-hidden">
-                              <Image
-                                src={course.thumbnail || '/images/placeholder-course.jpg'}
-                                alt={course.title}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                              {/* Fading gradient overlay from bottom */}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
-                              <div className="absolute top-3 left-3 bg-red-500 rounded-lg px-2 py-1 z-10">
-                                <span className="text-white text-xs font-semibold">New</span>
-                              </div>
-                            </div>
-                            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 bg-gradient-to-t from-black via-black/95 to-transparent">
-                              <h3 className="text-base md:text-lg font-bold text-white mb-2 line-clamp-2">
+                          <div className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 group-hover:border-white/30 transition-all h-[360px] sm:h-[400px] md:h-[420px]">
+                            <Image
+                              src={courseImage}
+                              alt={course.title}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              unoptimized
+                              priority={index < 3}
+                            />
+                            <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-5">
+                              {/* <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1.5 sm:mb-2 line-clamp-2">
                                 {course.title}
-                              </h3>
+                              </h3> */}
                               {course.instructor && (
-                                <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-1">
+                                <p className="text-white font-bold text-[10px] sm:text-xs md:text-sm mb-1.5 sm:mb-2 line-clamp-1 bg-black/60 rounded-lg px-2 py-1 inline-block">
                                   {course.instructor.name}
                                 </p>
                               )}
-                              <div className="flex items-center gap-2 text-gray-400 text-xs">
-                                <Clock className="h-3 w-3" />
+                              <div className="flex items-center gap-1.5 sm:gap-2 text-white font-bold text-[10px] sm:text-xs bg-black/60 rounded-lg px-2 py-1 inline-flex">
+                                <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                                 <span>{formatDuration(course.lessons)}</span>
                               </div>
                             </div>
                           </div>
                         </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <p className="text-gray-400">No trending courses available at the moment.</p>
+                  <div className="text-center py-8 sm:py-10 md:py-12">
+                    <p className="text-gray-400 text-sm sm:text-base">No trending courses available at the moment.</p>
                   </div>
                 )}
               </div>
             </section>
 
             {/* Membership Value Section */}
-            <section className="bg-brand-surface/80 border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 backdrop-blur-sm mb-20 md:mb-24">
-              <div className="text-center mb-12 md:mb-16">
-                <p className="text-sm md:text-base uppercase tracking-[0.2em] text-red-500 mb-4 md:mb-5">
+            <section className="bg-brand-surface/80 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 lg:p-16 backdrop-blur-sm mb-12 sm:mb-16 md:mb-20 lg:mb-24">
+              <div className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-16">
+                <p className="text-xs sm:text-sm md:text-base uppercase tracking-[0.2em] text-red-500 mb-3 sm:mb-4 md:mb-5 px-4">
                   A Platform Engineered for Growth and Mastery
                 </p>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white px-4">
                   A Forward Membership Gets You
                 </h2>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
-                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-4 md:gap-5">
-                  <div className="flex items-center gap-3">
-                    <Brain className="h-7 w-7 text-red-500" />
-                    <h3 className="text-white text-xl font-semibold">Expert Instructors</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
+                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 flex flex-col gap-3 sm:gap-4 md:gap-5">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Brain className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-red-500 flex-shrink-0" />
+                    <h3 className="text-white text-lg sm:text-xl font-semibold">Expert Instructors</h3>
                   </div>
-                  <p className="text-gray-300 text-base leading-relaxed">
+                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
                     Learn directly from the best business minds and proven experts across Africa,
                     ensuring relevance, credibility, and local context for every lesson.
                   </p>
                 </div>
-                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-4 md:gap-5">
-                  <div className="flex items-center gap-3">
-                    <TrendingUp className="h-7 w-7 text-red-500" />
-                    <h3 className="text-white text-xl font-semibold">Courses</h3>
+                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 flex flex-col gap-3 sm:gap-4 md:gap-5">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-red-500 flex-shrink-0" />
+                    <h3 className="text-white text-lg sm:text-xl font-semibold">Courses</h3>
                   </div>
-                  <p className="text-gray-300 text-base leading-relaxed">
+                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
                     High-quality, practical, on-demand business education covering essential topics.
                     Complete courses to earn verifiable FWD App Certifications that elevate your professional profile.
                   </p>
                 </div>
-                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-4 md:gap-5">
-                  <div className="flex items-center gap-3">
-                    <Globe className="h-7 w-7 text-red-500" />
-                    <h3 className="text-white text-xl font-semibold">Akira</h3>
+                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 flex flex-col gap-3 sm:gap-4 md:gap-5">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Globe className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-red-500 flex-shrink-0" />
+                    <h3 className="text-white text-lg sm:text-xl font-semibold">Akira</h3>
                   </div>
-                  <p className="text-gray-300 text-base leading-relaxed">
+                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
                     Our revolutionary AI assistant and coach delivers crucial market data, regulatory insights,
                     and cultural nuances across Africa, acting as your trusted, all-in-one local expert.
                   </p>
                 </div>
-                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-4 md:gap-5">
-                  <div className="flex items-center gap-3">
-                    <Users className="h-7 w-7 text-red-500" />
-                    <h3 className="text-white text-xl font-semibold">Community</h3>
+                <div className="bg-brand-surface-muted/70 border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 flex flex-col gap-3 sm:gap-4 md:gap-5">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Users className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-red-500 flex-shrink-0" />
+                    <h3 className="text-white text-lg sm:text-xl font-semibold">Community</h3>
                   </div>
-                  <p className="text-gray-300 text-base leading-relaxed">
+                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
                     A vibrant network where professionals and entrepreneurs connect, share experiences,
                     and collaborate to build the high-value support systems needed for scale.
                   </p>
@@ -453,11 +458,11 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* Reasons Section */}
-            <div className="py-12 md:py-16">
-              <p className="text-center text-sm md:text-base uppercase tracking-[0.3em] text-red-500 mb-8 md:mb-10">
+            <div className="py-8 sm:py-10 md:py-12 lg:py-16">
+              <p className="text-center text-xs sm:text-sm md:text-base uppercase tracking-[0.3em] text-red-500 mb-6 sm:mb-7 md:mb-8 lg:mb-10 px-4">
                 More Reasons to Join
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
                 {[
                   { value: '10+', label: 'Certified Core Courses' },
                   { value: '50+', label: 'Hours of Expert Video Content for immediate, practical learning' },
@@ -466,10 +471,10 @@ const LandingPage: React.FC = () => {
                 ].map((item) => (
                   <div
                     key={item.value}
-                    className="bg-brand-surface-muted/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6 md:p-8 text-center"
+                    className="bg-brand-surface-muted/50 backdrop-blur-sm border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 text-center"
                   >
-                    <div className="text-4xl font-extrabold text-red-500 mb-3">{item.value}</div>
-                    <div className="text-gray-300 text-sm leading-relaxed">{item.label}</div>
+                    <div className="text-3xl sm:text-4xl font-extrabold text-red-500 mb-2 sm:mb-3">{item.value}</div>
+                    <div className="text-gray-300 text-xs sm:text-sm leading-relaxed">{item.label}</div>
                   </div>
                 ))}
               </div>
@@ -478,41 +483,43 @@ const LandingPage: React.FC = () => {
         </main>
 
         {/* Mission Section */}
-        <section className="relative z-10 bg-brand-background/90 backdrop-blur-sm pt-2 md:pt-4 lg:pt-6 pb-16 md:pb-24 lg:pb-32">
+        <section className="relative z-10 bg-brand-background/90 backdrop-blur-sm pt-2 sm:pt-3 md:pt-4 lg:pt-6 pb-12 sm:pb-16 md:pb-24 lg:pb-32">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto text-center mb-16 md:mb-20 lg:mb-24 py-2 md:py-4">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 md:mb-8">Our Mission</h2>
-              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-8 md:mb-10">
+            <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24 py-2 sm:py-3 md:py-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-5 md:mb-6 lg:mb-8 px-4">Our Mission</h2>
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 leading-relaxed mb-6 sm:mb-7 md:mb-8 lg:mb-10 px-4">
               Expert Education to build the African Workforce, for precise advancement strategies of careers and Africa.
               </p>
 
-              <p className="text-xl md:text-3xl lg:text-4xl text-red-500 font-semibold mb-8 md:mb-10">
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-red-500 font-semibold mb-6 sm:mb-7 md:mb-8 lg:mb-10 px-4">
               Join The Movement.
               </p>
 
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleGoogleSignIn}
-                disabled={isSigningIn}
-                className="group"
-              >
-                {isSigningIn ? 'Joining...' : 'Master Your Craft, Move Forward.'}
-                <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <div className="px-4">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={handleGoogleSignIn}
+                  disabled={isSigningIn}
+                  className="group w-full sm:w-auto"
+                >
+                  {isSigningIn ? 'Joining...' : 'Master Your Craft, Move Forward.'}
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </div>
             </div>
 
             {/* Precision Learning Section */}
-            <div className="bg-brand-surface/70 border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16">
-              <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 md:mb-8">
+            <div className="bg-brand-surface/70 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 lg:p-16">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-5 md:mb-6 lg:mb-8 px-2">
                 Precision-Engineered Learning for African Success.
               </h3>
-              <p className="text-lg md:text-xl text-gray-300 mb-10 md:mb-12 max-w-4xl mx-auto">
+              <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 sm:mb-9 md:mb-10 lg:mb-12 max-w-4xl mx-auto px-2">
                 We believe the future of Africa is built by masters of their craft. FWD App is designed to drive that growth,
                 providing accessible, actionable knowledge that delivers measurable results for professionals, entrepreneurs,
                 and the organizations powering Africa's workforce.
               </p>
-              <div className="space-y-4 md:space-y-5">
+              <div className="space-y-3 sm:space-y-4 md:space-y-5">
                 {[
                   {
                     title: 'Context-First Curriculum',
@@ -532,37 +539,37 @@ const LandingPage: React.FC = () => {
                 ].map((item, index) => (
                   <div
                     key={item.title}
-                    className="bg-brand-surface-muted/60 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300"
+                    className="bg-brand-surface-muted/60 border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300"
                   >
                     <button
                       onClick={() => setExpandedCard(expandedCard === index ? null : index)}
-                      className="w-full flex items-center justify-between p-6 md:p-8 text-left hover:bg-white/5 transition-colors"
+                      className="w-full flex items-center justify-between p-4 sm:p-5 md:p-6 lg:p-8 text-left hover:bg-white/5 transition-colors"
                     >
-                      <h4 className="text-white text-xl font-semibold pr-4">{item.title}</h4>
+                      <h4 className="text-white text-base sm:text-lg md:text-xl font-semibold pr-3 sm:pr-4">{item.title}</h4>
                       <ChevronDown
-                        className={`h-5 w-5 text-red-500 flex-shrink-0 transition-transform duration-300 ${
+                        className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 flex-shrink-0 transition-transform duration-300 ${
                           expandedCard === index ? 'rotate-180' : ''
                         }`}
                       />
                     </button>
                     {expandedCard === index && (
-                      <div className="px-6 md:px-8 pb-6 md:pb-8 pt-0">
-                        <p className="text-gray-300 leading-relaxed text-base md:text-lg">{item.description}</p>
+                      <div className="px-4 sm:px-5 md:px-6 lg:px-8 pb-4 sm:pb-5 md:pb-6 lg:pb-8 pt-0">
+                        <p className="text-gray-300 leading-relaxed text-sm sm:text-base md:text-lg">{item.description}</p>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-              <div className="mt-10 md:mt-12 lg:mt-16 text-center">
+              <div className="mt-8 sm:mt-9 md:mt-10 lg:mt-12 xl:mt-16 text-center px-2">
                 <Button
                   variant="primary"
                   size="lg"
                   onClick={handleGoogleSignIn}
                   disabled={isSigningIn}
-                  className="group"
+                  className="group w-full sm:w-auto"
                 >
                   {isSigningIn ? 'Investing...' : 'Invest in your Career.'}
-                  <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
             </div>
@@ -570,77 +577,49 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Coming Soon Courses Section */}
-        <section className="relative z-10 bg-brand-background/90 backdrop-blur-sm pt-8 md:pt-12 pb-16 md:pb-24 lg:pb-32">
+        <section className="relative z-10 bg-brand-background/90 backdrop-blur-sm pt-6 sm:pt-8 md:pt-12 pb-12 sm:pb-16 md:pb-24 lg:pb-32">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-6 md:mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+            <div className="mb-5 sm:mb-6 md:mb-8">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">
                 Coming Soon
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
               {/* Course Card 1 */}
-              <div className="relative rounded-xl overflow-hidden border border-white/10 group hover:border-white/20 transition-all">
-                <div className="relative h-36 md:h-40 overflow-hidden">
-                  {/* Placeholder for course image - you can replace with actual images */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900">
-                    <div className="absolute inset-0 opacity-30">
-                      {/* Glitch effect overlay */}
-                      <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,0,0,0.1)_50%,transparent_100%)] animate-pulse"></div>
-                      <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(0,255,0,0.1)_50%,transparent_100%)] animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                      <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(0,0,255,0.1)_50%,transparent_100%)] animate-pulse" style={{animationDelay: '1s'}}></div>
-                    </div>
-                    {/* Placeholder for people/illustration */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24 h-24 bg-white/10 rounded-full"></div>
-                    </div>
-                  </div>
-                  {/* Gradient overlay to make images visible */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-                  {/* Date Tag */}
-                  <div className="absolute top-3 left-3 bg-white rounded-lg px-2.5 py-1 z-10">
-                    <span className="text-black text-xs font-semibold">Nov 25</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-b from-transparent via-black/60 to-black/90 p-4 md:p-5">
-                  <h3 className="text-lg md:text-xl font-bold text-white mb-1.5">
+              <div className="relative rounded-lg sm:rounded-xl overflow-hidden border border-white/10 group hover:border-white/20 transition-all h-48 sm:h-56 md:h-64">
+                <Image
+                  src="/images/L1.jpeg"
+                  alt="CYBERWARFARE Course"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-5">
+                  {/* <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-1 sm:mb-1.5">
                     CYBERWARFARE
-                  </h3>
-                  <div className="w-10 h-0.5 bg-white mb-3"></div>
-                  <p className="text-gray-300 text-xs md:text-sm">
+                  </h3> */}
+                  <div className="w-8 sm:w-10 h-0.5 bg-white mb-2 sm:mb-3"></div>
+                  <p className="text-white font-bold text-[10px] sm:text-xs md:text-sm bg-black/60 rounded-lg px-2 py-1 inline-block">
                     with Former NSA and US Cyber Command leaders
                   </p>
                 </div>
               </div>
 
               {/* Course Card 2 */}
-              <div className="relative rounded-xl overflow-hidden border border-white/10 group hover:border-white/20 transition-all">
-                <div className="relative h-36 md:h-40 overflow-hidden">
-                  {/* Placeholder for course image - you can replace with actual images */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900">
-                    <div className="absolute inset-0 opacity-30">
-                      {/* Glitch effect overlay */}
-                      <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,0,0,0.1)_50%,transparent_100%)] animate-pulse"></div>
-                      <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(0,255,0,0.1)_50%,transparent_100%)] animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                      <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(0,0,255,0.1)_50%,transparent_100%)] animate-pulse" style={{animationDelay: '1s'}}></div>
-                    </div>
-                    {/* Placeholder for people/illustration */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24 h-24 bg-white/10 rounded-full"></div>
-                    </div>
-                  </div>
-                  {/* Gradient overlay to make images visible */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
-                  {/* Date Tag */}
-                  <div className="absolute top-3 left-3 bg-white rounded-lg px-2.5 py-1 z-10">
-                    <span className="text-black text-xs font-semibold">Dec 15</span>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-b from-transparent via-black/60 to-black/90 p-4 md:p-5">
-                  <h3 className="text-lg md:text-xl font-bold text-white mb-1.5">
+              <div className="relative rounded-lg sm:rounded-xl overflow-hidden border border-white/10 group hover:border-white/20 transition-all h-48 sm:h-56 md:h-64">
+                <Image
+                  src="/images/L2.jpeg"
+                  alt="Course Title"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-5">
+                  {/* <h3 className="text-base sm:text-lg md:text-xl font-bold text-white mb-1 sm:mb-1.5">
                     COURSE TITLE
-                  </h3>
-                  <div className="w-10 h-0.5 bg-white mb-3"></div>
-                  <p className="text-gray-300 text-xs md:text-sm">
+                  </h3> */}
+                  <div className="w-8 sm:w-10 h-0.5 bg-white mb-2 sm:mb-3"></div>
+                  <p className="text-white font-bold text-[10px] sm:text-xs md:text-sm bg-black/60 rounded-lg px-2 py-1 inline-block">
                     Course description or tagline here
                   </p>
                 </div>
@@ -650,25 +629,27 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Call to Action */}
-        <section className="relative z-10 bg-gradient-to-t from-brand-background to-transparent pt-4 md:pt-6 pb-16 md:pb-24 lg:pb-32">
+        <section className="relative z-10 bg-gradient-to-t from-brand-background to-transparent pt-4 sm:pt-5 md:pt-6 pb-12 sm:pb-16 md:pb-24 lg:pb-32">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 md:mb-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-5 md:mb-6 lg:mb-8 px-4">
               Join Us in Shaping Africa's Future
             </h2>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8 md:mb-10">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 max-w-2xl mx-auto mb-6 sm:mb-7 md:mb-8 lg:mb-10 px-4">
               Be part of a movement that's empowering entrepreneurs to build thriving,
               sustainable businesses that contribute to a prosperous African future.
             </p>
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleGoogleSignIn}
-              disabled={isSigningIn}
-              className="group"
-            >
-              {isSigningIn ? 'Starting...' : 'Start Learning Today'}
-              <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            <div className="px-4">
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleGoogleSignIn}
+                disabled={isSigningIn}
+                className="group w-full sm:w-auto"
+              >
+                {isSigningIn ? 'Starting...' : 'Start Learning Today'}
+                <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
           </div>
         </section>
 

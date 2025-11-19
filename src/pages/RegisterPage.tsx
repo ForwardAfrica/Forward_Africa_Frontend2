@@ -406,7 +406,7 @@ const RegisterPage: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Login</span>
           </button>
-          <div className="mx-auto w-48 h-48 md:w-56 md:h-56 relative mb-2 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
+          <div className="mx-auto w-48 h-48 md:w-56 md:h-56 relative mb-1 drop-shadow-[0_10px_25px_rgba(93,88,242,0.35)]">
             <Image
               src="/images/chosen2.png"
               alt="Forward Africa logo"
@@ -416,16 +416,16 @@ const RegisterPage: React.FC = () => {
               priority
             />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="text-3xl font-bold text-white mb-1">
             Join Forward Africa
           </h2>
-          <p className="text-gray-200 mb-4">
+          <p className="text-gray-200 mb-3">
             Start your learning journey today
           </p>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-brand-surface/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-brand-glow max-w-2xl mx-auto">
+        <div className="bg-brand-surface/80 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-brand-glow max-w-2xl mx-auto -mt-2">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Basic Information - 2 columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
