@@ -7,6 +7,7 @@ import PermissionGuard from '../components/ui/PermissionGuard';
 import { Permission } from '../types';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import Layout from '../components/layout/Layout';
+import { standardizeRole } from '../lib/roleStandardization';
 
 interface SecuritySettings {
   passwordPolicy: {
