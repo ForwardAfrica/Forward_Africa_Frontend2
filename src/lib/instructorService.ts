@@ -1,5 +1,6 @@
 import { Instructor } from '../types';
 import { instructorAPI } from './api';
+import { authService } from './authService';
 
 export interface InstructorFormData {
   name: string;
@@ -36,6 +37,31 @@ export class InstructorServiceError extends Error {
 }
 
 export class InstructorService {
+  /**
+   * Checks if the current user has permission to create/manage instructors
+   */
+  static checkInstructorPermission(): void {
+    const user = authService.getUserFromToken();
+
+    if (!user) {
+      throw new InstructorServiceError(
+        'You are not authenticated. Please log in to create instructors.',
+        401,
+        'UNAUTHENTICATED'
+      );
+    }
+
+    // Check if user has the required role
+    const allowedRoles = ['super_admin', 'content_manager'];
+    if (!allowedRoles.includes(user.role)) {
+      throw new InstructorServiceError(
+        `Missing or insufficient permissions. Only Super Admin and Content Manager roles can create instructors. Your current role: ${user.role}`,
+        403,
+        'INSUFFICIENT_PERMISSIONS'
+      );
+    }
+  }
+
   /**
    * Validates instructor form data
    */
@@ -320,6 +346,9 @@ export class InstructorService {
    * Creates a new instructor
    */
   static async createInstructor(data: InstructorFormData): Promise<Instructor> {
+    // Check permissions first
+    this.checkInstructorPermission();
+
     // Validate input
     const errors = this.validateInstructorData(data);
     if (errors.length > 0) {
@@ -371,6 +400,9 @@ export class InstructorService {
    * Updates an existing instructor
    */
   static async updateInstructor(id: string, data: InstructorFormData): Promise<Instructor> {
+    // Check permissions first
+    this.checkInstructorPermission();
+
     if (!id?.trim()) {
       throw new InstructorServiceError('Instructor ID is required', 400, 'VALIDATION_ERROR');
     }
@@ -430,6 +462,9 @@ export class InstructorService {
    * Deletes an instructor
    */
   static async deleteInstructor(id: string): Promise<void> {
+    // Check permissions first
+    this.checkInstructorPermission();
+
     if (!id?.trim()) {
       throw new InstructorServiceError('Instructor ID is required', 400, 'VALIDATION_ERROR');
     }

@@ -7,6 +7,13 @@ service cloud.firestore {
     }
 
     function getUserRole() {
+      // First, try to get role from JWT token's custom claims (most reliable)
+      let tokenRole = request.auth.token.role;
+      if (tokenRole != null) {
+        return tokenRole;
+      }
+
+      // Fallback: get role from Firestore user document
       let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
       return userDoc != null && userDoc.data != null ? userDoc.data.role : null;
     }
