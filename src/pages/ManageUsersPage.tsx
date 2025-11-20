@@ -8,6 +8,8 @@ import ErrorMessage from '../components/ui/ErrorMessage';
 import { useUsers } from '../hooks/useDatabase';
 import Image from 'next/image';
 import Layout from '../components/layout/Layout';
+import { standardizeRole } from '../lib/roleStandardization';
+import { UserRole } from '../types';
 
 interface UserData {
   id: string;
