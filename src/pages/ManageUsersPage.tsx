@@ -366,10 +366,10 @@ const ManageUsersPage: React.FC = () => {
                 >
                   <option value="all">All Roles</option>
                   <option value="user">User</option>
-                  <option value="content_manager">Content Manager</option>
-                  <option value="community_manager">Community Manager</option>
-                  <option value="user_support">User Support</option>
-                  <option value="super_admin">Super Admin</option>
+                  <option value="Content Manager">Content Manager</option>
+                  <option value="Community Manager">Community Manager</option>
+                  <option value="User Support">User Support</option>
+                  <option value="Super Admin">Super Admin</option>
                 </select>
               </div>
             </div>
