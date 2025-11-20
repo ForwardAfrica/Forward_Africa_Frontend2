@@ -249,20 +249,22 @@ const ManageUsersPage: React.FC = () => {
   const getRoleBadge = (role: string) => {
     const styles = {
       user: 'bg-gray-500/20 text-gray-400',
-      content_manager: 'bg-green-500/20 text-green-400',
-      community_manager: 'bg-blue-500/20 text-blue-400',
-      user_support: 'bg-yellow-500/20 text-yellow-400',
-      super_admin: 'bg-purple-500/20 text-purple-400'
+      'Instructor': 'bg-green-500/20 text-green-400',
+      'Content Manager': 'bg-green-500/20 text-green-400',
+      'Community Manager': 'bg-blue-500/20 text-blue-400',
+      'User Support': 'bg-yellow-500/20 text-yellow-400',
+      'Super Admin': 'bg-purple-500/20 text-purple-400'
     };
     return styles[role as keyof typeof styles] || styles.user;
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'super_admin': return <Shield className="h-4 w-4 text-purple-500" />;
-      case 'content_manager': return <Shield className="h-4 w-4 text-blue-500" />;
-      case 'community_manager': return <User className="h-4 w-4 text-green-500" />;
-      case 'user_support': return <User className="h-4 w-4 text-yellow-500" />;
+      case 'Super Admin': return <Shield className="h-4 w-4 text-purple-500" />;
+      case 'Instructor': return <Shield className="h-4 w-4 text-green-500" />;
+      case 'Content Manager': return <Shield className="h-4 w-4 text-blue-500" />;
+      case 'Community Manager': return <User className="h-4 w-4 text-green-500" />;
+      case 'User Support': return <User className="h-4 w-4 text-yellow-500" />;
       default: return <User className="h-4 w-4 text-gray-400" />;
     }
   };
