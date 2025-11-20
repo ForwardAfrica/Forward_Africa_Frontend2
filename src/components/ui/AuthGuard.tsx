@@ -8,7 +8,7 @@ import { validateTokenInCookie } from '../../lib/validateToken';
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  requiredRole?: 'super_admin' | 'admin' | 'user';
+  requiredRole?: 'Super Admin' | 'admin' | 'user';
   fallback?: React.ReactNode;
 }
 
@@ -75,14 +75,14 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
       return true;
     }
 
-    // Check for super_admin role
-    if (requiredRole === 'super_admin') {
-      return userRole === 'super_admin';
+    // Check for Super Admin role
+    if (requiredRole === 'Super Admin') {
+      return userRole === 'Super Admin';
     }
 
-    // Check for admin role (admin roles: super_admin and content_manager)
+    // Check for admin role (admin roles: Super Admin, Content Manager, and Instructor)
     if (requiredRole === 'admin') {
-      return userRole === 'super_admin' || userRole === 'content_manager';
+      return userRole === 'Super Admin' || userRole === 'Content Manager' || userRole === 'Instructor';
     }
 
     return true; // Default to allowing access
