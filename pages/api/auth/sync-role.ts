@@ -75,34 +75,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ error: 'Invalid token - no userId' });
     }
 
+    // Get current Firestore user document (Firestore is the source of truth for roles)
+    const db = admin.firestore();
+    const userDocRef = db.collection('users').doc(userId);
+    const userDocSnapshot = await userDocRef.get();
+    const firestoreData = userDocSnapshot.data() || {};
+
+    const roleFromFirestore = firestoreData.role || 'user';
+    const permissionsFromFirestore = firestoreData.permissions || [];
+
     // Get the user from Firebase Auth
     const userRecord = await admin.auth().getUser(userId);
     const customClaims = userRecord.customClaims || {};
     const roleFromAuth = customClaims.role || 'user';
     const permissionsFromAuth = customClaims.permissions || [];
 
-    // Get current Firestore user document
-    const db = admin.firestore();
-    const userDocRef = db.collection('users').doc(userId);
-    const userDocSnapshot = await userDocRef.get();
-    const currentUserData = userDocSnapshot.data() || {};
-
-    // Check if role has changed
-    if (currentUserData.role !== roleFromAuth || JSON.stringify(currentUserData.permissions || []) !== JSON.stringify(permissionsFromAuth)) {
-      // Update Firestore document with latest role and permissions
-      await userDocRef.update({
-        role: roleFromAuth,
-        permissions: permissionsFromAuth,
-        updated_at: admin.firestore.FieldValue.serverTimestamp()
+    // Sync Firestore role to Firebase Auth custom claims (Firestore is source of truth)
+    if (roleFromAuth !== roleFromFirestore || JSON.stringify(permissionsFromAuth) !== JSON.stringify(permissionsFromFirestore)) {
+      await admin.auth().setCustomUserClaims(userId, {
+        role: roleFromFirestore,
+        permissions: permissionsFromFirestore
       });
 
-      console.log(`✅ Synced role for user ${userId}: ${roleFromAuth}`);
+      console.log(`✅ Synced Firebase Auth custom claims for user ${userId} from Firestore: ${roleFromFirestore}`);
+    } else {
+      console.log(`ℹ️ No sync needed - roles already match for user ${userId}: ${roleFromFirestore}`);
     }
 
     return res.status(200).json({
       message: 'Role synced successfully',
-      role: roleFromAuth,
-      permissions: permissionsFromAuth
+      role: roleFromFirestore,
+      permissions: permissionsFromFirestore
     });
   } catch (error: any) {
     console.error('Error syncing role:', error);
