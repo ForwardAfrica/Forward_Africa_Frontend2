@@ -170,7 +170,7 @@ const CreateAdminUserPage: React.FC = () => {
       setFormData({
         name: '',
         email: '',
-        role: 'content_manager',
+        role: 'Content Manager',
         password: '',
         confirmPassword: ''
       });
