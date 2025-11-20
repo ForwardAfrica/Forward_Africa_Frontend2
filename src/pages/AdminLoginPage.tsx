@@ -37,9 +37,11 @@ const AdminLoginPage: React.FC = () => {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'super_admin': return <Crown className="h-5 w-5 text-purple-500 mr-2" />;
-      case 'admin': return <Shield className="h-5 w-5 text-blue-500 mr-2" />;
-      case 'content_manager': return <UserPlus className="h-5 w-5 text-green-500 mr-2" />;
+      case 'Super Admin': return <Crown className="h-5 w-5 text-purple-500 mr-2" />;
+      case 'Instructor': return <UserPlus className="h-5 w-5 text-green-500 mr-2" />;
+      case 'Content Manager': return <Shield className="h-5 w-5 text-blue-500 mr-2" />;
+      case 'Community Manager': return <UserPlus className="h-5 w-5 text-green-500 mr-2" />;
+      case 'User Support': return <Shield className="h-5 w-5 text-yellow-500 mr-2" />;
       default: return <Shield className="h-5 w-5 text-gray-400 mr-2" />;
     }
   };
