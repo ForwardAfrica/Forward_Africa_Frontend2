@@ -171,19 +171,45 @@ export const instructorAPI = {
   // Create new instructor
   createInstructor: async (instructorData: Partial<Instructor>) => {
     try {
-      return await createInstructorInFirestore({
-        name: instructorData.name || '',
-        title: instructorData.title || '',
-        email: instructorData.email || '',
-        phone: instructorData.phone,
-        bio: instructorData.bio || '',
-        image: instructorData.image || '',
-        experience: instructorData.experience || 0,
-        expertise: instructorData.expertise || [],
-        socialLinks: instructorData.socialLinks
+      // Get JWT token from localStorage
+      const token = typeof window !== 'undefined'
+        ? localStorage.getItem('forward_africa_token')
+        : null;
+
+      if (!token) {
+        throw new Error('Authentication token not found. Please log in again.');
+      }
+
+      // Call API endpoint instead of directly using Firestore
+      // This uses the Admin SDK on the backend, which bypasses Firestore rules
+      const response = await fetch('/api/instructors/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: instructorData.name || '',
+          title: instructorData.title || '',
+          email: instructorData.email || '',
+          phone: instructorData.phone,
+          bio: instructorData.bio || '',
+          image: instructorData.image || '',
+          experience: instructorData.experience || 0,
+          expertise: instructorData.expertise || [],
+          socialLinks: instructorData.socialLinks
+        })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}: Failed to create instructor`);
+      }
+
+      const result = await response.json();
+      return result.data || result;
     } catch (error) {
-      console.error('Failed to create instructor in Firestore:', error);
+      console.error('Failed to create instructor:', error);
       throw error;
     }
   },
