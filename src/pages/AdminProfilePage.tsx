@@ -224,18 +224,22 @@ const AdminProfilePage: React.FC = () => {
 
   const getRoleBadge = (role: string) => {
     const styles = {
-      content_manager: 'bg-green-500/20 text-green-400 border-green-500/30',
-      admin: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      super_admin: 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+      'Content Manager': 'bg-green-500/20 text-green-400 border-green-500/30',
+      'Instructor': 'bg-green-500/20 text-green-400 border-green-500/30',
+      'Community Manager': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      'User Support': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      'Super Admin': 'bg-purple-500/20 text-purple-400 border-purple-500/30'
     };
-    return styles[role as keyof typeof styles] || styles.admin;
+    return styles[role as keyof typeof styles] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'super_admin': return <Crown className="h-5 w-5" />;
-      case 'admin': return <Shield className="h-5 w-5" />;
-      case 'content_manager': return <UserPlus className="h-5 w-5" />;
+      case 'Super Admin': return <Crown className="h-5 w-5" />;
+      case 'Instructor': return <UserPlus className="h-5 w-5" />;
+      case 'Content Manager': return <UserPlus className="h-5 w-5" />;
+      case 'Community Manager': return <Users className="h-5 w-5" />;
+      case 'User Support': return <User className="h-5 w-5" />;
       default: return <User className="h-5 w-5" />;
     }
   };
