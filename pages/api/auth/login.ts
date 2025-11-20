@@ -222,6 +222,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.warn('Could not fetch user role from Firestore:', error);
     }
 
+    // Update Firebase Auth custom claims to match Firestore (Firestore is source of truth)
+    try {
+      await admin.auth().setCustomUserClaims(userRecord.uid, {
+        role: userRole,
+        permissions: userPermissions
+      });
+      console.log('✅ Updated Firebase Auth custom claims:', { role: userRole, permissions: userPermissions });
+    } catch (error) {
+      console.warn('⚠️ Could not update Firebase Auth custom claims:', error);
+    }
+
     // Create JWT token with user information and role
     const tokenPayload = {
       userId: userRecord.uid,
