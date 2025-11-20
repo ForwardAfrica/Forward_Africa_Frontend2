@@ -400,6 +400,9 @@ export class InstructorService {
    * Updates an existing instructor
    */
   static async updateInstructor(id: string, data: InstructorFormData): Promise<Instructor> {
+    // Check permissions first
+    this.checkInstructorPermission();
+
     if (!id?.trim()) {
       throw new InstructorServiceError('Instructor ID is required', 400, 'VALIDATION_ERROR');
     }
