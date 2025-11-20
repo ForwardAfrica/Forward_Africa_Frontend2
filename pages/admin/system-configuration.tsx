@@ -96,7 +96,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
 
       // Verify super admin role
-      if (user.role !== 'super_admin') {
+      if (user.role !== 'Super Admin') {
         return {
           redirect: {
             destination: '/403?error=insufficient_permissions',

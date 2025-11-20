@@ -56,8 +56,8 @@ const AdminProfilePage: React.FC = () => {
   const adminRole = userRole || 'admin';
   const loginDate = new Date().toISOString();
 
-  // Check if user can access this page (content_manager, admin, super_admin)
-  const allowedRoles = ['content_manager', 'admin', 'super_admin'];
+  // Check if user can access this page (Content Manager, Instructor, Super Admin)
+  const allowedRoles = ['Content Manager', 'Instructor', 'Super Admin'];
   if (!allowedRoles.includes(adminRole)) {
     navigate('/admin');
     return null;

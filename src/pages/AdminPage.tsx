@@ -289,9 +289,9 @@ const AdminPage: React.FC = () => {
   const isAuthenticated = typeof window !== 'undefined' && !!localStorage.getItem('forward_africa_token');
   console.log('🔐 Authentication status:', isAuthenticated);
 
-  // For testing purposes, if no user role is set, default to super_admin
+  // For testing purposes, if no user role is set, default to Super Admin
   if (isClient && !userRole) {
-    console.log('⚠️ No user role found, defaulting to super_admin for testing');
+    console.log('⚠️ No user role found, defaulting to Super Admin for testing');
   }
 
   const filteredCourses = courses.filter(course => {
