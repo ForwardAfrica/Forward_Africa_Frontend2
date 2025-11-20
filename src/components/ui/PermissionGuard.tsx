@@ -23,7 +23,7 @@ const PermissionGuard: React.FC<PermissionGuardProps> = ({
   const { hasPermission, hasAnyPermission, hasAllPermissions, userRole } = usePermissions();
 
   // Super admin has access to everything
-  if (userRole === 'super_admin') {
+  if (userRole === 'Super Admin') {
     return <>{children}</>;
   }
 
