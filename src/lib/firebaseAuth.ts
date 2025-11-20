@@ -403,12 +403,12 @@ export const firebaseAuthService = {
 
   // Check if user has admin privileges
   isAdmin: (user: FirebaseUser | null): boolean => {
-    return user?.role === 'super_admin' || user?.role === 'content_manager' || user?.role === 'community_manager';
+    return user?.role === 'Super Admin' || user?.role === 'Content Manager' || user?.role === 'Instructor' || user?.role === 'Community Manager';
   },
 
   // Check if user is super admin
   isSuperAdmin: (user: FirebaseUser | null): boolean => {
-    return user?.role === 'super_admin';
+    return user?.role === 'Super Admin';
   },
 
   // Auth state change listener

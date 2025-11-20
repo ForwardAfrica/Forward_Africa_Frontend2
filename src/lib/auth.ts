@@ -642,7 +642,7 @@ export const authService = {
   // Check if user has admin privileges
   isAdmin: (): boolean => {
     const user = authService.getUser();
-    return user?.role === 'super_admin';
+    return user?.role === 'Super Admin' || user?.role === 'Content Manager' || user?.role === 'Instructor';
   },
 
   // Check if user is authenticated
