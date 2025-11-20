@@ -73,6 +73,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (userFromToken) {
           console.log('✅ AuthContext: User loaded from token:', userFromToken);
           setUser(userFromToken);
+
+          // Sync role from Firebase Auth to Firestore on app init (non-blocking)
+          authService.syncRole().catch(err => {
+            console.warn('⚠️ Failed to sync role on app init:', err);
+          });
         } else {
           console.log('❌ AuthContext: getUserFromToken() returned null');
           setUser(null);
