@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { authService, AuthUser, LoginCredentials, RegisterData, AuthError } from '../lib/authService';
+import { standardizeRole } from '../lib/roleStandardization';
 
 interface AuthContextType {
   user: AuthUser | null;
