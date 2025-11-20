@@ -82,7 +82,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
     return hasRequiredRole(userRole, requiredRole);
   };
 
-  if (!hasRequiredRole()) {
+  if (!hasRequiredRoleCheck()) {
     console.log('❌ Access denied:', { userRole, requiredRole });
     if (fallback) {
       return <>{fallback}</>;
