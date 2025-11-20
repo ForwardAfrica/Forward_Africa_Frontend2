@@ -217,6 +217,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(response.user);
         console.log('✅ User signed in:', response.user.email);
 
+        // Sync role from Firebase Auth to Firestore (non-blocking)
+        authService.syncRole().catch(err => {
+          console.warn('⚠️ Failed to sync role during login:', err);
+        });
+
         // Set redirect flag to prevent interference
         isRedirectingRef.current = true;
         await router.replace('/home');
