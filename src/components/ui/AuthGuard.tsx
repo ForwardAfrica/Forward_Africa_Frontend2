@@ -68,8 +68,8 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
     );
   }
 
-  // Check role permissions with improved logic
-  const hasRequiredRole = () => {
+  // Check role permissions using standardized role comparison
+  const hasRequiredRoleCheck = () => {
     console.log('🔍 Role check:', { userRole, requiredRole, user });
 
     // If no specific role required, allow access
@@ -77,17 +77,9 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
       return true;
     }
 
-    // Check for Super Admin role
-    if (requiredRole === 'Super Admin') {
-      return userRole === 'Super Admin';
-    }
-
-    // Check for admin role (admin roles: Super Admin, Content Manager, and Instructor)
-    if (requiredRole === 'admin') {
-      return userRole === 'Super Admin' || userRole === 'Content Manager' || userRole === 'Instructor';
-    }
-
-    return true; // Default to allowing access
+    // Use the standardized role comparison utility
+    // This handles 'Super Admin', 'admin', 'super_admin', etc.
+    return hasRequiredRole(userRole, requiredRole);
   };
 
   if (!hasRequiredRole()) {
