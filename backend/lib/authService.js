@@ -317,7 +317,6 @@ class AuthService {
         const db = adminApp.firestore();
         await db.collection('users').doc(userId).update({
           role: newRole,
-          permissions,
           updated_at: admin.firestore.FieldValue.serverTimestamp()
         });
       } catch (error) {
