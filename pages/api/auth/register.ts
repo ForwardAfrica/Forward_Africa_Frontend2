@@ -144,12 +144,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Set default role
     const userRole = 'user';
-    const userPermissions: string[] = [];
 
     try {
       await admin.auth().setCustomUserClaims(userRecord.uid, {
-        role: userRole,
-        permissions: userPermissions
+        role: userRole
       });
     } catch (error) {
       console.warn('Could not set custom claims:', error);
@@ -162,7 +160,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       displayName: full_name,
       photoURL: null,
       role: userRole,
-      permissions: userPermissions,
       education_level: education_level || null,
       job_title: job_title || null,
       topics_of_interest: topics_of_interest || [],
@@ -190,8 +187,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       email: userRecord.email,
       displayName: full_name,
       photoURL: null,
-      role: userRole,
-      permissions: userPermissions
+      role: userRole
     };
 
     const jwtToken = JWTManager.createToken(tokenPayload);
@@ -218,7 +214,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         displayName: full_name,
         photoURL: null,
         role: userRole,
-        permissions: userPermissions,
         onboarding_completed: false
       },
       token: jwtToken
