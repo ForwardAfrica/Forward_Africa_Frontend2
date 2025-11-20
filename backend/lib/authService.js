@@ -175,7 +175,6 @@ class AuthService {
 
       const customClaims = userRecord.customClaims || {};
       const role = customClaims.role || 'user';
-      const permissions = customClaims.permissions || [];
 
       // Get updated user profile
       let userProfile = {
@@ -183,8 +182,7 @@ class AuthService {
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role,
-        permissions
+        role
       };
 
       try {
@@ -207,8 +205,7 @@ class AuthService {
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role: role,
-        permissions: permissions
+        role: role
       };
 
       const newAccessToken = JWTManager.createToken(tokenPayload);
