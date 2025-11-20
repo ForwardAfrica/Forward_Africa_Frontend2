@@ -490,8 +490,19 @@ export class InstructorService {
    * Deletes an instructor
    */
   static async deleteInstructor(id: string): Promise<void> {
-    // Check permissions first
-    this.checkInstructorPermission();
+    // Check permissions - this will throw if user lacks permissions
+    try {
+      this.checkInstructorPermission();
+    } catch (error) {
+      if (error instanceof InstructorServiceError) {
+        throw error;
+      }
+      throw new InstructorServiceError(
+        'Permission check failed',
+        403,
+        'INSUFFICIENT_PERMISSIONS'
+      );
+    }
 
     if (!id?.trim()) {
       throw new InstructorServiceError('Instructor ID is required', 400, 'VALIDATION_ERROR');
