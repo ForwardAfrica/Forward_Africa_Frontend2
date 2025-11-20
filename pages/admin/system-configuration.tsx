@@ -96,7 +96,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
 
       // Verify super admin role
-      if (user.role !== 'super_admin') {
+      if (user.role !== 'Super Admin') {
         return {
           redirect: {
             destination: '/403?error=insufficient_permissions',
@@ -157,7 +157,7 @@ export default function SystemConfiguration({ user, serverTime, csrfToken }: {
 }) {
   return (
     <ErrorBoundary>
-      <AuthGuard requiredRole="super_admin">
+      <AuthGuard requiredRole="Super Admin">
         <SystemConfigurationPage />
       </AuthGuard>
     </ErrorBoundary>

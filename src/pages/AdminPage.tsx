@@ -99,7 +99,7 @@ const AdminPage: React.FC = () => {
   } = useInstructors();
 
   // Get admin role from context
-  const adminRole = userRole || 'super_admin'; // Default to super_admin for testing
+  const adminRole = userRole || 'Super Admin'; // Default to super_admin for testing
   const adminEmail = profile?.email || 'admin@forwardafrica.com';
 
   // Debug user state
@@ -289,9 +289,9 @@ const AdminPage: React.FC = () => {
   const isAuthenticated = typeof window !== 'undefined' && !!localStorage.getItem('forward_africa_token');
   console.log('🔐 Authentication status:', isAuthenticated);
 
-  // For testing purposes, if no user role is set, default to super_admin
+  // For testing purposes, if no user role is set, default to Super Admin
   if (isClient && !userRole) {
-    console.log('⚠️ No user role found, defaulting to super_admin for testing');
+    console.log('⚠️ No user role found, defaulting to Super Admin for testing');
   }
 
   const filteredCourses = courses.filter(course => {
@@ -471,7 +471,7 @@ const AdminPage: React.FC = () => {
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-right">
-            <p className="text-white font-medium">{adminRole === 'super_admin' ? 'Super Administrator' : adminRole === 'content_manager' ? 'Content Manager' : 'Administrator'}</p>
+            <p className="text-white font-medium">{adminRole === 'Super Admin' ? 'Super Administrator' : adminRole === 'Content Manager' ? 'Content Manager' : 'Administrator'}</p>
             <p className="text-gray-400 text-sm">{adminEmail}</p>
             {/* Debug info */}
             {/* <p className="text-gray-500 text-xs">Role: {userRole} | Permissions: {profile?.permissions?.length || 0}</p> */}

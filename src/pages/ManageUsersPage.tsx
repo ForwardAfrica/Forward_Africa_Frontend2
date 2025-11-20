@@ -37,7 +37,7 @@ const ManageUsersPage: React.FC = () => {
   const { userRole, hasPermission } = usePermissions();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended' | 'pending'>('all');
-  const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'content_manager' | 'community_manager' | 'user_support' | 'super_admin'>('all');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'Content Manager' | 'Community Manager' | 'User Support' | 'Super Admin'>('all');
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [users, setUsers] = useState<UserData[]>([]);
 
@@ -616,7 +616,7 @@ const ManageUsersPage: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-white">
-                    {users.filter(u => u.role === 'content_manager' || u.role === 'super_admin').length}
+                    {users.filter(u => u.role === 'Content Manager' || u.role === 'Super Admin').length}
                   </div>
                   <div className="text-sm text-gray-400">Admins</div>
                 </div>
