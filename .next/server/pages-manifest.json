@@ -3,5 +3,8 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/course/[courseId]": "pages/course/[courseId].js"
+  "/login": "pages/login.js",
+  "/api/auth/login": "pages/api/auth/login.js",
+  "/home": "pages/home.js",
+  "/admin": "pages/admin.js"
 }

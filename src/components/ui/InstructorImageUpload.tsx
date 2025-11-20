@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Upload, X, AlertCircle } from 'lucide-react';
 import Button from './Button';
 import Image from 'next/image';
-import { useFirebaseImageUpload } from '../../hooks/useFirebaseImageUpload';
 import { validateFile } from '../../utils/fileValidator';
 
 interface InstructorImageUploadProps {
-  onImageUpload: (url: string) => void;
+  onImageUpload: (base64: string) => void;
   currentImage?: string;
   instructorId?: string;
   label?: string;
@@ -17,73 +16,68 @@ interface InstructorImageUploadProps {
 const InstructorImageUpload: React.FC<InstructorImageUploadProps> = ({
   onImageUpload,
   currentImage,
-  instructorId: providedInstructorId,
   label = 'Profile Image',
   className = '',
   required = false
 }) => {
   const [preview, setPreview] = useState<string | null>(currentImage || null);
+  const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [tempInstructorId] = useState<string>(() => {
-    return providedInstructorId || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  });
 
-  const {
-    isUploading,
-    error,
-    uploadFile,
-    clearError
-  } = useFirebaseImageUpload({
-    uploadType: 'instructorImage',
-    entityId: tempInstructorId,
-    onSuccess: (url) => {
-      onImageUpload(url);
-    },
-    onError: (errorMessage) => {
-      setPreview(null);
-    }
-  });
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file before preview
+    setError(null);
+    setIsProcessing(true);
+
+    // Validate file
     const validation = validateFile(file, {
       maxSize: 5 * 1024 * 1024, // 5MB
       allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
     });
 
     if (!validation.isValid) {
-      alert(validation.error || 'Invalid file');
+      setError(validation.error || 'Invalid file');
+      setIsProcessing(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
       return;
     }
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreview(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-
-    // Upload file to Firebase Storage
-    uploadFile(file);
+    // Convert to Base64
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+        setPreview(base64String);
+        onImageUpload(base64String);
+        setIsProcessing(false);
+      };
+      reader.onerror = () => {
+        setError('Failed to read file');
+        setIsProcessing(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setError('Failed to process image');
+      setIsProcessing(false);
+    }
   };
 
   const handleRemoveImage = () => {
     setPreview(null);
+    setError(null);
     onImageUpload('');
-    clearError();
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
   const handleClick = () => {
-    clearError();
+    setError(null);
     fileInputRef.current?.click();
   };
 
@@ -107,7 +101,7 @@ const InstructorImageUpload: React.FC<InstructorImageUploadProps> = ({
               className="w-full h-full object-cover rounded-lg border-2 border-gray-600"
               priority={false}
             />
-            {!isUploading && (
+            {!isProcessing && (
               <button
                 type="button"
                 onClick={handleRemoveImage}
@@ -125,13 +119,13 @@ const InstructorImageUpload: React.FC<InstructorImageUploadProps> = ({
             type="button"
             variant="outline"
             onClick={handleClick}
-            disabled={isUploading}
+            disabled={isProcessing}
             className="w-full flex items-center justify-center space-x-2 py-3"
           >
-            {isUploading ? (
+            {isProcessing ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                <span>Uploading...</span>
+                <span>Processing...</span>
               </>
             ) : (
               <>
@@ -158,12 +152,12 @@ const InstructorImageUpload: React.FC<InstructorImageUploadProps> = ({
         accept="image/*"
         onChange={handleFileSelect}
         className="hidden"
-        disabled={isUploading}
+        disabled={isProcessing}
       />
 
       {/* Help Text */}
       <p className="text-xs text-gray-400">
-        Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB
+        Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB. Images are stored as Base64 in the database.
       </p>
     </div>
   );
