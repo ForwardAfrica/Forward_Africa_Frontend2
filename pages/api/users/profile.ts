@@ -151,7 +151,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let userData: any = {};
     let userRole = 'user';
-    let userPermissions: string[] = [];
 
     try {
       const db = admin.firestore();
@@ -160,7 +159,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (userDoc.exists) {
         userData = userDoc.data() || {};
         userRole = userData.role || userRole;
-        userPermissions = userData.permissions || userPermissions;
       }
     } catch (error) {
       console.warn('Could not fetch updated user data:', error);
@@ -173,7 +171,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       displayName: updatedUserRecord.displayName || '',
       photoURL: updatedUserRecord.photoURL || null,
       role: userRole,
-      permissions: userPermissions,
       ...userData
     };
 
