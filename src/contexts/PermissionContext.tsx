@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Permission, UserRole, ROLE_PERMISSIONS } from '../types';
 import { hasPermission as checkPermission, hasAnyPermission, hasAllPermissions } from '../types';
 import { useAuth } from './AuthContext';
+import { standardizeRole } from '../lib/roleStandardization';
 
 interface PermissionContextType {
   userRole: UserRole;
@@ -28,11 +29,22 @@ export const PermissionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [permissions, setPermissions] = useState<Permission[]>(ROLE_PERMISSIONS.user);
 
   useEffect(() => {
-    // Use exact role from user, no normalization
-    const userRole = (user?.role as UserRole) || 'user';
+    // Standardize role to ensure it's in the exact JWT format
+    // This handles cases where role might be stored as 'super_admin', 'content_manager', etc.
+    const standardized = standardizeRole(user?.role);
 
-    setUserRole(userRole);
-    setPermissions(ROLE_PERMISSIONS[userRole] || ROLE_PERMISSIONS.user);
+    console.log('🔐 PermissionContext: Setting role', { original: user?.role, standardized });
+
+    setUserRole(standardized);
+
+    // Always lookup using the standardized role
+    const rolePermissions = ROLE_PERMISSIONS[standardized];
+    if (!rolePermissions) {
+      console.warn(`⚠️ PermissionContext: No permissions found for role "${standardized}", defaulting to user permissions`);
+      setPermissions(ROLE_PERMISSIONS.user);
+    } else {
+      setPermissions(rolePermissions);
+    }
   }, [user]);
 
   const hasPermission = (permission: Permission): boolean => {

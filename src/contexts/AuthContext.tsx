@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { authService, AuthUser, LoginCredentials, RegisterData, AuthError } from '../lib/authService';
+import { standardizeRole } from '../lib/roleStandardization';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -393,8 +394,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     profile: user,
     loading: loading || !isClient,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'Super Admin' || user?.role === 'Content Manager' || user?.role === 'Instructor',
-    isSuperAdmin: user?.role === 'Super Admin',
+    isAdmin: user ? ['Super Admin', 'Content Manager', 'Instructor'].includes(standardizeRole(user.role)) : false,
+    isSuperAdmin: user ? standardizeRole(user.role) === 'Super Admin' : false,
     error,
     signIn,
     signUp,

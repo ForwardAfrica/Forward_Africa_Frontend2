@@ -5,12 +5,14 @@ import { useNavigate } from '../lib/router';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/layout/Layout';
+import { standardizeRole } from '../lib/roleStandardization';
+import { UserRole } from '../types';
 
 interface AdminUser {
   id: string;
   name: string;
   email: string;
-  role: 'content_manager' | 'community_manager' | 'user_support' | 'super_admin';
+  role: UserRole;
   password: string;
   createdAt: Date;
   createdBy: string;
@@ -22,7 +24,7 @@ const CreateAdminUserPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    role: 'content_manager' as 'content_manager' | 'community_manager' | 'user_support' | 'super_admin',
+    role: 'Content Manager' as UserRole,
     password: '',
     confirmPassword: ''
   });
@@ -90,8 +92,8 @@ const CreateAdminUserPage: React.FC = () => {
       validationErrors.push('Passwords do not match');
     }
 
-    // Role validation for super_admin creation
-    if (formData.role === 'super_admin' && currentUserRole !== 'super_admin') {
+    // Role validation for Super Admin creation
+    if (formData.role === 'Super Admin' && standardizeRole(currentUserRole) !== 'Super Admin') {
       validationErrors.push('Only super admins can create super admin accounts');
     }
 
@@ -317,10 +319,10 @@ const CreateAdminUserPage: React.FC = () => {
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
-                  { value: 'content_manager', label: 'Content Manager' },
-                  { value: 'community_manager', label: 'Community Manager' },
-                  { value: 'user_support', label: 'User Support' },
-                  ...(currentUserRole === 'super_admin' ? [{ value: 'super_admin', label: 'Super Admin' }] : [])
+                  { value: 'Content Manager', label: 'Content Manager' },
+                  { value: 'Community Manager', label: 'Community Manager' },
+                  { value: 'User Support', label: 'User Support' },
+                  ...(standardizeRole(currentUserRole) === 'Super Admin' ? [{ value: 'Super Admin', label: 'Super Admin' }] : [])
                 ].map((role) => (
                   <label
                     key={role.value}

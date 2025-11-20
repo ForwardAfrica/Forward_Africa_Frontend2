@@ -7,6 +7,7 @@ import PermissionGuard from '../components/ui/PermissionGuard';
 import { Permission } from '../types';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import Layout from '../components/layout/Layout';
+import { standardizeRole } from '../lib/roleStandardization';
 
 interface SecuritySettings {
   passwordPolicy: {
@@ -81,7 +82,7 @@ const SecuritySettingsPage: React.FC = () => {
       manage_settings: false,
       access_audit_logs: false
     },
-    content_manager: {
+    'Content Manager': {
       view_courses: true,
       enroll_courses: true,
       create_courses: true,
@@ -92,7 +93,7 @@ const SecuritySettingsPage: React.FC = () => {
       manage_settings: false,
       access_audit_logs: false
     },
-    admin: {
+    'Instructor': {
       view_courses: true,
       enroll_courses: true,
       create_courses: true,
@@ -103,7 +104,7 @@ const SecuritySettingsPage: React.FC = () => {
       manage_settings: true,
       access_audit_logs: true
     },
-    super_admin: {
+    'Super Admin': {
       view_courses: true,
       enroll_courses: true,
       create_courses: true,
@@ -222,8 +223,9 @@ const SecuritySettingsPage: React.FC = () => {
   };
 
   const handleRolePermissionChange = (role: string, permission: string, value: boolean) => {
-    // Only super_admin can modify admin and super_admin permissions
-    if ((role === 'admin' || role === 'super_admin') && userRole !== 'super_admin') {
+    // Only Super Admin can modify admin and Super Admin permissions
+    const standardizedRole = standardizeRole(role);
+    if ((standardizedRole === 'Instructor' || standardizedRole === 'Super Admin') && standardizeRole(userRole) !== 'Super Admin') {
       setPermissionError('Only Super Administrators can modify Admin and Super Admin permissions.');
       return;
     }
@@ -537,14 +539,14 @@ const SecuritySettingsPage: React.FC = () => {
                 {Object.entries(rolePermissions).map(([role, permissions]) => (
                   <div key={role} className="border border-gray-700 rounded-lg p-6">
                     <h4 className="text-white font-medium mb-4 flex items-center">
-                      {role === 'super_admin' && <Shield className="h-5 w-5 mr-2 text-purple-500" />}
-                      {role === 'admin' && <Shield className="h-5 w-5 mr-2 text-blue-500" />}
-                      {role === 'content_manager' && <Users className="h-5 w-5 mr-2 text-green-500" />}
+                      {role === 'Super Admin' && <Shield className="h-5 w-5 mr-2 text-purple-500" />}
+                      {role === 'Instructor' && <Shield className="h-5 w-5 mr-2 text-blue-500" />}
+                      {role === 'Content Manager' && <Users className="h-5 w-5 mr-2 text-green-500" />}
                       {role === 'user' && <Users className="h-5 w-5 mr-2 text-gray-400" />}
-                      {role.replace('_', ' ').toUpperCase()}
+                      {role}
 
                       {/* Show warning for protected roles */}
-                      {(role === 'admin' || role === 'super_admin') && userRole !== 'super_admin' && (
+                      {(role === 'Instructor' || role === 'Super Admin') && standardizeRole(userRole) !== 'Super Admin' && (
                         <span className="ml-2 text-xs text-yellow-400">
                           (Only Super Admins can modify these permissions)
                         </span>
@@ -555,8 +557,8 @@ const SecuritySettingsPage: React.FC = () => {
                       {Object.entries(permissions).map(([permission, value]) => {
                         // Determine if this permission can be modified by current user
                         const canModify = !(
-                          (role === 'admin' || role === 'super_admin') &&
-                          userRole !== 'super_admin'
+                          (role === 'Instructor' || role === 'Super Admin') &&
+                          standardizeRole(userRole) !== 'Super Admin'
                         );
 
                         return (

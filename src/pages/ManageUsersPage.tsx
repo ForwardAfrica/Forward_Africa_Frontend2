@@ -8,13 +8,15 @@ import ErrorMessage from '../components/ui/ErrorMessage';
 import { useUsers } from '../hooks/useDatabase';
 import Image from 'next/image';
 import Layout from '../components/layout/Layout';
+import { standardizeRole } from '../lib/roleStandardization';
+import { UserRole } from '../types';
 
 interface UserData {
   id: string;
   name: string;
   email: string;
   status: 'active' | 'suspended' | 'pending';
-  role: 'user' | 'content_manager' | 'community_manager' | 'user_support' | 'super_admin';
+  role: UserRole;
   joinDate: string;
   lastActive: string;
   coursesEnrolled: number;
@@ -102,40 +104,49 @@ const ManageUsersPage: React.FC = () => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    // Standardize both the user role and filter for comparison (handle legacy snake_case)
+    const standardizedUserRole = standardizeRole(user.role);
+    const standardizedFilter = roleFilter === 'all' ? 'all' : standardizeRole(roleFilter);
+    const matchesRole = standardizedFilter === 'all' || standardizedUserRole === standardizedFilter;
 
     return matchesSearch && matchesStatus && matchesRole;
   });
 
   // Initialize permissions for a user
   const initializeUserPermissions = (user: UserData) => {
+    // Standardize role for permission checks
+    const standardizedRole = standardizeRole(user.role);
+    const isSuperAdmin = standardizedRole === 'Super Admin';
+    const isContentManager = standardizedRole === 'Content Manager';
+    const isCommunityManager = standardizedRole === 'Community Manager';
+
     const allPermissions: Permission[] = [
       // User Management
-      { id: 'users:view', name: 'View Users', description: 'Can view user list and details', category: 'User Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'users:create', name: 'Create Users', description: 'Can create new admin users', category: 'User Management', enabled: user.role === 'super_admin' },
-      { id: 'users:edit', name: 'Edit Users', description: 'Can edit user information', category: 'User Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'users:delete', name: 'Delete Users', description: 'Can delete user accounts', category: 'User Management', enabled: user.role === 'super_admin' },
-      { id: 'users:suspend', name: 'Suspend Users', description: 'Can suspend user accounts', category: 'User Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
+      { id: 'users:view', name: 'View Users', description: 'Can view user list and details', category: 'User Management', enabled: isSuperAdmin || isContentManager },
+      { id: 'users:create', name: 'Create Users', description: 'Can create new admin users', category: 'User Management', enabled: isSuperAdmin },
+      { id: 'users:edit', name: 'Edit Users', description: 'Can edit user information', category: 'User Management', enabled: isSuperAdmin || isContentManager },
+      { id: 'users:delete', name: 'Delete Users', description: 'Can delete user accounts', category: 'User Management', enabled: isSuperAdmin },
+      { id: 'users:suspend', name: 'Suspend Users', description: 'Can suspend user accounts', category: 'User Management', enabled: isSuperAdmin || isContentManager },
 
       // Content Management
       { id: 'content:view', name: 'View Content', description: 'Can view all course content', category: 'Content Management', enabled: true },
-      { id: 'content:create', name: 'Create Content', description: 'Can create new courses and lessons', category: 'Content Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'content:edit', name: 'Edit Content', description: 'Can edit existing content', category: 'Content Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'content:delete', name: 'Delete Content', description: 'Can delete content', category: 'Content Management', enabled: user.role === 'super_admin' },
-      { id: 'content:publish', name: 'Publish Content', description: 'Can publish content to live', category: 'Content Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
+      { id: 'content:create', name: 'Create Content', description: 'Can create new courses and lessons', category: 'Content Management', enabled: isSuperAdmin || isContentManager },
+      { id: 'content:edit', name: 'Edit Content', description: 'Can edit existing content', category: 'Content Management', enabled: isSuperAdmin || isContentManager },
+      { id: 'content:delete', name: 'Delete Content', description: 'Can delete content', category: 'Content Management', enabled: isSuperAdmin },
+      { id: 'content:publish', name: 'Publish Content', description: 'Can publish content to live', category: 'Content Management', enabled: isSuperAdmin || isContentManager },
 
       // Community Management
       { id: 'community:view', name: 'View Community', description: 'Can view community features', category: 'Community Management', enabled: true },
-      { id: 'community:moderate', name: 'Moderate Community', description: 'Can moderate community discussions', category: 'Community Management', enabled: user.role === 'super_admin' || user.role === 'community_manager' },
-      { id: 'community:ban', name: 'Ban Users', description: 'Can ban users from community', category: 'Community Management', enabled: user.role === 'super_admin' || user.role === 'community_manager' },
+      { id: 'community:moderate', name: 'Moderate Community', description: 'Can moderate community discussions', category: 'Community Management', enabled: isSuperAdmin || isCommunityManager },
+      { id: 'community:ban', name: 'Ban Users', description: 'Can ban users from community', category: 'Community Management', enabled: isSuperAdmin || isCommunityManager },
 
       // Analytics & Reports
-      { id: 'analytics:view', name: 'View Analytics', description: 'Can view platform analytics', category: 'Analytics', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'reports:generate', name: 'Generate Reports', description: 'Can generate system reports', category: 'Analytics', enabled: user.role === 'super_admin' },
+      { id: 'analytics:view', name: 'View Analytics', description: 'Can view platform analytics', category: 'Analytics', enabled: isSuperAdmin || isContentManager },
+      { id: 'reports:generate', name: 'Generate Reports', description: 'Can generate system reports', category: 'Analytics', enabled: isSuperAdmin },
 
       // System Settings
-      { id: 'settings:view', name: 'View Settings', description: 'Can view system settings', category: 'System Settings', enabled: user.role === 'super_admin' },
-      { id: 'settings:edit', name: 'Edit Settings', description: 'Can modify system settings', category: 'System Settings', enabled: user.role === 'super_admin' },
+      { id: 'settings:view', name: 'View Settings', description: 'Can view system settings', category: 'System Settings', enabled: isSuperAdmin },
+      { id: 'settings:edit', name: 'Edit Settings', description: 'Can modify system settings', category: 'System Settings', enabled: isSuperAdmin },
     ];
 
     setUserPermissions(allPermissions);
@@ -212,16 +223,16 @@ const ManageUsersPage: React.FC = () => {
         ['community:moderate', 'community:ban'].includes(p.id) && p.enabled
       );
 
-      let newRole = 'user';
+      let newRole: UserRole = 'user';
       if (hasAdminPermissions) {
-        newRole = 'super_admin';
+        newRole = 'Super Admin';
       } else if (hasContentManagerPermissions) {
-        newRole = 'content_manager';
+        newRole = 'Content Manager';
       } else if (hasCommunityManagerPermissions) {
-        newRole = 'community_manager';
+        newRole = 'Community Manager';
       }
 
-      // Update user in database
+      // Update user in database with standardized role
       await updateUser(selectedUser.id, { role: newRole });
 
       // Update local state
@@ -361,10 +372,10 @@ const ManageUsersPage: React.FC = () => {
                 >
                   <option value="all">All Roles</option>
                   <option value="user">User</option>
-                  <option value="content_manager">Content Manager</option>
-                  <option value="community_manager">Community Manager</option>
-                  <option value="user_support">User Support</option>
-                  <option value="super_admin">Super Admin</option>
+                  <option value="Content Manager">Content Manager</option>
+                  <option value="Community Manager">Community Manager</option>
+                  <option value="User Support">User Support</option>
+                  <option value="Super Admin">Super Admin</option>
                 </select>
               </div>
             </div>
@@ -692,7 +703,7 @@ const ManageUsersPage: React.FC = () => {
                     <div className="flex items-center space-x-2 mt-2">
                       {getRoleIcon(selectedUser.role)}
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadge(selectedUser.role)}`}>
-                        {selectedUser.role.replace('_', ' ').toUpperCase()}
+                        {selectedUser.role}
                       </span>
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(selectedUser.status)}`}>
                         {selectedUser.status.charAt(0).toUpperCase() + selectedUser.status.slice(1)}
