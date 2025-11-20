@@ -1,4 +1,16 @@
 {
+  "pages/admin.tsx -> ../src/pages/AdminPage": {
+    "id": "pages/admin.tsx -> ../src/pages/AdminPage",
+    "files": [
+      "static/chunks/src_pages_AdminPage_tsx.js"
+    ]
+  },
+  "pages/home.tsx -> ../src/pages/HomePage": {
+    "id": "pages/home.tsx -> ../src/pages/HomePage",
+    "files": [
+      "static/chunks/src_pages_HomePage_tsx.js"
+    ]
+  },
   "pages/index.tsx -> ../src/pages/LandingPage": {
     "id": "pages/index.tsx -> ../src/pages/LandingPage",
     "files": [
@@ -10,5 +22,9 @@
     "files": [
       "static/chunks/src_pages_LoginPage_tsx.js"
     ]
+  },
+  "src/pages/AdminPage.tsx -> ../lib/api": {
+    "id": "src/pages/AdminPage.tsx -> ../lib/api",
+    "files": []
   }
 }
