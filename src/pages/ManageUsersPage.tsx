@@ -114,33 +114,39 @@ const ManageUsersPage: React.FC = () => {
 
   // Initialize permissions for a user
   const initializeUserPermissions = (user: UserData) => {
+    // Standardize role for permission checks
+    const standardizedRole = standardizeRole(user.role);
+    const isSuperAdmin = standardizedRole === 'Super Admin';
+    const isContentManager = standardizedRole === 'Content Manager';
+    const isCommunityManager = standardizedRole === 'Community Manager';
+
     const allPermissions: Permission[] = [
       // User Management
-      { id: 'users:view', name: 'View Users', description: 'Can view user list and details', category: 'User Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'users:create', name: 'Create Users', description: 'Can create new admin users', category: 'User Management', enabled: user.role === 'super_admin' },
-      { id: 'users:edit', name: 'Edit Users', description: 'Can edit user information', category: 'User Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'users:delete', name: 'Delete Users', description: 'Can delete user accounts', category: 'User Management', enabled: user.role === 'super_admin' },
-      { id: 'users:suspend', name: 'Suspend Users', description: 'Can suspend user accounts', category: 'User Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
+      { id: 'users:view', name: 'View Users', description: 'Can view user list and details', category: 'User Management', enabled: isSuperAdmin || isContentManager },
+      { id: 'users:create', name: 'Create Users', description: 'Can create new admin users', category: 'User Management', enabled: isSuperAdmin },
+      { id: 'users:edit', name: 'Edit Users', description: 'Can edit user information', category: 'User Management', enabled: isSuperAdmin || isContentManager },
+      { id: 'users:delete', name: 'Delete Users', description: 'Can delete user accounts', category: 'User Management', enabled: isSuperAdmin },
+      { id: 'users:suspend', name: 'Suspend Users', description: 'Can suspend user accounts', category: 'User Management', enabled: isSuperAdmin || isContentManager },
 
       // Content Management
       { id: 'content:view', name: 'View Content', description: 'Can view all course content', category: 'Content Management', enabled: true },
-      { id: 'content:create', name: 'Create Content', description: 'Can create new courses and lessons', category: 'Content Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'content:edit', name: 'Edit Content', description: 'Can edit existing content', category: 'Content Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'content:delete', name: 'Delete Content', description: 'Can delete content', category: 'Content Management', enabled: user.role === 'super_admin' },
-      { id: 'content:publish', name: 'Publish Content', description: 'Can publish content to live', category: 'Content Management', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
+      { id: 'content:create', name: 'Create Content', description: 'Can create new courses and lessons', category: 'Content Management', enabled: isSuperAdmin || isContentManager },
+      { id: 'content:edit', name: 'Edit Content', description: 'Can edit existing content', category: 'Content Management', enabled: isSuperAdmin || isContentManager },
+      { id: 'content:delete', name: 'Delete Content', description: 'Can delete content', category: 'Content Management', enabled: isSuperAdmin },
+      { id: 'content:publish', name: 'Publish Content', description: 'Can publish content to live', category: 'Content Management', enabled: isSuperAdmin || isContentManager },
 
       // Community Management
       { id: 'community:view', name: 'View Community', description: 'Can view community features', category: 'Community Management', enabled: true },
-      { id: 'community:moderate', name: 'Moderate Community', description: 'Can moderate community discussions', category: 'Community Management', enabled: user.role === 'super_admin' || user.role === 'community_manager' },
-      { id: 'community:ban', name: 'Ban Users', description: 'Can ban users from community', category: 'Community Management', enabled: user.role === 'super_admin' || user.role === 'community_manager' },
+      { id: 'community:moderate', name: 'Moderate Community', description: 'Can moderate community discussions', category: 'Community Management', enabled: isSuperAdmin || isCommunityManager },
+      { id: 'community:ban', name: 'Ban Users', description: 'Can ban users from community', category: 'Community Management', enabled: isSuperAdmin || isCommunityManager },
 
       // Analytics & Reports
-      { id: 'analytics:view', name: 'View Analytics', description: 'Can view platform analytics', category: 'Analytics', enabled: user.role === 'super_admin' || user.role === 'content_manager' },
-      { id: 'reports:generate', name: 'Generate Reports', description: 'Can generate system reports', category: 'Analytics', enabled: user.role === 'super_admin' },
+      { id: 'analytics:view', name: 'View Analytics', description: 'Can view platform analytics', category: 'Analytics', enabled: isSuperAdmin || isContentManager },
+      { id: 'reports:generate', name: 'Generate Reports', description: 'Can generate system reports', category: 'Analytics', enabled: isSuperAdmin },
 
       // System Settings
-      { id: 'settings:view', name: 'View Settings', description: 'Can view system settings', category: 'System Settings', enabled: user.role === 'super_admin' },
-      { id: 'settings:edit', name: 'Edit Settings', description: 'Can modify system settings', category: 'System Settings', enabled: user.role === 'super_admin' },
+      { id: 'settings:view', name: 'View Settings', description: 'Can view system settings', category: 'System Settings', enabled: isSuperAdmin },
+      { id: 'settings:edit', name: 'Edit Settings', description: 'Can modify system settings', category: 'System Settings', enabled: isSuperAdmin },
     ];
 
     setUserPermissions(allPermissions);
