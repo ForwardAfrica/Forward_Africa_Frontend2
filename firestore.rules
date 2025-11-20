@@ -7,15 +7,19 @@ service cloud.firestore {
     }
 
     function getUserRole() {
-      // First, try to get role from JWT token's custom claims (most reliable)
+      // First priority: get role from Firestore user document (most reliable for client SDK)
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      if (userDoc != null && userDoc.data != null && userDoc.data.role != null) {
+        return userDoc.data.role;
+      }
+
+      // Fallback: try to get role from JWT token's custom claims (for server-side operations)
       let tokenRole = request.auth.token.role;
       if (tokenRole != null) {
         return tokenRole;
       }
 
-      // Fallback: get role from Firestore user document
-      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
-      return userDoc != null && userDoc.data != null ? userDoc.data.role : null;
+      return null;
     }
 
     function isAdmin() {
