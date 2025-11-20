@@ -97,7 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Verify token
     let payload;
     try {
-      console.log('🔐 Verifying token...');
+      console.log('�� Verifying token...');
       payload = JWTManager.verifyToken(token);
       console.log('✅ Token verified successfully for user:', payload.userId);
     } catch (error: any) {
@@ -114,7 +114,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       displayName: payload.displayName || '',
       photoURL: payload.photoURL || null,
       role: payload.role || 'user',
-      permissions: payload.permissions || [],
       onboarding_completed: payload.onboarding_completed || false
     };
 
