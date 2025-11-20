@@ -157,7 +157,7 @@ export default function SystemConfiguration({ user, serverTime, csrfToken }: {
 }) {
   return (
     <ErrorBoundary>
-      <AuthGuard requiredRole="super_admin">
+      <AuthGuard requiredRole="Super Admin">
         <SystemConfigurationPage />
       </AuthGuard>
     </ErrorBoundary>
