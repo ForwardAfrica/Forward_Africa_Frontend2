@@ -276,15 +276,13 @@ class AuthService {
 
       const customClaims = userRecord.customClaims || {};
       const role = customClaims.role || 'user';
-      const permissions = customClaims.permissions || [];
 
       let userProfile = {
         uid: userRecord.uid,
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role,
-        permissions
+        role
       };
 
       try {
@@ -310,14 +308,13 @@ class AuthService {
   }
 
   // Update user role
-  static async updateUserRole(userId, newRole, permissions = []) {
+  static async updateUserRole(userId, newRole) {
     try {
       const adminApp = initFirebaseAdmin();
 
       // Update Firebase custom claims
       await adminApp.auth().setCustomUserClaims(userId, {
-        role: newRole,
-        permissions
+        role: newRole
       });
 
       // Update Firestore
