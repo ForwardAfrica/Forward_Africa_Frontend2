@@ -1,5 +1,6 @@
 import { Instructor } from '../types';
 import { instructorAPI } from './api';
+import { authService } from './authService';
 
 export interface InstructorFormData {
   name: string;
