@@ -346,6 +346,9 @@ export class InstructorService {
    * Creates a new instructor
    */
   static async createInstructor(data: InstructorFormData): Promise<Instructor> {
+    // Check permissions first
+    this.checkInstructorPermission();
+
     // Validate input
     const errors = this.validateInstructorData(data);
     if (errors.length > 0) {
