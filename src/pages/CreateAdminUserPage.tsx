@@ -92,8 +92,8 @@ const CreateAdminUserPage: React.FC = () => {
       validationErrors.push('Passwords do not match');
     }
 
-    // Role validation for super_admin creation
-    if (formData.role === 'super_admin' && currentUserRole !== 'super_admin') {
+    // Role validation for Super Admin creation
+    if (formData.role === 'Super Admin' && standardizeRole(currentUserRole) !== 'Super Admin') {
       validationErrors.push('Only super admins can create super admin accounts');
     }
 
