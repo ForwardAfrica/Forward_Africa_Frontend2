@@ -1,6 +1,7 @@
-import { Instructor } from '../types';
+import { Instructor, ROLE_HIERARCHY, UserRole } from '../types';
 import { instructorAPI } from './api';
 import { authService } from './authService';
+import { standardizeRole } from './roleStandardization';
 
 export interface InstructorFormData {
   name: string;
@@ -51,13 +52,16 @@ export class InstructorService {
       );
     }
 
-    // Check if user has the required role (supports both formats: "Super Admin" and "super_admin")
-    const userRole = (user.role as string) || 'user';
-    const allowedRoles = ['super_admin', 'content_manager', 'Super Admin', 'Content Manager', 'Admin'];
+    // Standardize the role to ensure consistent format
+    const standardizedRole = standardizeRole(user.role as string);
 
-    if (!allowedRoles.includes(userRole)) {
+    // Super Admin, Content Manager, and Instructor roles can manage instructors
+    const requiredRoleLevel = ROLE_HIERARCHY['Content Manager']; // Content Manager level or higher
+    const userRoleLevel = ROLE_HIERARCHY[standardizedRole] || 0;
+
+    if (userRoleLevel < requiredRoleLevel) {
       throw new InstructorServiceError(
-        `Missing or insufficient permissions. Only Super Admin and Content Manager roles can create instructors. Your current role: ${userRole}`,
+        `Missing or insufficient permissions. Only Super Admin and Content Manager roles can create instructors. Your current role: ${standardizedRole}`,
         403,
         'INSUFFICIENT_PERMISSIONS'
       );
@@ -348,8 +352,19 @@ export class InstructorService {
    * Creates a new instructor
    */
   static async createInstructor(data: InstructorFormData): Promise<Instructor> {
-    // Check permissions first
-    this.checkInstructorPermission();
+    // Check permissions - this will throw if user lacks permissions
+    try {
+      this.checkInstructorPermission();
+    } catch (error) {
+      if (error instanceof InstructorServiceError) {
+        throw error;
+      }
+      throw new InstructorServiceError(
+        'Permission check failed',
+        403,
+        'INSUFFICIENT_PERMISSIONS'
+      );
+    }
 
     // Validate input
     const errors = this.validateInstructorData(data);
@@ -402,8 +417,19 @@ export class InstructorService {
    * Updates an existing instructor
    */
   static async updateInstructor(id: string, data: InstructorFormData): Promise<Instructor> {
-    // Check permissions first
-    this.checkInstructorPermission();
+    // Check permissions - this will throw if user lacks permissions
+    try {
+      this.checkInstructorPermission();
+    } catch (error) {
+      if (error instanceof InstructorServiceError) {
+        throw error;
+      }
+      throw new InstructorServiceError(
+        'Permission check failed',
+        403,
+        'INSUFFICIENT_PERMISSIONS'
+      );
+    }
 
     if (!id?.trim()) {
       throw new InstructorServiceError('Instructor ID is required', 400, 'VALIDATION_ERROR');
@@ -464,8 +490,19 @@ export class InstructorService {
    * Deletes an instructor
    */
   static async deleteInstructor(id: string): Promise<void> {
-    // Check permissions first
-    this.checkInstructorPermission();
+    // Check permissions - this will throw if user lacks permissions
+    try {
+      this.checkInstructorPermission();
+    } catch (error) {
+      if (error instanceof InstructorServiceError) {
+        throw error;
+      }
+      throw new InstructorServiceError(
+        'Permission check failed',
+        403,
+        'INSUFFICIENT_PERMISSIONS'
+      );
+    }
 
     if (!id?.trim()) {
       throw new InstructorServiceError('Instructor ID is required', 400, 'VALIDATION_ERROR');
