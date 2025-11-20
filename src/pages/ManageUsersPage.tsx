@@ -104,7 +104,10 @@ const ManageUsersPage: React.FC = () => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    // Standardize both the user role and filter for comparison (handle legacy snake_case)
+    const standardizedUserRole = standardizeRole(user.role);
+    const standardizedFilter = roleFilter === 'all' ? 'all' : standardizeRole(roleFilter);
+    const matchesRole = standardizedFilter === 'all' || standardizedUserRole === standardizedFilter;
 
     return matchesSearch && matchesStatus && matchesRole;
   });
