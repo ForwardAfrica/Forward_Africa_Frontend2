@@ -24,7 +24,7 @@ const CreateAdminUserPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    role: 'content_manager' as 'content_manager' | 'community_manager' | 'user_support' | 'super_admin',
+    role: 'Content Manager' as UserRole,
     password: '',
     confirmPassword: ''
   });
