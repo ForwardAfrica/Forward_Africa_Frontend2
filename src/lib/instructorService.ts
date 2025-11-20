@@ -462,6 +462,9 @@ export class InstructorService {
    * Deletes an instructor
    */
   static async deleteInstructor(id: string): Promise<void> {
+    // Check permissions first
+    this.checkInstructorPermission();
+
     if (!id?.trim()) {
       throw new InstructorServiceError('Instructor ID is required', 400, 'VALIDATION_ERROR');
     }
