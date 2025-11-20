@@ -5,10 +5,12 @@ import { usePermissions } from '../../contexts/PermissionContext';
 import { RefreshCw, AlertTriangle } from 'lucide-react';
 import Button from './Button';
 import { validateTokenInCookie } from '../../lib/validateToken';
+import { hasRequiredRole } from '../../lib/roleStandardization';
+import { UserRole } from '../../types';
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  requiredRole?: 'Super Admin' | 'admin' | 'user';
+  requiredRole?: UserRole | 'admin';
   fallback?: React.ReactNode;
 }
 
