@@ -214,16 +214,16 @@ const ManageUsersPage: React.FC = () => {
         ['community:moderate', 'community:ban'].includes(p.id) && p.enabled
       );
 
-      let newRole = 'user';
+      let newRole: UserRole = 'user';
       if (hasAdminPermissions) {
-        newRole = 'super_admin';
+        newRole = 'Super Admin';
       } else if (hasContentManagerPermissions) {
-        newRole = 'content_manager';
+        newRole = 'Content Manager';
       } else if (hasCommunityManagerPermissions) {
-        newRole = 'community_manager';
+        newRole = 'Community Manager';
       }
 
-      // Update user in database
+      // Update user in database with standardized role
       await updateUser(selectedUser.id, { role: newRole });
 
       // Update local state
