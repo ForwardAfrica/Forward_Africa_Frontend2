@@ -60,9 +60,11 @@ export default function AdminDashboardPage() {
 
   function getDisplayName(role: string): string {
     switch (role) {
-      case 'super_admin': return 'Super Administrator';
-      case 'admin': return 'Administrator';
-      case 'content_manager': return 'Content Manager';
+      case 'Super Admin': return 'Super Administrator';
+      case 'Instructor': return 'Instructor';
+      case 'Content Manager': return 'Content Manager';
+      case 'Community Manager': return 'Community Manager';
+      case 'User Support': return 'User Support';
       default: return 'User';
     }
   }
