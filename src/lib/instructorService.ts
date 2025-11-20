@@ -51,26 +51,13 @@ export class InstructorService {
       );
     }
 
-    // Normalize role from JWT token (may have capital letters or spaces)
-    const rawRole = (user.role as string) || 'user';
-    let normalizedRole = rawRole.toLowerCase();
+    // Check if user has the required role (supports both formats: "Super Admin" and "super_admin")
+    const userRole = (user.role as string) || 'user';
+    const allowedRoles = ['super_admin', 'content_manager', 'Super Admin', 'Content Manager', 'Admin'];
 
-    // Handle role name variations
-    if (rawRole === 'Super Admin' || rawRole === 'Admin') {
-      normalizedRole = 'super_admin';
-    } else if (rawRole === 'Content Manager') {
-      normalizedRole = 'content_manager';
-    } else if (rawRole === 'Community Manager') {
-      normalizedRole = 'community_manager';
-    } else if (rawRole === 'User Support') {
-      normalizedRole = 'user_support';
-    }
-
-    // Check if user has the required role
-    const allowedRoles = ['super_admin', 'content_manager'];
-    if (!allowedRoles.includes(normalizedRole)) {
+    if (!allowedRoles.includes(userRole)) {
       throw new InstructorServiceError(
-        `Missing or insufficient permissions. Only Super Admin and Content Manager roles can create instructors. Your current role: ${rawRole}`,
+        `Missing or insufficient permissions. Only Super Admin and Content Manager roles can create instructors. Your current role: ${userRole}`,
         403,
         'INSUFFICIENT_PERMISSIONS'
       );
