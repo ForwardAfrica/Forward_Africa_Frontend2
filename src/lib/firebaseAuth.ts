@@ -20,7 +20,7 @@ export interface FirebaseUser {
   displayName: string | null;
   photoURL: string | null;
   emailVerified: boolean;
-  role: 'user' | 'content_manager' | 'community_manager' | 'user_support' | 'super_admin';
+  role: 'user' | 'Super Admin' | 'Instructor' | 'Content Manager' | 'Community Manager' | 'User Support';
   permissions: string[];
   onboarding_completed: boolean;
   industry?: string;
