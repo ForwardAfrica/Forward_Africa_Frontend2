@@ -498,6 +498,38 @@ export const authService = {
     console.log(`✅ AuthService: Token is valid. Expires in ${timeUntilExpirySeconds}s (${Math.floor(timeUntilExpirySeconds / 60)}m ${timeUntilExpirySeconds % 60}s)`);
 
     return { isValid: true, isExpired: false, timeUntilExpiry };
+  },
+
+  // Sync user role from Firebase Auth to Firestore
+  async syncRole(): Promise<void> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        console.warn('⚠️ AuthService: No token available for role sync');
+        return;
+      }
+
+      console.log('🔄 AuthService: Syncing user role...');
+
+      const response = await fetch('/api/auth/sync-role', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ AuthService: Role synced successfully:', data);
+      } else {
+        console.warn('⚠️ AuthService: Failed to sync role:', response.statusText);
+      }
+    } catch (error) {
+      console.warn('⚠️ AuthService: Error syncing role:', error);
+      // Don't throw - this is not critical
+    }
   }
 };
 
