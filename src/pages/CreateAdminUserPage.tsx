@@ -5,12 +5,14 @@ import { useNavigate } from '../lib/router';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/layout/Layout';
+import { standardizeRole } from '../lib/roleStandardization';
+import { UserRole } from '../types';
 
 interface AdminUser {
   id: string;
   name: string;
   email: string;
-  role: 'content_manager' | 'community_manager' | 'user_support' | 'super_admin';
+  role: UserRole;
   password: string;
   createdAt: Date;
   createdBy: string;
