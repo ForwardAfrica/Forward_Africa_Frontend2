@@ -24,7 +24,7 @@ const SecurityCenterPage: React.FC = () => {
   });
 
   // Check if user is super admin
-  const isSuperAdmin = userRole === 'super_admin';
+  const isSuperAdmin = userRole === 'Super Admin';
 
   // Redirect if not super admin
   useEffect(() => {
