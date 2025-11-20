@@ -137,7 +137,7 @@ export default function AdminDashboardPage() {
         </div>
         <div className="flex items-center space-x-4">
           <div className="text-right">
-            <p className="text-white font-medium">{userRole === 'super_admin' ? 'Super Administrator' : userRole === 'content_manager' ? 'Content Manager' : 'Administrator'}</p>
+            <p className="text-white font-medium">{userRole === 'Super Admin' ? 'Super Administrator' : userRole === 'Content Manager' ? 'Content Manager' : 'Administrator'}</p>
             <p className="text-gray-400 text-sm">{user?.email || profile?.email || 'admin@forwardafrica.com'}</p>
           </div>
           <button
