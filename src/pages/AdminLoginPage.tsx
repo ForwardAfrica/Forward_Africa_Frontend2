@@ -125,7 +125,7 @@ const AdminLoginPage: React.FC = () => {
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center">
-                {getRoleIcon('super_admin')}
+                {getRoleIcon('Super Admin')}
                 <div className="flex-1">
                   <div className="text-white font-medium">Super Admin</div>
                   <div className="text-gray-400">admin@forwardafrica.com</div>
@@ -133,15 +133,15 @@ const AdminLoginPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center">
-                {getRoleIcon('admin')}
+                {getRoleIcon('Instructor')}
                 <div className="flex-1">
-                  <div className="text-white font-medium">Admin</div>
+                  <div className="text-white font-medium">Instructor</div>
                   <div className="text-gray-400">jane.smith@example.com</div>
                   <div className="text-gray-500">password123</div>
                 </div>
               </div>
               <div className="flex items-center">
-                {getRoleIcon('content_manager')}
+                {getRoleIcon('Content Manager')}
                 <div className="flex-1">
                   <div className="text-white font-medium">Content Manager</div>
                   <div className="text-gray-400">mike.johnson@example.com</div>
