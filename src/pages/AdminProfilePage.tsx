@@ -77,18 +77,22 @@ const AdminProfilePage: React.FC = () => {
 
   function getDisplayName(role: string): string {
     switch (role) {
-      case 'super_admin': return 'Super Administrator';
-      case 'admin': return 'Administrator';
-      case 'content_manager': return 'Content Manager';
+      case 'Super Admin': return 'Super Administrator';
+      case 'Instructor': return 'Instructor';
+      case 'Content Manager': return 'Content Manager';
+      case 'Community Manager': return 'Community Manager';
+      case 'User Support': return 'User Support';
       default: return 'User';
     }
   }
 
   function getPermissionsText(role: string): string {
     switch (role) {
-      case 'super_admin': return 'Full System Access';
-      case 'admin': return 'Platform Management';
-      case 'content_manager': return 'Content Management';
+      case 'Super Admin': return 'Full System Access';
+      case 'Instructor': return 'Content Creation & Management';
+      case 'Content Manager': return 'Content Management';
+      case 'Community Manager': return 'Community Moderation';
+      case 'User Support': return 'User Support & Assistance';
       default: return 'Limited Access';
     }
   }
