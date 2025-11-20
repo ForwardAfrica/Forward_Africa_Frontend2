@@ -295,7 +295,7 @@ const RoleManagement: React.FC<RoleManagementProps> = ({ currentUserRole, curren
                         variant="outline"
                         size="sm"
                         onClick={() => handleDeleteUser(user.id)}
-                        disabled={!hasPermission(currentUserPermissions, 'users:delete') || user.role === 'super_admin'}
+                        disabled={!hasPermission(currentUserPermissions, 'users:delete') || user.role === 'Super Admin'}
                         className="flex items-center text-red-500 border-red-500"
                       >
                         <Trash2 className="h-3 w-3 mr-1" />
