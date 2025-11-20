@@ -16,7 +16,7 @@ interface UserData {
   name: string;
   email: string;
   status: 'active' | 'suspended' | 'pending';
-  role: 'user' | 'content_manager' | 'community_manager' | 'user_support' | 'super_admin';
+  role: UserRole;
   joinDate: string;
   lastActive: string;
   coursesEnrolled: number;
