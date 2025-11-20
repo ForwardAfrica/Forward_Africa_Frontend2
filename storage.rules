@@ -18,12 +18,28 @@ service firebase.storage {
       return userDoc != null && userDoc.data != null ? userDoc.data.role : null;
     }
 
+    function normalizeRole(role) {
+      // Normalize role format variations (handle capital letters and spaces)
+      if (role == 'Super Admin' || role == 'Admin') {
+        return 'super_admin';
+      } else if (role == 'Content Manager') {
+        return 'content_manager';
+      } else if (role == 'Community Manager') {
+        return 'community_manager';
+      } else if (role == 'User Support') {
+        return 'user_support';
+      }
+      return role;
+    }
+
     function isAdmin() {
-      return getUserRole() in ['admin', 'super_admin'];
+      let role = normalizeRole(getUserRole());
+      return role != null && role in ['admin', 'super_admin'];
     }
 
     function canManageCourses() {
-      return getUserRole() in ['content_manager', 'admin', 'super_admin'];
+      let role = normalizeRole(getUserRole());
+      return role != null && role in ['content_manager', 'admin', 'super_admin'];
     }
 
     function isOwner(userId) {
