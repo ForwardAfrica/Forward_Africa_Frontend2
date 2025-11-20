@@ -337,7 +337,7 @@ const AuditLogsPage: React.FC = () => {
 
 export default function AuditLogsPageWrapper() {
   return (
-    <AuthGuard requiredRole="super_admin">
+    <AuthGuard requiredRole="Super Admin">
       <AuditLogsPage />
     </AuthGuard>
   );
