@@ -213,20 +213,22 @@ const CreateAdminUserPage: React.FC = () => {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'super_admin': return <Crown className="h-5 w-5" />;
-      case 'content_manager': return <Shield className="h-5 w-5" />;
-      case 'community_manager': return <UserPlus className="h-5 w-5" />;
-      case 'user_support': return <User className="h-5 w-5" />;
+      case 'Super Admin': return <Crown className="h-5 w-5" />;
+      case 'Instructor': return <Shield className="h-5 w-5" />;
+      case 'Content Manager': return <Shield className="h-5 w-5" />;
+      case 'Community Manager': return <UserPlus className="h-5 w-5" />;
+      case 'User Support': return <User className="h-5 w-5" />;
       default: return <User className="h-5 w-5" />;
     }
   };
 
   const getRoleDescription = (role: string) => {
     switch (role) {
-      case 'super_admin': return 'Full system access, can manage all users and settings';
-      case 'content_manager': return 'Content creation and management permissions';
-      case 'community_manager': return 'Community moderation and management';
-      case 'user_support': return 'User support and assistance';
+      case 'Super Admin': return 'Full system access, can manage all users and settings';
+      case 'Instructor': return 'Can create and manage courses and content';
+      case 'Content Manager': return 'Content creation and management permissions';
+      case 'Community Manager': return 'Community moderation and management';
+      case 'User Support': return 'User support and assistance';
       default: return 'Basic access permissions';
     }
   };

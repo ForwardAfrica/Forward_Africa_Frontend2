@@ -7,7 +7,7 @@ export interface AuthUser {
   id: string;
   email: string;
   full_name: string;
-  role: 'user' | 'content_manager' | 'community_manager' | 'user_support' | 'super_admin';
+  role: 'user' | 'Super Admin' | 'Instructor' | 'Content Manager' | 'Community Manager' | 'User Support';
   permissions: string[];
   avatar_url?: string;
   onboarding_completed: boolean;
@@ -642,7 +642,7 @@ export const authService = {
   // Check if user has admin privileges
   isAdmin: (): boolean => {
     const user = authService.getUser();
-    return user?.role === 'super_admin';
+    return user?.role === 'Super Admin' || user?.role === 'Content Manager' || user?.role === 'Instructor';
   },
 
   // Check if user is authenticated

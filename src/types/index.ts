@@ -17,8 +17,8 @@ export interface User {
   onboarding_completed: boolean;
 }
 
-// Role Definitions
-export type UserRole = 'super_admin' | 'content_manager' | 'community_manager' | 'user_support' | 'user';
+// Role Definitions - EXACT strings from database, NO normalization
+export type UserRole = 'Super Admin' | 'Instructor' | 'Content Manager' | 'Community Manager' | 'User Support' | 'user';
 
 // Workflow Types
 export type WorkflowStatus = 'draft' | 'review' | 'approved' | 'published' | 'archived';
@@ -119,9 +119,9 @@ export type Permission =
   | 'security:view_sessions'
   | 'security:terminate_sessions';
 
-// Role Permission Matrix
+// Role Permission Matrix - Using EXACT role strings from database
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  super_admin: [
+  'Super Admin': [
     // Full system access
     'system:full_access',
     'system:configuration',
@@ -192,7 +192,36 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'security:terminate_sessions'
   ],
 
-  content_manager: [
+  'Instructor': [
+    // Content management
+    'content:upload',
+    'content:edit',
+    'content:delete',
+    'content:publish',
+    'content:review',
+    'content:workflow',
+
+    // Course management
+    'courses:view',
+    'courses:create',
+    'courses:edit',
+    'courses:delete',
+    'courses:publish',
+    'courses:assign_instructors',
+
+    // Limited user management
+    'users:view',
+    'users:edit',
+
+    // Basic analytics
+    'analytics:view',
+
+    // Communication
+    'communication:send_announcements',
+    'communication:send_notifications'
+  ],
+
+  'Content Manager': [
     // Content management
     'content:upload',
     'content:edit',
@@ -227,7 +256,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'communication:send_notifications'
   ],
 
-  community_manager: [
+  'Community Manager': [
     // Community management
     'community:moderate',
     'community:ban_users',
@@ -253,7 +282,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'analytics:view'
   ],
 
-  user_support: [
+  'User Support': [
     // Support management
     'support:view_tickets',
     'support:respond_tickets',
@@ -317,12 +346,13 @@ export const hasAllPermissions = (userPermissions: Permission[], requiredPermiss
   return requiredPermissions.every(permission => hasPermission(userPermissions, permission));
 };
 
-// Role Hierarchy
+// Role Hierarchy - Using EXACT role strings from database
 export const ROLE_HIERARCHY: Record<UserRole, number> = {
-  super_admin: 5,
-  content_manager: 4,
-  community_manager: 3,
-  user_support: 2,
+  'Super Admin': 5,
+  'Instructor': 4,
+  'Content Manager': 4,
+  'Community Manager': 3,
+  'User Support': 2,
   user: 1
 };
 

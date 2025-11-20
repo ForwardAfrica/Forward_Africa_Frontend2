@@ -28,39 +28,25 @@ export const PermissionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [permissions, setPermissions] = useState<Permission[]>(ROLE_PERMISSIONS.user);
 
   useEffect(() => {
-    // Get user role from AuthContext user and normalize it
-    let normalizedRole: UserRole = 'user';
-    const rawRole = (user?.role as string) || 'user';
+    // Use exact role from user, no normalization
+    const userRole = (user?.role as UserRole) || 'user';
 
-    // Normalize role for ROLE_PERMISSIONS lookup
-    if (rawRole === 'Super Admin' || rawRole === 'Admin') {
-      normalizedRole = 'super_admin';
-    } else if (rawRole === 'Content Manager') {
-      normalizedRole = 'content_manager';
-    } else if (rawRole === 'Community Manager') {
-      normalizedRole = 'community_manager';
-    } else if (rawRole === 'User Support') {
-      normalizedRole = 'user_support';
-    } else if (rawRole === 'user') {
-      normalizedRole = 'user';
-    }
-
-    setUserRole(normalizedRole);
-    setPermissions(ROLE_PERMISSIONS[normalizedRole] || ROLE_PERMISSIONS.user);
+    setUserRole(userRole);
+    setPermissions(ROLE_PERMISSIONS[userRole] || ROLE_PERMISSIONS.user);
   }, [user]);
 
   const hasPermission = (permission: Permission): boolean => {
-    if (userRole === 'super_admin') return true;
+    if (userRole === 'Super Admin') return true;
     return checkPermission(permissions, permission);
   };
 
   const hasAnyPermissionCheck = (requiredPermissions: Permission[]): boolean => {
-    if (userRole === 'super_admin') return true;
+    if (userRole === 'Super Admin') return true;
     return hasAnyPermission(permissions, requiredPermissions);
   };
 
   const hasAllPermissionsCheck = (requiredPermissions: Permission[]): boolean => {
-    if (userRole === 'super_admin') return true;
+    if (userRole === 'Super Admin') return true;
     return hasAllPermissions(permissions, requiredPermissions);
   };
 

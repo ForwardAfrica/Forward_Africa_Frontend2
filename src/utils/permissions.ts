@@ -95,10 +95,11 @@ export const isUserSupport = (userPermissions: Permission[]): boolean => {
  */
 export const getRoleDisplayName = (role: UserRole): string => {
   const roleNames: Record<UserRole, string> = {
-    super_admin: 'Super Admin',
-    content_manager: 'Content Manager',
-    community_manager: 'Community Manager',
-    user_support: 'User Support',
+    'Super Admin': 'Super Admin',
+    'Instructor': 'Instructor',
+    'Content Manager': 'Content Manager',
+    'Community Manager': 'Community Manager',
+    'User Support': 'User Support',
     user: 'User'
   };
   return roleNames[role] || role;
@@ -109,10 +110,11 @@ export const getRoleDisplayName = (role: UserRole): string => {
  */
 export const getRoleDescription = (role: UserRole): string => {
   const roleDescriptions: Record<UserRole, string> = {
-    super_admin: 'Full system access and configuration. Can manage all users, content, and system settings.',
-    content_manager: 'Course upload and editing permissions. Can manage content workflow and instructor accounts.',
-    community_manager: 'Forum moderation capabilities. Can manage community interactions and user support.',
-    user_support: 'Limited user account assistance. Basic reporting and communication tools.',
+    'Super Admin': 'Full system access and configuration. Can manage all users, content, and system settings.',
+    'Instructor': 'Course creation and instruction. Can upload content, manage courses, and review student progress.',
+    'Content Manager': 'Course upload and editing permissions. Can manage content workflow and instructor accounts.',
+    'Community Manager': 'Forum moderation capabilities. Can manage community interactions and user support.',
+    'User Support': 'Limited user account assistance. Basic reporting and communication tools.',
     user: 'Standard user with access to courses and basic features.'
   };
   return roleDescriptions[role] || '';
