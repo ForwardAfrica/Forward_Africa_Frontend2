@@ -38,6 +38,31 @@ export class InstructorServiceError extends Error {
 
 export class InstructorService {
   /**
+   * Checks if the current user has permission to create/manage instructors
+   */
+  static checkInstructorPermission(): void {
+    const user = authService.getUserFromToken();
+
+    if (!user) {
+      throw new InstructorServiceError(
+        'You are not authenticated. Please log in to create instructors.',
+        401,
+        'UNAUTHENTICATED'
+      );
+    }
+
+    // Check if user has the required role
+    const allowedRoles = ['super_admin', 'content_manager'];
+    if (!allowedRoles.includes(user.role)) {
+      throw new InstructorServiceError(
+        `Missing or insufficient permissions. Only Super Admin and Content Manager roles can create instructors. Your current role: ${user.role}`,
+        403,
+        'INSUFFICIENT_PERMISSIONS'
+      );
+    }
+  }
+
+  /**
    * Validates instructor form data
    */
   static validateInstructorData(data: InstructorFormData): InstructorValidationError[] {
