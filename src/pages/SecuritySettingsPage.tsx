@@ -223,8 +223,9 @@ const SecuritySettingsPage: React.FC = () => {
   };
 
   const handleRolePermissionChange = (role: string, permission: string, value: boolean) => {
-    // Only super_admin can modify admin and super_admin permissions
-    if ((role === 'admin' || role === 'super_admin') && userRole !== 'super_admin') {
+    // Only Super Admin can modify admin and Super Admin permissions
+    const standardizedRole = standardizeRole(role);
+    if ((standardizedRole === 'Instructor' || standardizedRole === 'Super Admin') && standardizeRole(userRole) !== 'Super Admin') {
       setPermissionError('Only Super Administrators can modify Admin and Super Admin permissions.');
       return;
     }
