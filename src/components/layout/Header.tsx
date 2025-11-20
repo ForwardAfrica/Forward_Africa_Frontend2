@@ -18,7 +18,7 @@ const Header: React.FC = () => {
   const { notifications, markAsRead, markAllAsRead, unreadCount } = useNotifications();
   const { user, profile, enhancedSignOut } = useAuthEnhanced();
   const { userRole } = usePermissions();
-  const canAccessAdmin = userRole === 'super_admin' || userRole === 'content_manager';
+  const canAccessAdmin = userRole === 'Super Admin' || userRole === 'Content Manager' || userRole === 'Instructor';
 
   useEffect(() => {
     const handleScroll = () => {
