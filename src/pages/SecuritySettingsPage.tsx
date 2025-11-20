@@ -539,14 +539,14 @@ const SecuritySettingsPage: React.FC = () => {
                 {Object.entries(rolePermissions).map(([role, permissions]) => (
                   <div key={role} className="border border-gray-700 rounded-lg p-6">
                     <h4 className="text-white font-medium mb-4 flex items-center">
-                      {role === 'super_admin' && <Shield className="h-5 w-5 mr-2 text-purple-500" />}
-                      {role === 'admin' && <Shield className="h-5 w-5 mr-2 text-blue-500" />}
-                      {role === 'content_manager' && <Users className="h-5 w-5 mr-2 text-green-500" />}
+                      {role === 'Super Admin' && <Shield className="h-5 w-5 mr-2 text-purple-500" />}
+                      {role === 'Instructor' && <Shield className="h-5 w-5 mr-2 text-blue-500" />}
+                      {role === 'Content Manager' && <Users className="h-5 w-5 mr-2 text-green-500" />}
                       {role === 'user' && <Users className="h-5 w-5 mr-2 text-gray-400" />}
-                      {role.replace('_', ' ').toUpperCase()}
+                      {role}
 
                       {/* Show warning for protected roles */}
-                      {(role === 'admin' || role === 'super_admin') && userRole !== 'super_admin' && (
+                      {(role === 'Instructor' || role === 'Super Admin') && standardizeRole(userRole) !== 'Super Admin' && (
                         <span className="ml-2 text-xs text-yellow-400">
                           (Only Super Admins can modify these permissions)
                         </span>
@@ -557,8 +557,8 @@ const SecuritySettingsPage: React.FC = () => {
                       {Object.entries(permissions).map(([permission, value]) => {
                         // Determine if this permission can be modified by current user
                         const canModify = !(
-                          (role === 'admin' || role === 'super_admin') &&
-                          userRole !== 'super_admin'
+                          (role === 'Instructor' || role === 'Super Admin') &&
+                          standardizeRole(userRole) !== 'Super Admin'
                         );
 
                         return (
