@@ -44,7 +44,6 @@ class AuthService {
       // Get user's custom claims (role, permissions, etc.)
       const customClaims = userRecord.customClaims || {};
       const role = customClaims.role || 'user';
-      const permissions = customClaims.permissions || [];
 
       // Get user profile from Firestore
       let userProfile = {
@@ -52,8 +51,7 @@ class AuthService {
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role,
-        permissions
+        role
       };
 
       try {
@@ -79,8 +77,7 @@ class AuthService {
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role: role,
-        permissions: permissions
+        role: role
       };
 
       const accessToken = JWTManager.createToken(tokenPayload);
@@ -111,12 +108,10 @@ class AuthService {
 
       // Set default role
       const role = 'user';
-      const permissions = [];
 
       try {
         await adminApp.auth().setCustomUserClaims(userRecord.uid, {
-          role,
-          permissions
+          role
         });
       } catch (error) {
         console.warn('Could not set custom claims:', error);
@@ -131,7 +126,6 @@ class AuthService {
           displayName: displayName,
           photoURL: null,
           role,
-          permissions,
           ...userData,
           onboarding_completed: false,
           created_at: admin.firestore.FieldValue.serverTimestamp(),
@@ -147,8 +141,7 @@ class AuthService {
         email: userRecord.email,
         displayName: displayName,
         photoURL: null,
-        role,
-        permissions
+        role
       };
 
       const accessToken = JWTManager.createToken(tokenPayload);
@@ -163,7 +156,6 @@ class AuthService {
           displayName: displayName,
           photoURL: null,
           role,
-          permissions,
           onboarding_completed: false
         }
       };
@@ -183,7 +175,6 @@ class AuthService {
 
       const customClaims = userRecord.customClaims || {};
       const role = customClaims.role || 'user';
-      const permissions = customClaims.permissions || [];
 
       // Get updated user profile
       let userProfile = {
@@ -191,8 +182,7 @@ class AuthService {
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role,
-        permissions
+        role
       };
 
       try {
@@ -215,8 +205,7 @@ class AuthService {
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role: role,
-        permissions: permissions
+        role: role
       };
 
       const newAccessToken = JWTManager.createToken(tokenPayload);
@@ -243,15 +232,13 @@ class AuthService {
 
       const customClaims = userRecord.customClaims || {};
       const role = customClaims.role || 'user';
-      const permissions = customClaims.permissions || [];
 
       let userProfile = {
         uid: userRecord.uid,
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role,
-        permissions
+        role
       };
 
       try {
@@ -284,15 +271,13 @@ class AuthService {
 
       const customClaims = userRecord.customClaims || {};
       const role = customClaims.role || 'user';
-      const permissions = customClaims.permissions || [];
 
       let userProfile = {
         uid: userRecord.uid,
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role,
-        permissions
+        role
       };
 
       try {
@@ -318,14 +303,13 @@ class AuthService {
   }
 
   // Update user role
-  static async updateUserRole(userId, newRole, permissions = []) {
+  static async updateUserRole(userId, newRole) {
     try {
       const adminApp = initFirebaseAdmin();
 
       // Update Firebase custom claims
       await adminApp.auth().setCustomUserClaims(userId, {
-        role: newRole,
-        permissions
+        role: newRole
       });
 
       // Update Firestore
@@ -333,7 +317,6 @@ class AuthService {
         const db = adminApp.firestore();
         await db.collection('users').doc(userId).update({
           role: newRole,
-          permissions,
           updated_at: admin.firestore.FieldValue.serverTimestamp()
         });
       } catch (error) {

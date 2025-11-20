@@ -127,9 +127,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get updated user data from Firebase
     const userRecord = await admin.auth().getUser(payload.userId);
 
-    // Get user's current role and permissions
+    // Get user's current role
     let userRole = 'user';
-    let userPermissions: string[] = [];
     let userData: any = {};
 
     try {
@@ -139,7 +138,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (userDoc.exists) {
         const data = userDoc.data();
         userRole = data?.role || 'user';
-        userPermissions = data?.permissions || [];
         userData = data || {};
       }
     } catch (error) {
@@ -152,8 +150,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       email: userRecord.email,
       displayName: userRecord.displayName || '',
       photoURL: userRecord.photoURL || null,
-      role: userRole,
-      permissions: userPermissions
+      role: userRole
     };
 
     const newToken = JWTManager.createToken(tokenPayload);
@@ -183,7 +180,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       displayName: userRecord.displayName || '',
       photoURL: userRecord.photoURL || null,
       role: userRole,
-      permissions: userPermissions,
       ...userData
     };
 

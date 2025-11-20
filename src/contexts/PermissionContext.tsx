@@ -33,16 +33,22 @@ export const PermissionProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     // This handles cases where role might be stored as 'super_admin', 'content_manager', etc.
     const standardized = standardizeRole(user?.role);
 
-    console.log('🔐 PermissionContext: Setting role', { original: user?.role, standardized });
+    console.log('🔐 PermissionContext: Setting role from user.role', {
+      original: user?.role,
+      standardized,
+      userExists: !!user
+    });
 
     setUserRole(standardized);
 
-    // Always lookup using the standardized role
+    // Always derive permissions from the standardized role
+    // Never rely on the permissions array from the JWT
     const rolePermissions = ROLE_PERMISSIONS[standardized];
     if (!rolePermissions) {
       console.warn(`⚠️ PermissionContext: No permissions found for role "${standardized}", defaulting to user permissions`);
       setPermissions(ROLE_PERMISSIONS.user);
     } else {
+      console.log(`✅ PermissionContext: Permissions loaded for role "${standardized}"`, rolePermissions);
       setPermissions(rolePermissions);
     }
   }, [user]);

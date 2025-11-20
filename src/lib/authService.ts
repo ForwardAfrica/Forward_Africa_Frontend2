@@ -8,7 +8,6 @@ export interface AuthUser {
   displayName?: string;
   photoURL?: string | null;
   role: 'user' | 'Super Admin' | 'Instructor' | 'Content Manager' | 'Community Manager' | 'User Support';
-  permissions: string[];
   avatar_url?: string;
   onboarding_completed: boolean;
   industry?: string;
@@ -252,7 +251,6 @@ export const authService = {
         displayName: payload.displayName || '',
         photoURL: payload.photoURL || null,
         role: payload.role || 'user',
-        permissions: payload.permissions || [],
         avatar_url: payload.photoURL || undefined,
         onboarding_completed: payload.onboarding_completed || false
       };

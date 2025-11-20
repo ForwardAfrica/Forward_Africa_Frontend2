@@ -82,19 +82,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const firestoreData = userDocSnapshot.data() || {};
 
     const roleFromFirestore = firestoreData.role || 'user';
-    const permissionsFromFirestore = firestoreData.permissions || [];
 
     // Get the user from Firebase Auth
     const userRecord = await admin.auth().getUser(userId);
     const customClaims = userRecord.customClaims || {};
     const roleFromAuth = customClaims.role || 'user';
-    const permissionsFromAuth = customClaims.permissions || [];
 
     // Sync Firestore role to Firebase Auth custom claims (Firestore is source of truth)
-    if (roleFromAuth !== roleFromFirestore || JSON.stringify(permissionsFromAuth) !== JSON.stringify(permissionsFromFirestore)) {
+    if (roleFromAuth !== roleFromFirestore) {
       await admin.auth().setCustomUserClaims(userId, {
-        role: roleFromFirestore,
-        permissions: permissionsFromFirestore
+        role: roleFromFirestore
       });
 
       console.log(`✅ Synced Firebase Auth custom claims for user ${userId} from Firestore: ${roleFromFirestore}`);
@@ -104,8 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       message: 'Role synced successfully',
-      role: roleFromFirestore,
-      permissions: permissionsFromFirestore
+      role: roleFromFirestore
     });
   } catch (error: any) {
     console.error('Error syncing role:', error);
