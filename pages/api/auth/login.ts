@@ -200,9 +200,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw error;
     }
 
-    // Get user's role and permissions from Firestore
+    // Get user's role from Firestore
     let userRole = 'user';
-    let userPermissions: string[] = [];
     let userData: any = {};
 
     try {
@@ -215,7 +214,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const data = userDoc.data();
         userRole = data?.role || 'user';
         console.log('📋 User document found:', { role: userRole, userData: data });
-        userPermissions = data?.permissions || [];
         userData = data || {};
       }
     } catch (error) {
@@ -225,10 +223,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Update Firebase Auth custom claims to match Firestore (Firestore is source of truth)
     try {
       await admin.auth().setCustomUserClaims(userRecord.uid, {
-        role: userRole,
-        permissions: userPermissions
+        role: userRole
       });
-      console.log('✅ Updated Firebase Auth custom claims:', { role: userRole, permissions: userPermissions });
+      console.log('✅ Updated Firebase Auth custom claims:', { role: userRole });
     } catch (error) {
       console.warn('⚠️ Could not update Firebase Auth custom claims:', error);
     }
@@ -239,8 +236,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       email: userRecord.email,
       displayName: userRecord.displayName || '',
       photoURL: userRecord.photoURL || null,
-      role: userRole,
-      permissions: userPermissions
+      role: userRole
     };
 
     const jwtToken = JWTManager.createToken(tokenPayload);
@@ -254,7 +250,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       displayName: userRecord.displayName || '',
       photoURL: userRecord.photoURL || null,
       role: userRole,
-      permissions: userPermissions,
       ...userData
     };
 
@@ -280,7 +275,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     rateLimit.recordAttempt(email, true);
 
-    console.log('✅ Login successful for:', email);
+    console.log('✅ Login successful for:', email, 'with role:', userRole);
 
     return res.status(200).json({
       message: 'Login successful',
