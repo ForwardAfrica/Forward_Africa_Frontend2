@@ -1,23 +1,5 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  limit,
-  startAfter,
-  serverTimestamp,
-  Timestamp,
-  writeBatch,
-  onSnapshot,
-  Unsubscribe
-} from 'firebase/firestore';
-import { db } from './firebase';
+// Frontend Firestore Service - All operations now go through backend API endpoints
+// The backend uses Firebase Admin SDK for secure, privileged database operations
 
 export interface Course {
   id: string;
@@ -43,8 +25,8 @@ export interface Course {
   coming_soon: boolean;
   release_date?: Date;
   total_xp: number;
-  created_at: Timestamp;
-  updated_at: Timestamp;
+  created_at: any;
+  updated_at: any;
 }
 
 export interface Lesson {
@@ -66,8 +48,8 @@ export interface UserProgress {
   completed: boolean;
   progress_percentage: number;
   time_spent: number;
-  last_accessed: Timestamp;
-  completed_at?: Timestamp;
+  last_accessed: any;
+  completed_at?: any;
 }
 
 export interface Category {
@@ -75,7 +57,7 @@ export interface Category {
   name: string;
   description: string;
   icon: string;
-  created_at: Timestamp;
+  created_at: any;
 }
 
 export interface Instructor {
@@ -89,7 +71,7 @@ export interface Instructor {
     website?: string;
   };
   courses_count: number;
-  created_at: Timestamp;
+  created_at: any;
 }
 
 export interface Certificate {
@@ -97,7 +79,7 @@ export interface Certificate {
   user_id: string;
   course_id: string;
   course_title: string;
-  issued_at: Timestamp;
+  issued_at: any;
   pdf_url?: string;
 }
 
@@ -108,7 +90,7 @@ export interface Achievement {
   title: string;
   description: string;
   icon: string;
-  earned_at: Timestamp;
+  earned_at: any;
 }
 
 export interface Notification {
@@ -118,7 +100,7 @@ export interface Notification {
   message: string;
   type: 'info' | 'success' | 'warning' | 'error';
   read: boolean;
-  created_at: Timestamp;
+  created_at: any;
 }
 
 export interface AuditLog {
@@ -129,7 +111,7 @@ export interface AuditLog {
   details: string;
   ip_address: string;
   user_agent?: string;
-  timestamp: Timestamp;
+  timestamp: any;
   resource_type?: string;
   resource_id?: string;
 }
@@ -141,23 +123,24 @@ export class FirestoreService {
 
   static async getCourses(limitCount: number = 20, lastDoc?: any): Promise<Course[]> {
     try {
-      let q = query(
-        collection(db, 'courses'),
-        orderBy('created_at', 'desc'),
-        limit(limitCount)
-      );
+      const limit = limitCount;
+      const lastDocId = lastDoc?.id;
+      
+      const queryStr = lastDocId 
+        ? `?limit=${limit}&lastDocId=${lastDocId}` 
+        : `?limit=${limit}`;
 
-      if (lastDoc) {
-        q = query(
-          collection(db, 'courses'),
-          orderBy('created_at', 'desc'),
-          startAfter(lastDoc),
-          limit(limitCount)
-        );
+      const response = await fetch(`/api/courses${queryStr}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch courses: ${response.statusText}`);
       }
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching courses:', error);
       throw error;
@@ -166,13 +149,21 @@ export class FirestoreService {
 
   static async getCourseById(courseId: string): Promise<Course | null> {
     try {
-      const docRef = doc(db, 'courses', courseId);
-      const docSnap = await getDoc(docRef);
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() } as Course;
+      if (response.status === 404) {
+        return null;
       }
-      return null;
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch course: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || null;
     } catch (error) {
       console.error('❌ Error fetching course:', error);
       throw error;
@@ -181,16 +172,17 @@ export class FirestoreService {
 
   static async getCoursesByCategory(category: string): Promise<Course[]> {
     try {
-      const q = query(
-        collection(db, 'courses'),
-        where('category', '==', category),
-        where('coming_soon', '==', false),
-        orderBy('created_at', 'desc'),
-        limit(20)
-      );
+      const response = await fetch(`/api/courses/category/${encodeURIComponent(category)}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch courses by category: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching courses by category:', error);
       throw error;
@@ -199,16 +191,17 @@ export class FirestoreService {
 
   static async getFeaturedCourses(): Promise<Course[]> {
     try {
-      const q = query(
-        collection(db, 'courses'),
-        where('featured', '==', true),
-        where('coming_soon', '==', false),
-        orderBy('created_at', 'desc'),
-        limit(6)
-      );
+      const response = await fetch('/api/courses/featured', {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch featured courses: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching featured courses:', error);
       throw error;
@@ -217,16 +210,19 @@ export class FirestoreService {
 
   static async createCourse(courseData: Omit<Course, 'id' | 'created_at' | 'updated_at'>): Promise<string> {
     try {
-      const docRef = doc(collection(db, 'courses'));
-      const course: Course = {
-        ...courseData,
-        id: docRef.id,
-        created_at: serverTimestamp() as Timestamp,
-        updated_at: serverTimestamp() as Timestamp
-      };
+      const response = await fetch('/api/courses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(courseData)
+      });
 
-      await setDoc(docRef, course);
-      return docRef.id;
+      if (!response.ok) {
+        throw new Error(`Failed to create course: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.courseId;
     } catch (error) {
       console.error('❌ Error creating course:', error);
       throw error;
@@ -235,11 +231,16 @@ export class FirestoreService {
 
   static async updateCourse(courseId: string, courseData: Partial<Course>): Promise<void> {
     try {
-      const docRef = doc(db, 'courses', courseId);
-      await updateDoc(docRef, {
-        ...courseData,
-        updated_at: serverTimestamp()
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(courseData)
       });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update course: ${response.statusText}`);
+      }
     } catch (error) {
       console.error('❌ Error updating course:', error);
       throw error;
@@ -248,8 +249,14 @@ export class FirestoreService {
 
   static async deleteCourse(courseId: string): Promise<void> {
     try {
-      const docRef = doc(db, 'courses', courseId);
-      await deleteDoc(docRef);
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete course: ${response.statusText}`);
+      }
     } catch (error) {
       console.error('❌ Error deleting course:', error);
       throw error;
@@ -262,13 +269,17 @@ export class FirestoreService {
 
   static async getUserProgress(userId: string, courseId: string): Promise<UserProgress[]> {
     try {
-      const q = query(
-        collection(db, 'progress', userId, 'courses', courseId, 'lessons'),
-        orderBy('order', 'asc')
-      );
+      const response = await fetch(`/api/progress/${userId}/${courseId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as UserProgress));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user progress: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching user progress:', error);
       throw error;
@@ -282,15 +293,16 @@ export class FirestoreService {
     progressData: Partial<UserProgress>
   ): Promise<void> {
     try {
-      const docRef = doc(db, 'progress', userId, 'courses', courseId, 'lessons', lessonId);
-      await setDoc(docRef, {
-        ...progressData,
-        user_id: userId,
-        course_id: courseId,
-        lesson_id: lessonId,
-        last_accessed: serverTimestamp(),
-        updated_at: serverTimestamp()
-      }, { merge: true });
+      const response = await fetch(`/api/progress/${userId}/${courseId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ lessonId, progressData })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update user progress: ${response.statusText}`);
+      }
     } catch (error) {
       console.error('❌ Error updating user progress:', error);
       throw error;
@@ -303,17 +315,14 @@ export class FirestoreService {
     lessonId: string
   ): Promise<void> {
     try {
-      const docRef = doc(db, 'progress', userId, 'courses', courseId, 'lessons', lessonId);
-      await setDoc(docRef, {
-        user_id: userId,
-        course_id: courseId,
-        lesson_id: lessonId,
-        completed: true,
-        progress_percentage: 100,
-        completed_at: serverTimestamp(),
-        last_accessed: serverTimestamp(),
-        updated_at: serverTimestamp()
-      }, { merge: true });
+      const response = await fetch(`/api/progress/${userId}/${courseId}/${lessonId}/complete`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to mark lesson as complete: ${response.statusText}`);
+      }
     } catch (error) {
       console.error('❌ Error marking lesson complete:', error);
       throw error;
@@ -326,13 +335,17 @@ export class FirestoreService {
 
   static async getCategories(): Promise<Category[]> {
     try {
-      const q = query(
-        collection(db, 'categories'),
-        orderBy('name', 'asc')
-      );
+      const response = await fetch('/api/categories', {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch categories: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching categories:', error);
       throw error;
@@ -345,13 +358,17 @@ export class FirestoreService {
 
   static async getInstructors(): Promise<Instructor[]> {
     try {
-      const q = query(
-        collection(db, 'instructors'),
-        orderBy('name', 'asc')
-      );
+      const response = await fetch('/api/instructors', {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Instructor));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch instructors: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching instructors:', error);
       throw error;
@@ -360,13 +377,21 @@ export class FirestoreService {
 
   static async getInstructorById(instructorId: string): Promise<Instructor | null> {
     try {
-      const docRef = doc(db, 'instructors', instructorId);
-      const docSnap = await getDoc(docRef);
+      const response = await fetch(`/api/instructors/${instructorId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() } as Instructor;
+      if (response.status === 404) {
+        return null;
       }
-      return null;
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch instructor: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || null;
     } catch (error) {
       console.error('❌ Error fetching instructor:', error);
       throw error;
@@ -379,14 +404,17 @@ export class FirestoreService {
 
   static async getUserCertificates(userId: string): Promise<Certificate[]> {
     try {
-      const q = query(
-        collection(db, 'certificates'),
-        where('user_id', '==', userId),
-        orderBy('issued_at', 'desc')
-      );
+      const response = await fetch(`/api/certificates/${userId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Certificate));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch certificates: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching certificates:', error);
       throw error;
@@ -395,15 +423,20 @@ export class FirestoreService {
 
   static async createCertificate(certificateData: Omit<Certificate, 'id' | 'issued_at'>): Promise<string> {
     try {
-      const docRef = doc(collection(db, 'certificates'));
-      const certificate: Certificate = {
-        ...certificateData,
-        id: docRef.id,
-        issued_at: serverTimestamp() as Timestamp
-      };
+      const userId = certificateData.user_id;
+      const response = await fetch(`/api/certificates/${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(certificateData)
+      });
 
-      await setDoc(docRef, certificate);
-      return docRef.id;
+      if (!response.ok) {
+        throw new Error(`Failed to create certificate: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.certificateId;
     } catch (error) {
       console.error('❌ Error creating certificate:', error);
       throw error;
@@ -416,13 +449,17 @@ export class FirestoreService {
 
   static async getUserAchievements(userId: string): Promise<Achievement[]> {
     try {
-      const q = query(
-        collection(db, 'achievements', userId, 'user_achievements'),
-        orderBy('earned_at', 'desc')
-      );
+      const response = await fetch(`/api/achievements/${userId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Achievement));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch achievements: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching achievements:', error);
       throw error;
@@ -435,14 +472,17 @@ export class FirestoreService {
 
   static async getUserNotifications(userId: string): Promise<Notification[]> {
     try {
-      const q = query(
-        collection(db, 'notifications', userId, 'user_notifications'),
-        orderBy('created_at', 'desc'),
-        limit(50)
-      );
+      const response = await fetch(`/api/notifications/${userId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch notifications: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching notifications:', error);
       throw error;
@@ -451,8 +491,16 @@ export class FirestoreService {
 
   static async markNotificationAsRead(userId: string, notificationId: string): Promise<void> {
     try {
-      const docRef = doc(db, 'notifications', userId, 'user_notifications', notificationId);
-      await updateDoc(docRef, { read: true });
+      const response = await fetch(`/api/notifications/${userId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ notificationId })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to mark notification as read: ${response.statusText}`);
+      }
     } catch (error) {
       console.error('❌ Error marking notification as read:', error);
       throw error;
@@ -465,15 +513,19 @@ export class FirestoreService {
 
   static async createAuditLog(auditData: Omit<AuditLog, 'id' | 'timestamp'>): Promise<string> {
     try {
-      const docRef = doc(collection(db, 'audit_logs'));
-      const auditLog: AuditLog = {
-        ...auditData,
-        id: docRef.id,
-        timestamp: serverTimestamp() as Timestamp
-      };
+      const response = await fetch('/api/audit-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(auditData)
+      });
 
-      await setDoc(docRef, auditLog);
-      return docRef.id;
+      if (!response.ok) {
+        throw new Error(`Failed to create audit log: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.logId;
     } catch (error) {
       console.error('❌ Error creating audit log:', error);
       throw error;
@@ -482,54 +534,21 @@ export class FirestoreService {
 
   static async getAuditLogs(limitCount: number = 100): Promise<AuditLog[]> {
     try {
-      const q = query(
-        collection(db, 'audit_logs'),
-        orderBy('timestamp', 'desc'),
-        limit(limitCount)
-      );
+      const response = await fetch(`/api/audit-logs?limit=${limitCount}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AuditLog));
+      if (!response.ok) {
+        throw new Error(`Failed to fetch audit logs: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
       console.error('❌ Error fetching audit logs:', error);
       throw error;
     }
-  }
-
-  // ============================================================================
-  // REAL-TIME LISTENERS
-  // ============================================================================
-
-  static subscribeToUserProgress(
-    userId: string,
-    courseId: string,
-    callback: (progress: UserProgress[]) => void
-  ): Unsubscribe {
-    const q = query(
-      collection(db, 'progress', userId, 'courses', courseId, 'lessons'),
-      orderBy('order', 'asc')
-    );
-
-    return onSnapshot(q, (snapshot) => {
-      const progress = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as UserProgress));
-      callback(progress);
-    });
-  }
-
-  static subscribeToNotifications(
-    userId: string,
-    callback: (notifications: Notification[]) => void
-  ): Unsubscribe {
-    const q = query(
-      collection(db, 'notifications', userId, 'user_notifications'),
-      orderBy('created_at', 'desc'),
-      limit(50)
-    );
-
-    return onSnapshot(q, (snapshot) => {
-      const notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
-      callback(notifications);
-    });
   }
 
   // ============================================================================
@@ -542,24 +561,23 @@ export class FirestoreService {
     progressUpdates: { lessonId: string; progressData: Partial<UserProgress> }[]
   ): Promise<void> {
     try {
-      const batch = writeBatch(db);
-
-      progressUpdates.forEach(({ lessonId, progressData }) => {
-        const docRef = doc(db, 'progress', userId, 'courses', courseId, 'lessons', lessonId);
-        batch.set(docRef, {
-          ...progressData,
-          user_id: userId,
-          course_id: courseId,
-          lesson_id: lessonId,
-          last_accessed: serverTimestamp(),
-          updated_at: serverTimestamp()
-        }, { merge: true });
-      });
-
-      await batch.commit();
+      // Execute updates sequentially through individual API calls
+      // For batch operations, you can implement a dedicated endpoint if needed
+      for (const update of progressUpdates) {
+        await this.updateUserProgress(userId, courseId, update.lessonId, update.progressData);
+      }
     } catch (error) {
       console.error('❌ Error batch updating user progress:', error);
       throw error;
     }
   }
+
+  // ============================================================================
+  // REAL-TIME LISTENERS (No longer supported via REST API)
+  // ============================================================================
+  // Real-time listeners (onSnapshot, subscribeToUserProgress, etc.) are not 
+  // supported through REST API. For real-time updates, you would need to:
+  // 1. Implement WebSocket endpoints on the backend
+  // 2. Use polling with regular fetch calls
+  // 3. Use a service like Firebase Cloud Messaging for push notifications
 }
