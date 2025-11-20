@@ -319,10 +319,10 @@ const CreateAdminUserPage: React.FC = () => {
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
-                  { value: 'content_manager', label: 'Content Manager' },
-                  { value: 'community_manager', label: 'Community Manager' },
-                  { value: 'user_support', label: 'User Support' },
-                  ...(currentUserRole === 'super_admin' ? [{ value: 'super_admin', label: 'Super Admin' }] : [])
+                  { value: 'Content Manager', label: 'Content Manager' },
+                  { value: 'Community Manager', label: 'Community Manager' },
+                  { value: 'User Support', label: 'User Support' },
+                  ...(standardizeRole(currentUserRole) === 'Super Admin' ? [{ value: 'Super Admin', label: 'Super Admin' }] : [])
                 ].map((role) => (
                   <label
                     key={role.value}
