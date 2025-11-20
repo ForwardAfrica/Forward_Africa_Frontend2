@@ -7,7 +7,7 @@ export interface AuthUser {
   full_name: string;
   displayName?: string;
   photoURL?: string | null;
-  role: 'user' | 'content_manager' | 'community_manager' | 'user_support' | 'super_admin';
+  role: 'user' | 'Super Admin' | 'Instructor' | 'Content Manager' | 'Community Manager' | 'User Support';
   permissions: string[];
   avatar_url?: string;
   onboarding_completed: boolean;
