@@ -19,7 +19,7 @@ service cloud.firestore {
     }
 
     function normalizeRole(role) {
-      // Normalize role format variations
+      // Normalize role format variations (handle capital letters and spaces)
       if (role == 'Super Admin' || role == 'Admin') {
         return 'super_admin';
       } else if (role == 'Content Manager') {
@@ -29,7 +29,7 @@ service cloud.firestore {
       } else if (role == 'User Support') {
         return 'user_support';
       }
-      return role == null ? null : string(role).lower();
+      return role;
     }
 
     function isAdmin() {
