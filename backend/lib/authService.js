@@ -232,15 +232,13 @@ class AuthService {
 
       const customClaims = userRecord.customClaims || {};
       const role = customClaims.role || 'user';
-      const permissions = customClaims.permissions || [];
 
       let userProfile = {
         uid: userRecord.uid,
         email: userRecord.email,
         displayName: userRecord.displayName || '',
         photoURL: userRecord.photoURL || null,
-        role,
-        permissions
+        role
       };
 
       try {
