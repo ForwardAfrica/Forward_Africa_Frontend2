@@ -151,6 +151,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             if (response && response.user) {
               setUser(response.user);
               console.log('✅ Token refreshed and user updated');
+
+              // Sync role from Firebase Auth to Firestore (non-blocking)
+              authService.syncRole().catch(err => {
+                console.warn('⚠️ Failed to sync role during token refresh:', err);
+              });
+
               scheduleTokenRefresh();
             }
           } catch (error) {
