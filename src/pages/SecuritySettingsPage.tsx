@@ -82,7 +82,7 @@ const SecuritySettingsPage: React.FC = () => {
       manage_settings: false,
       access_audit_logs: false
     },
-    content_manager: {
+    'Content Manager': {
       view_courses: true,
       enroll_courses: true,
       create_courses: true,
@@ -93,7 +93,7 @@ const SecuritySettingsPage: React.FC = () => {
       manage_settings: false,
       access_audit_logs: false
     },
-    admin: {
+    'Instructor': {
       view_courses: true,
       enroll_courses: true,
       create_courses: true,
@@ -104,7 +104,7 @@ const SecuritySettingsPage: React.FC = () => {
       manage_settings: true,
       access_audit_logs: true
     },
-    super_admin: {
+    'Super Admin': {
       view_courses: true,
       enroll_courses: true,
       create_courses: true,
