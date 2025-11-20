@@ -703,7 +703,7 @@ const ManageUsersPage: React.FC = () => {
                     <div className="flex items-center space-x-2 mt-2">
                       {getRoleIcon(selectedUser.role)}
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadge(selectedUser.role)}`}>
-                        {selectedUser.role.replace('_', ' ').toUpperCase()}
+                        {selectedUser.role}
                       </span>
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(selectedUser.status)}`}>
                         {selectedUser.status.charAt(0).toUpperCase() + selectedUser.status.slice(1)}
