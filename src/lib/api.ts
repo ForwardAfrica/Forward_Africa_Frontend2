@@ -14,23 +14,41 @@ import {
 
 // Generic API request function with authentication
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  // Backend removed — return mock data to keep UI functional.
-  console.warn('API request intercepted (backend removed). Returning mock for:', endpoint, options?.method || 'GET');
+  try {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('forward_africa_token') : null;
 
-  const method = (options.method || 'GET').toUpperCase();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
 
-  // Heuristic mocks
-  // List endpoints -> return empty array
-  if (/\/(users|courses|categories|instructors|lessons)(?:$|\?|\/|$)/.test(endpoint)) {
-    if (/\/(users|courses)\/[^/]+/.test(endpoint)) {
-      // single resource
-      return null;
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
-    return [];
-  }
 
-  if (method === 'GET') return null;
-  return { success: true };
+    // Use relative URL for Next.js API routes
+    const url = endpoint.startsWith('/api') ? endpoint : `/api${endpoint}`;
+
+    console.log('📡 API Request:', { method: options.method || 'GET', url });
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      console.error('❌ API Error:', { status: response.status, url });
+      throw new Error(`API Error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ API Response:', { url, dataLength: Array.isArray(data) ? data.length : 'not-array' });
+
+    return data;
+  } catch (error) {
+    console.error('❌ API Request failed:', error);
+    throw error;
+  }
 };
 
 // User API
