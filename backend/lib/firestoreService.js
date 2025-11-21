@@ -55,6 +55,12 @@ class FirestoreService {
   // COURSES
   // ============================================================================
 
+  /**
+   * Get courses with optional pagination
+   * @param {number} limitCount - Maximum number of courses to fetch
+   * @param {string|null} lastDocId - Document ID for pagination cursor
+   * @returns {Promise<Array>} Array of courses
+   */
   static async getCourses(limitCount = 20, lastDocId = null) {
     try {
       const db = getFirestore();
