@@ -1021,18 +1021,51 @@ const AdminPage: React.FC = () => {
             </Button>
           </div>
 
-          {/* Search */}
+          {/* Search and View Toggle */}
           <div className="bg-gray-800 rounded-lg p-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search instructors..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search instructors..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+
+              {/* View Toggle */}
+              <div className="flex gap-2 bg-gray-700 rounded-lg p-1">
+                <button
+                  onClick={() => setInstructorViewType('card')}
+                  className={`px-3 py-2 rounded transition-colors flex items-center gap-2 ${
+                    instructorViewType === 'card'
+                      ? 'bg-red-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                  title="Card view"
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                  <span className="text-sm hidden sm:inline">Card</span>
+                </button>
+                <button
+                  onClick={() => setInstructorViewType('table')}
+                  className={`px-3 py-2 rounded transition-colors flex items-center gap-2 ${
+                    instructorViewType === 'table'
+                      ? 'bg-red-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                  title="Table view"
+                >
+                  <List className="h-4 w-4" />
+                  <span className="text-sm hidden sm:inline">Table</span>
+                </button>
+              </div>
             </div>
+            <p className="text-gray-400 text-sm mt-4">
+              Found {filteredInstructors.length} instructor{filteredInstructors.length !== 1 ? 's' : ''}
+            </p>
           </div>
 
           {/* Instructors Grid */}
