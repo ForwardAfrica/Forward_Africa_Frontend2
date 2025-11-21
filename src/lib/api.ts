@@ -171,9 +171,9 @@ export const instructorAPI = {
   // Create new instructor
   createInstructor: async (instructorData: Partial<Instructor>) => {
     try {
-      // Get JWT token from localStorage
+      // Get JWT token from cookie (secure HTTP-only cookie)
       const token = typeof window !== 'undefined'
-        ? localStorage.getItem('forward_africa_token')
+        ? authService.getToken()
         : null;
 
       if (!token) {
