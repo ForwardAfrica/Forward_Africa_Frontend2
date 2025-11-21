@@ -2,7 +2,7 @@
 // All Firestore operations have been migrated to backend API routes
 // This service now provides minimal client-side auth functionality
 
-import { auth, onAuthStateChanged as firebaseOnAuthStateChanged } from './firebase';
+import { auth, onAuthStateChanged } from './firebase';
 
 export interface FirebaseUser {
   uid: string;
