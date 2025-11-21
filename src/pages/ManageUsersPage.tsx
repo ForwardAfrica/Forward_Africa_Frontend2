@@ -79,6 +79,20 @@ const ManageUsersPage: React.FC = () => {
     fetchAllUsers();
   }, []);
 
+  // Helper function to safely format dates
+  const formatDate = (dateValue: any): string => {
+    if (!dateValue) return 'Unknown';
+
+    const parsed = Date.parse(dateValue);
+    if (isNaN(parsed)) return 'Unknown';
+
+    try {
+      return new Date(dateValue).toISOString().split('T')[0];
+    } catch (error) {
+      return 'Unknown';
+    }
+  };
+
   // Convert database users to UserData format when dbUsers changes
   useEffect(() => {
     if (dbUsers && dbUsers.length > 0) {
@@ -88,8 +102,8 @@ const ManageUsersPage: React.FC = () => {
         email: dbUser.email,
         status: 'active', // Default to active since we don't have status field in DB
         role: dbUser.role || 'user',
-        joinDate: dbUser.created_at ? new Date(dbUser.created_at).toISOString().split('T')[0] : 'Unknown',
-        lastActive: dbUser.updated_at ? new Date(dbUser.updated_at).toISOString().split('T')[0] : 'Unknown',
+        joinDate: formatDate(dbUser.created_at),
+        lastActive: formatDate(dbUser.updated_at),
         coursesEnrolled: 0, // Will be calculated from user_progress table later
         coursesCompleted: 0, // Will be calculated from user_progress table later
         avatar: dbUser.avatar_url
@@ -525,7 +539,7 @@ const ManageUsersPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           <div className="flex items-center">
                             <Activity className="h-4 w-4 mr-2 text-gray-400" />
-                            {new Date(user.lastActive).toLocaleDateString()}
+                            {user.lastActive === 'Unknown' ? 'Unknown' : new Date(user.lastActive).toLocaleDateString()}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -631,7 +645,9 @@ const ManageUsersPage: React.FC = () => {
                 <div>
                   <div className="text-2xl font-bold text-white">
                     {users.filter(u => {
+                      if (u.joinDate === 'Unknown') return false;
                       const joinDate = new Date(u.joinDate);
+                      if (isNaN(joinDate.getTime())) return false;
                       const thirtyDaysAgo = new Date();
                       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
                       return joinDate > thirtyDaysAgo;
@@ -719,14 +735,14 @@ const ManageUsersPage: React.FC = () => {
                       <Calendar className="h-5 w-5 text-gray-400" />
                       <span className="text-gray-400">Joined</span>
                     </div>
-                    <p className="text-white font-medium">{new Date(selectedUser.joinDate).toLocaleDateString()}</p>
+                    <p className="text-white font-medium">{selectedUser.joinDate === 'Unknown' ? 'Unknown' : new Date(selectedUser.joinDate).toLocaleDateString()}</p>
                   </div>
                   <div className="bg-gray-700 rounded-lg p-4">
                     <div className="flex items-center space-x-2">
                       <Activity className="h-5 w-5 text-gray-400" />
                       <span className="text-gray-400">Last Active</span>
                     </div>
-                    <p className="text-white font-medium">{new Date(selectedUser.lastActive).toLocaleDateString()}</p>
+                    <p className="text-white font-medium">{selectedUser.lastActive === 'Unknown' ? 'Unknown' : new Date(selectedUser.lastActive).toLocaleDateString()}</p>
                   </div>
                   <div className="bg-gray-700 rounded-lg p-4">
                     <div className="flex items-center space-x-2">
