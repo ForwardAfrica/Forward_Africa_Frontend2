@@ -50,4 +50,4 @@ if (typeof window !== "undefined") {
   }
 }
 
-export { db, auth, storage, analytics };
+export { db, auth, storage, analytics, onAuthStateChanged };
