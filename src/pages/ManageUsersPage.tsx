@@ -645,7 +645,9 @@ const ManageUsersPage: React.FC = () => {
                 <div>
                   <div className="text-2xl font-bold text-white">
                     {users.filter(u => {
+                      if (u.joinDate === 'Unknown') return false;
                       const joinDate = new Date(u.joinDate);
+                      if (isNaN(joinDate.getTime())) return false;
                       const thirtyDaysAgo = new Date();
                       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
                       return joinDate > thirtyDaysAgo;
