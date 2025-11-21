@@ -9,7 +9,9 @@ export interface FirebaseUser {
   uid: string;
   email: string | null;
   displayName: string | null;
+  full_name?: string | null;
   photoURL: string | null;
+  avatar_url?: string | null;
   emailVerified: boolean;
   role: 'user' | 'Super Admin' | 'Instructor' | 'Content Manager' | 'Community Manager' | 'User Support';
   permissions: string[];
