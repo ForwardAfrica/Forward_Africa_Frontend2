@@ -41,8 +41,10 @@ export default function AdminDashboardPage() {
 
   const {
     users,
+    students,
     loading: usersLoading,
-    fetchAllUsers
+    fetchAllUsers,
+    fetchStudents
   } = useUsers();
 
   // Check if we're on the client side
@@ -55,8 +57,8 @@ export default function AdminDashboardPage() {
     if (!isClient) return;
 
     fetchPlatformStats();
-    fetchAllUsers();
-  }, [fetchPlatformStats, fetchAllUsers, isClient]);
+    fetchStudents();
+  }, [fetchPlatformStats, fetchStudents, isClient]);
 
   function getDisplayName(role: string): string {
     switch (role) {
@@ -69,11 +71,11 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // Calculate total students (users with "user" role only)
-  const totalStudents = users.filter(user => user.role === 'user').length;
+  // Total students is the count of fetched students
+  const totalStudents = students.length;
 
-  // Calculate active users (students who have completed at least one course)
-  const activeUsers = users.filter(user => user.role === 'user' && user.onboardingCompleted).length;
+  // Calculate active students (those who have completed onboarding)
+  const activeUsers = students.filter(student => student.onboardingCompleted).length;
 
   // Check if user is super admin
   const isSuperAdmin = userRole === 'Super Admin';

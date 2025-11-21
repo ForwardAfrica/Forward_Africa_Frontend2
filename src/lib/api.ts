@@ -68,6 +68,9 @@ export const userAPI = {
   // Get all users
   getUsers: () => apiRequest('/users/list'),
 
+  // Get students only (users with role 'user')
+  getStudents: () => apiRequest('/admin/students'),
+
   // Get user by ID
   getUser: (userId: string) => apiRequest(`/users/${userId}`),
 
