@@ -178,14 +178,14 @@ const ProfilePage: React.FC = () => {
 
   // Get user data from auth context with better fallbacks and memoization
   const userData = useMemo(() => {
-    const avatarUrl = user?.avatar_url || profile?.avatar_url || '/images/placeholder-avatar.jpg';
+    const avatarUrl = user?.avatar_url || user?.photoURL || user?.avatarUrl || profile?.avatar_url || profile?.photoURL || profile?.avatarUrl || '/images/placeholder-avatar.jpg';
     // Add cache-busting parameter to force image reload when user changes
     const cacheBustedAvatar = avatarUrl.includes('?')
       ? `${avatarUrl}&t=${Date.now()}`
       : `${avatarUrl}?t=${Date.now()}`;
 
     return {
-      name: user?.full_name || profile?.full_name || 'User',
+      name: user?.full_name || user?.displayName || user?.fullName || profile?.full_name || profile?.displayName || profile?.fullName || 'User',
       email: user?.email || profile?.email || 'user@example.com',
       avatar: cacheBustedAvatar,
       joinDate: new Date(), // We'll add created_at to AuthUser interface later
@@ -194,7 +194,7 @@ const ProfilePage: React.FC = () => {
       certificatesEarned: certificatesEarned,
       lastPasswordChange: new Date('2023-12-15') // This would come from user's password history
     };
-  }, [user?.full_name, user?.email, user?.avatar_url, profile?.full_name, profile?.email, profile?.avatar_url, completedCourses, totalHoursWatched, certificatesEarned]);
+  }, [user?.full_name, user?.displayName, user?.fullName, user?.email, user?.avatar_url, user?.photoURL, user?.avatarUrl, profile?.full_name, profile?.displayName, profile?.fullName, profile?.email, profile?.avatar_url, profile?.photoURL, profile?.avatarUrl, completedCourses, totalHoursWatched, certificatesEarned]);
 
   const validatePassword = (password: string): string[] => {
     const errors: string[] = [];
