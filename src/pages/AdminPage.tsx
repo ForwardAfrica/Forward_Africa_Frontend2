@@ -525,6 +525,7 @@ const AdminPage: React.FC = () => {
             { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
             { id: 'courses', label: 'Courses', icon: BookOpen },
             { id: 'instructors', label: 'Instructors', icon: Users },
+            { id: 'students', label: 'Students', icon: GraduationCap },
             { id: 'analytics', label: 'Analytics', icon: TrendingUp },
             { id: 'audit', label: 'Audit Logs', icon: Activity }
           ]).map(({ id, label, icon: Icon }) => (
