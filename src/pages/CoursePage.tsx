@@ -75,13 +75,22 @@ const CoursePage: React.FC = () => {
           setLoading(true);
           console.log('Fetching course data for:', courseId);
 
-          // Fetch course from database API
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/courses/${courseId}`);
-          if (!response.ok) {
-            throw new Error('Course not found');
+          // Fetch course from database API using the authenticated API request
+          let courseResponse;
+          try {
+            courseResponse = await courseAPI.getCourse(courseId);
+          } catch (error) {
+            console.error('API Request error:', error);
+            throw new Error('Failed to fetch course data. Please check your connection and try again.');
           }
 
-          const foundCourse = await response.json();
+          // Handle wrapped response from API
+          const foundCourse = courseResponse.data || courseResponse;
+
+          if (!foundCourse || !foundCourse.id) {
+            throw new Error('Course data is invalid or missing');
+          }
+
           console.log('Course data from API:', foundCourse);
           console.log('Instructor data from API:', {
             instructor_name: foundCourse.instructor_name,
@@ -108,12 +117,12 @@ const CoursePage: React.FC = () => {
             });
 
             // Fetch all courses to find alternative
-            const allCoursesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/courses`);
-            if (allCoursesResponse.ok) {
-              const allCourses = await allCoursesResponse.json();
+            try {
+              const allCoursesResponse = await courseAPI.getAllCourses(true);
+              const allCoursesData = Array.isArray(allCoursesResponse) ? allCoursesResponse : allCoursesResponse.data || allCoursesResponse.courses || [];
 
               // Find courses with the same title that have lessons
-              const alternativeCourses = allCourses.filter((course: any) =>
+              const alternativeCourses = allCoursesData.filter((course: any) =>
                 course.title === foundCourse.title &&
                 course.id !== foundCourse.id &&
                 course.lessons &&
@@ -143,6 +152,8 @@ const CoursePage: React.FC = () => {
               } else {
                 console.log('❌ No alternative courses found with lessons');
               }
+            } catch (error) {
+              console.error('Error fetching alternative courses:', error);
             }
           }
 
