@@ -192,8 +192,7 @@ const AdminPage: React.FC = () => {
       courseId,
       canDeleteCourses,
       userRole,
-      profile,
-      token: localStorage.getItem('forward_africa_token') ? 'Token exists' : 'No token'
+      profile
     });
 
     if (!canDeleteCourses) {
@@ -203,20 +202,17 @@ const AdminPage: React.FC = () => {
 
     if (confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
       try {
-        const token = localStorage.getItem('forward_africa_token');
-        console.log('🔑 Using token:', token ? 'Token exists' : 'No token found');
+        console.log('🔑 Calling Firebase API to delete course');
 
-        // Call the API to delete the course
-        const response = await fetch(`http://localhost:3002/api/courses/${courseId}`, {
+        // Call the Firebase API to delete the course
+        const response = await fetch(`/api/courses/${courseId}`, {
           method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Content-Type': 'application/json'
           }
         });
 
         console.log('📡 Delete response status:', response.status);
-        console.log('📡 Delete response headers:', Object.fromEntries(response.headers.entries()));
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -231,7 +227,7 @@ const AdminPage: React.FC = () => {
         logAuditEvent('course_deleted', `Deleted course: ${course?.title}`);
 
         // Refresh the courses list from the database
-        await fetchAllCourses(true); // Include coming soon courses for admin management
+        await fetchAllCourses(true);
 
         // Show success message
         alert('Course deleted successfully');

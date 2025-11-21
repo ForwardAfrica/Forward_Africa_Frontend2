@@ -12,6 +12,7 @@ interface ImageUploadProps {
   className?: string;
   previewSize?: 'sm' | 'md' | 'lg';
   required?: boolean;
+  useBase64?: boolean;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -21,7 +22,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   label,
   className = '',
   previewSize = 'md',
-  required = false
+  required = false,
+  useBase64 = false
 }) => {
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,15 +82,23 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Create preview
+    // Create preview and convert to Base64
     const reader = new FileReader();
     reader.onload = (e) => {
-      setPreview(e.target?.result as string);
+      const base64String = e.target?.result as string;
+      setPreview(base64String);
+
+      // If useBase64 is true, pass the Base64 string directly instead of uploading
+      if (useBase64) {
+        onImageUpload(base64String);
+      }
     };
     reader.readAsDataURL(file);
 
-    // Upload file using the hook
-    uploadFile(file);
+    // Only upload file using the hook if not using Base64
+    if (!useBase64) {
+      uploadFile(file);
+    }
   };
 
   const handleRemoveImage = () => {

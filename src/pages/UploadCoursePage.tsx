@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { Upload, ArrowLeft, Plus, X, Star, User, Info } from 'lucide-react';
+import { Upload, ArrowLeft, Plus, X, Star, User, Info, CheckCircle, AlertCircle } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useNavigate, useSearchParams } from '../lib/router';
 import { categoryAPI } from '../lib/api';
 import { Instructor, Category } from '../types';
 import ImageUpload from '../components/ui/ImageUpload';
 import Layout from '../components/layout/Layout';
+import { fileToBase64, validateImageFile } from '../utils/imageConverter';
 
 interface LessonForm {
   title: string;
   description: string;
   thumbnail: string;
   videoUrl: string;
+}
+
+interface SuccessMessage {
+  show: boolean;
+  message: string;
+}
+
+interface ErrorMessage {
+  show: boolean;
+  message: string;
 }
 
 const UploadCoursePage: React.FC = () => {
@@ -46,25 +57,25 @@ const UploadCoursePage: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [retryCount, setRetryCount] = useState(0);
-  const [failedLessons, setFailedLessons] = useState<number[]>([]);
+  const [successMessage, setSuccessMessage] = useState<SuccessMessage>({ show: false, message: '' });
+  const [errorMessage, setErrorMessage] = useState<ErrorMessage>({ show: false, message: '' });
 
   // Load instructors and categories from backend
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load instructors
-        const instructorsResponse = await fetch('http://localhost:3002/api/instructors');
+        // Load instructors from API
+        const instructorsResponse = await fetch('/api/instructors');
         if (instructorsResponse.ok) {
           const instructorsData = await instructorsResponse.json();
-          setInstructors(instructorsData);
+          setInstructors(Array.isArray(instructorsData) ? instructorsData : instructorsData.data || []);
         } else {
           console.error('Failed to load instructors');
         }
 
-        // Load categories
+        // Load categories from API
         const categoriesData: any = await categoryAPI.getAllCategories();
-        const categoriesArr: Category[] = Array.isArray(categoriesData) ? categoriesData as Category[] : [];
+        const categoriesArr: Category[] = Array.isArray(categoriesData) ? categoriesData : (categoriesData?.data || []);
         setAvailableCategories(categoriesArr);
       } catch (error) {
         console.error('Error loading data:', error);
@@ -78,16 +89,17 @@ const UploadCoursePage: React.FC = () => {
     if (isEditing && editCourseId) {
       const loadCourse = async () => {
         try {
-          const response = await fetch(`http://localhost:3002/api/courses/${editCourseId}`);
+          const response = await fetch(`/api/courses/${editCourseId}`);
           if (response.ok) {
-            const existingCourse = await response.json();
+            const courseData = await response.json();
+            const existingCourse = courseData.data || courseData;
             console.log('Loading existing course for editing:', existingCourse);
 
-            setTitle(existingCourse.title);
-            setDescription(existingCourse.description);
-            setCategory(existingCourse.category_id);
-            setThumbnail(existingCourse.thumbnail);
-            setBanner(existingCourse.banner);
+            setTitle(existingCourse.title || '');
+            setDescription(existingCourse.description || '');
+            setCategory(existingCourse.category || existingCourse.category_id || '');
+            setThumbnail(existingCourse.thumbnail || '');
+            setBanner(existingCourse.banner || '');
             setIsComingSoon(existingCourse.coming_soon === 1 || existingCourse.coming_soon === true);
             setIsFeatured(existingCourse.featured || false);
             setReleaseDate(existingCourse.release_date || '');
@@ -97,24 +109,13 @@ const UploadCoursePage: React.FC = () => {
               setUseInstructor(true);
               setSelectedInstructorId(existingCourse.instructor_id);
             }
-
-            // Load lessons for this course
-            const lessonsResponse = await fetch(`http://localhost:3002/api/lessons/${editCourseId}`);
-            if (lessonsResponse.ok) {
-              const lessonsData = await lessonsResponse.json();
-              const lessonForms: LessonForm[] = lessonsData.map((lesson: any) => ({
-                title: lesson.title,
-                description: lesson.description,
-                thumbnail: lesson.thumbnail,
-                videoUrl: lesson.video_url
-              }));
-              setLessons(lessonForms);
-            }
           } else {
             console.error('Failed to load course for editing');
+            setErrorMessage({ show: true, message: 'Failed to load course for editing' });
           }
         } catch (error) {
           console.error('Error loading course for editing:', error);
+          setErrorMessage({ show: true, message: 'Error loading course for editing' });
         }
       };
       loadCourse();
@@ -125,10 +126,10 @@ const UploadCoursePage: React.FC = () => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await fetch('http://localhost:3002/api/categories');
+        const response = await fetch('/api/categories');
         if (response.ok) {
           const data = await response.json();
-          const categoriesArr: Category[] = Array.isArray(data) ? data as Category[] : [];
+          const categoriesArr: Category[] = Array.isArray(data) ? data : (data?.data || []);
           setAvailableCategories(categoriesArr);
         } else {
           console.error('Failed to load categories');
@@ -174,39 +175,6 @@ const UploadCoursePage: React.FC = () => {
     return errors;
   };
 
-  // Retry logic for failed lesson creation
-  const createLessonWithRetry = async (lessonData: any, lessonIndex: number, maxRetries = 3): Promise<any> => {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const lessonResponse = await fetch('http://localhost:3002/api/lessons', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(lessonData)
-        });
-
-        if (!lessonResponse.ok) {
-          const errorData = await lessonResponse.json();
-          throw new Error(errorData.error || 'Failed to create lesson');
-        }
-
-        const lessonResult = await lessonResponse.json();
-        console.log(`Lesson ${lessonIndex + 1} created successfully (attempt ${attempt})`);
-        return lessonResult;
-      } catch (error) {
-        console.error(`Lesson ${lessonIndex + 1} creation failed (attempt ${attempt}):`, error);
-
-        if (attempt === maxRetries) {
-          throw error;
-        }
-
-        // Wait before retrying (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-      }
-    }
-  };
-
   const addLesson = () => {
     setLessons([
       ...lessons,
@@ -240,8 +208,8 @@ const UploadCoursePage: React.FC = () => {
           name: newCategoryName.trim()
         };
 
-        // Create category in backend
-        const response = await fetch('http://localhost:3002/api/categories', {
+        // Create category via API
+        const response = await fetch('/api/categories', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -254,212 +222,131 @@ const UploadCoursePage: React.FC = () => {
           setCategory(newCategory.id);
           setNewCategoryName('');
           setShowCreateCategory(false);
-
-          // Log audit event
-          logAuditEvent('category_created', `Created new category: ${newCategory.name}`);
         } else {
           console.error('Failed to create category');
-          alert('Failed to create category. Please try again.');
+          setErrorMessage({ show: true, message: 'Failed to create category' });
         }
       } catch (error) {
         console.error('Error creating category:', error);
-        alert('Failed to create category. Please try again.');
+        setErrorMessage({ show: true, message: 'Error creating category' });
       }
     }
   };
 
-  const logAuditEvent = (action: string, details: string) => {
-    const auditLog = {
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      user: localStorage.getItem('adminEmail') || 'Unknown',
-      action,
-      details,
-      ipAddress: '192.168.1.100' // Mock IP
-    };
-
-    const existingLogs = JSON.parse(localStorage.getItem('auditLogs') || '[]');
-    existingLogs.unshift(auditLog);
-    localStorage.setItem('auditLogs', JSON.stringify(existingLogs.slice(0, 1000))); // Keep last 1000 logs
+  const clearForm = () => {
+    setTitle('');
+    setDescription('');
+    setCategory('');
+    setThumbnail('');
+    setBanner('');
+    setReleaseDate('');
+    setLessons([]);
+    setIsComingSoon(false);
+    setIsFeatured(false);
+    setUseInstructor(false);
+    setSelectedInstructorId('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clear previous errors and reset states
+    // Clear previous messages
     setValidationErrors([]);
-    setFailedLessons([]);
-    setRetryCount(0);
+    setErrorMessage({ show: false, message: '' });
+    setSuccessMessage({ show: false, message: '' });
 
     // Validate form
     const errors = validateForm();
     if (errors.length > 0) {
       setValidationErrors(errors);
-      alert('Please fix the following errors:\n' + errors.join('\n'));
+      setErrorMessage({ show: true, message: 'Please fix the validation errors below' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     setIsSubmitting(true);
     setUploadProgress(0);
-    setCurrentStep('Preparing course data...');
-
-    console.log('Submitting course data to backend...');
-    console.log('Is editing:', isEditing);
-    console.log('Edit course ID:', editCourseId);
-    console.log('Lessons to create:', lessons.length);
 
     try {
-      // Get instructor info
-      let instructorId = 'instructor-1'; // Default instructor
-      if (useInstructor && selectedInstructorId) {
-        instructorId = selectedInstructorId;
-      }
+      // Step 1: Prepare course data
+      setCurrentStep('Preparing course data...');
+      setUploadProgress(10);
 
-      // Prepare course data for backend
+      const instructorId = useInstructor && selectedInstructorId ? selectedInstructorId : 'default-instructor';
+
       const courseData = {
         title,
         description,
         instructor_id: instructorId,
-        category_id: category,
+        category,
         thumbnail,
         banner,
-        video_url: '', // Will be set by lessons
         featured: isFeatured,
         coming_soon: isComingSoon,
         release_date: isComingSoon ? releaseDate : null,
-        total_xp: lessons.length * 100
+        total_xp: lessons.length * 100,
+        lessons: lessons.map((lesson, index) => ({
+          title: lesson.title,
+          description: lesson.description,
+          thumbnail: lesson.thumbnail,
+          video_url: lesson.videoUrl,
+          duration: '10:00',
+          xp_points: 100,
+          order_index: index
+        }))
       };
 
-      console.log('Course data to save:', courseData);
+      console.log('Course data prepared:', courseData);
 
-      let courseId: string;
+      // Step 2: Create or update course
+      setCurrentStep(isEditing ? 'Updating course in Firestore...' : 'Creating course in Firestore...');
+      setUploadProgress(50);
 
-      // Step 1: Create or update course
-      setCurrentStep(isEditing ? 'Updating course...' : 'Creating course...');
-      setUploadProgress(10);
+      const url = isEditing && editCourseId 
+        ? `/api/courses/${editCourseId}` 
+        : '/api/courses';
+      
+      const method = isEditing ? 'PUT' : 'POST';
 
-      if (isEditing && editCourseId) {
-        // Update existing course
-        console.log('Updating existing course with ID:', editCourseId);
-        const courseResponse = await fetch(`http://localhost:3002/api/courses/${editCourseId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(courseData)
-        });
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(courseData)
+      });
 
-        if (!courseResponse.ok) {
-          const errorData = await courseResponse.json();
-          throw new Error(errorData.error || 'Failed to update course');
-        }
-
-        const courseResult = await courseResponse.json();
-        courseId = editCourseId;
-        console.log('Course updated successfully');
-
-        // Delete existing lessons for this course
-        setCurrentStep('Removing existing lessons...');
-        setUploadProgress(20);
-
-        const deleteLessonsResponse = await fetch(`http://localhost:3002/api/lessons/${editCourseId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-
-        if (!deleteLessonsResponse.ok) {
-          console.warn('Failed to delete existing lessons, but continuing with update');
-        }
-
-        logAuditEvent('course_updated', `Updated course: ${title}`);
-      } else {
-        // Create new course
-        console.log('Creating new course');
-        const courseResponse = await fetch('http://localhost:3002/api/courses', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(courseData)
-        });
-
-        if (!courseResponse.ok) {
-          const errorData = await courseResponse.json();
-          throw new Error(errorData.error || 'Failed to create course');
-        }
-
-        const courseResult = await courseResponse.json();
-        courseId = courseResult.id;
-        console.log('Course created with ID:', courseId);
-        logAuditEvent('course_created', `Created new course: ${title}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to ${isEditing ? 'update' : 'create'} course`);
       }
 
-            // Step 2: Create lessons using batch endpoint for better performance
-      console.log(`Creating ${lessons.length} lessons for course ${courseId}`);
-
-      setCurrentStep('Preparing lessons for batch creation...');
-      setUploadProgress(30);
-
-      // Prepare lesson data for batch creation
-      const lessonData = lessons.map((lesson, index) => ({
-        title: lesson.title,
-        duration: '10:00',
-        thumbnail: lesson.thumbnail,
-        video_url: lesson.videoUrl,
-        description: lesson.description,
-        xp_points: 100,
-        order_index: index
-      }));
-
-      setCurrentStep('Creating lessons in batch...');
-      setUploadProgress(60);
-
-      try {
-        const batchResponse = await fetch('http://localhost:3002/api/lessons/batch', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            course_id: courseId,
-            lessons: lessonData
-          })
-        });
-
-        if (!batchResponse.ok) {
-          const errorData = await batchResponse.json();
-          throw new Error(errorData.error || 'Failed to create lessons');
-        }
-
-        const batchResult = await batchResponse.json();
-        console.log(`Successfully created ${batchResult.count} lessons in batch`);
-
-        setUploadProgress(100);
-        setCurrentStep('Course uploaded successfully!');
-      } catch (error) {
-        console.error('Batch lesson creation failed:', error);
-        throw new Error(`Failed to create lessons: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      }
+      const result = await response.json();
+      console.log('Course saved successfully:', result);
 
       setUploadProgress(100);
-      setCurrentStep('Course uploaded successfully!');
+      setCurrentStep(`Course ${isEditing ? 'updated' : 'created'} successfully!`);
 
-      console.log('Course and lessons processed successfully');
-      const actionMessage = isEditing ? 'Course updated successfully' : 'Course created successfully';
-      alert(actionMessage);
+      // Show success message
+      const successMsg = isEditing ? 'Course updated successfully!' : 'Course created successfully!';
+      setSuccessMessage({ show: true, message: successMsg });
 
-      // Navigate back to admin page
-      navigate('/admin');
+      // Clear form
+      clearForm();
+
+      // Navigate back to admin after a short delay
+      setTimeout(() => {
+        navigate('/admin');
+      }, 2000);
+
     } catch (error) {
       console.error('Error processing course:', error);
-      const errorMessage = isEditing ? 'Failed to update course' : 'Failed to create course';
-      alert(`${errorMessage}: ${error instanceof Error ? error.message : String(error)}. Please try again.`);
+      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
+      setErrorMessage({ show: true, message: errorMsg });
+      setCurrentStep('');
     } finally {
       setIsSubmitting(false);
       setUploadProgress(0);
-      setCurrentStep('');
     }
   };
 
@@ -479,6 +366,28 @@ const UploadCoursePage: React.FC = () => {
               {isEditing ? 'Edit Course' : 'Upload New Course'}
             </h1>
           </div>
+
+          {/* Success Message */}
+          {successMessage.show && (
+            <div className="mb-6 bg-green-900 border border-green-700 rounded-lg p-4 flex items-start">
+              <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-green-200 font-medium">{successMessage.message}</h3>
+                <p className="text-green-300 text-sm mt-1">Redirecting to admin dashboard...</p>
+              </div>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {errorMessage.show && (
+            <div className="mb-6 bg-red-900 border border-red-700 rounded-lg p-4 flex items-start">
+              <AlertCircle className="h-5 w-5 text-red-400 mr-3 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-red-200 font-medium">Error</h3>
+                <p className="text-red-300 text-sm mt-1">{errorMessage.message}</p>
+              </div>
+            </div>
+          )}
 
           {/* Progress Indicator */}
           {isSubmitting && (
@@ -505,16 +414,6 @@ const UploadCoursePage: React.FC = () => {
                   <li key={index}>• {error}</li>
                 ))}
               </ul>
-            </div>
-          )}
-
-          {/* Failed Lessons Warning */}
-          {failedLessons.length > 0 && (
-            <div className="mb-6 bg-yellow-900 border border-yellow-700 rounded-lg p-4">
-              <h3 className="text-yellow-200 font-medium mb-2">Some lessons failed to create:</h3>
-              <p className="text-yellow-300 text-sm">
-                Lessons {failedLessons.map(i => i + 1).join(', ')} failed. Retry count: {retryCount}
-              </p>
             </div>
           )}
 
@@ -613,7 +512,7 @@ const UploadCoursePage: React.FC = () => {
                         <option value="">Choose an instructor</option>
                         {instructors.map(instructor => (
                           <option key={instructor.id} value={instructor.id}>
-                            {instructor.name} - {instructor.title}
+                            {(instructor as any).name || (instructor as any).title} 
                           </option>
                         ))}
                       </select>
@@ -683,6 +582,7 @@ const UploadCoursePage: React.FC = () => {
                   label="Course Thumbnail"
                   previewSize="sm"
                   required
+                  useBase64={true}
                 />
 
                 <ImageUpload
@@ -692,6 +592,7 @@ const UploadCoursePage: React.FC = () => {
                   label="Course Banner"
                   previewSize="sm"
                   required
+                  useBase64={true}
                 />
               </div>
 
@@ -805,6 +706,7 @@ const UploadCoursePage: React.FC = () => {
                             label="Lesson Thumbnail"
                             previewSize="sm"
                             required
+                            useBase64={true}
                           />
 
                           <div>
@@ -853,10 +755,10 @@ const UploadCoursePage: React.FC = () => {
                   {isSubmitting ? (
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Uploading...
+                      {isEditing ? 'Updating...' : 'Creating...'}
                     </div>
                   ) : (
-                    isEditing ? 'Update Course' : 'Upload Course'
+                    isEditing ? 'Update Course' : 'Create Course'
                   )}
                 </Button>
               </div>
