@@ -735,14 +735,14 @@ const ManageUsersPage: React.FC = () => {
                       <Calendar className="h-5 w-5 text-gray-400" />
                       <span className="text-gray-400">Joined</span>
                     </div>
-                    <p className="text-white font-medium">{new Date(selectedUser.joinDate).toLocaleDateString()}</p>
+                    <p className="text-white font-medium">{selectedUser.joinDate === 'Unknown' ? 'Unknown' : new Date(selectedUser.joinDate).toLocaleDateString()}</p>
                   </div>
                   <div className="bg-gray-700 rounded-lg p-4">
                     <div className="flex items-center space-x-2">
                       <Activity className="h-5 w-5 text-gray-400" />
                       <span className="text-gray-400">Last Active</span>
                     </div>
-                    <p className="text-white font-medium">{new Date(selectedUser.lastActive).toLocaleDateString()}</p>
+                    <p className="text-white font-medium">{selectedUser.lastActive === 'Unknown' ? 'Unknown' : new Date(selectedUser.lastActive).toLocaleDateString()}</p>
                   </div>
                   <div className="bg-gray-700 rounded-lg p-4">
                     <div className="flex items-center space-x-2">
