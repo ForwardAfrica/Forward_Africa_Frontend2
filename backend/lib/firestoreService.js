@@ -3,6 +3,55 @@ const admin = require('firebase-admin');
 
 class FirestoreService {
   // ============================================================================
+  // HELPER METHODS
+  // ============================================================================
+
+  static async enrichCourseWithInstructor(course) {
+    if (!course || !course.instructor_id) {
+      return course;
+    }
+
+    try {
+      const db = getFirestore();
+      const instructorDoc = await db.collection('instructors').doc(course.instructor_id).get();
+
+      if (instructorDoc.exists) {
+        const instructorData = instructorDoc.data();
+        return {
+          ...course,
+          instructor: {
+            id: course.instructor_id,
+            name: instructorData.name || 'Unknown Instructor',
+            title: instructorData.title || 'Instructor',
+            image: instructorData.image || '/images/placeholder-avatar.jpg',
+            bio: instructorData.bio || 'Experienced instructor',
+            email: instructorData.email || 'instructor@forwardafrica.com',
+            expertise: instructorData.expertise || ['Education'],
+            experience: instructorData.experience || 5,
+            createdAt: instructorData.createdAt || instructorData.created_at
+          },
+          instructor_name: instructorData.name,
+          instructor_title: instructorData.title,
+          instructor_image: instructorData.image,
+          instructor_bio: instructorData.bio,
+          instructor_email: instructorData.email,
+          instructor_expertise: JSON.stringify(instructorData.expertise || ['Education']),
+          instructor_experience: instructorData.experience,
+          instructor_created_at: instructorData.createdAt || instructorData.created_at
+        };
+      }
+    } catch (error) {
+      console.error('⚠️ Error enriching course with instructor data:', error);
+    }
+
+    return course;
+  }
+
+  static async enrichCoursesWithInstructors(courses) {
+    return Promise.all(courses.map(course => this.enrichCourseWithInstructor(course)));
+  }
+
+  // ============================================================================
   // COURSES
   // ============================================================================
 
@@ -29,7 +78,7 @@ class FirestoreService {
         courses.push({ id: doc.id, ...doc.data() });
       });
 
-      return courses;
+      return this.enrichCoursesWithInstructors(courses);
     } catch (error) {
       console.error('❌ Error fetching courses:', error);
       throw error;
@@ -42,7 +91,8 @@ class FirestoreService {
       const doc = await db.collection('courses').doc(courseId).get();
 
       if (doc.exists) {
-        return { id: doc.id, ...doc.data() };
+        const course = { id: doc.id, ...doc.data() };
+        return this.enrichCourseWithInstructor(course);
       }
       return null;
     } catch (error) {
@@ -66,7 +116,7 @@ class FirestoreService {
         courses.push({ id: doc.id, ...doc.data() });
       });
 
-      return courses;
+      return this.enrichCoursesWithInstructors(courses);
     } catch (error) {
       console.error('❌ Error fetching courses by category:', error);
       throw error;
@@ -88,7 +138,7 @@ class FirestoreService {
         courses.push({ id: doc.id, ...doc.data() });
       });
 
-      return courses;
+      return this.enrichCoursesWithInstructors(courses);
     } catch (error) {
       console.error('❌ Error fetching featured courses:', error);
       throw error;
@@ -135,6 +185,33 @@ class FirestoreService {
       await db.collection('courses').doc(courseId).delete();
     } catch (error) {
       console.error('❌ Error deleting course:', error);
+      throw error;
+    }
+  }
+
+  static async getCoursesByInstructor(instructorId, includeComingSoon = false) {
+    try {
+      const db = getFirestore();
+      let q = db.collection('courses')
+        .where('instructor_id', '==', instructorId)
+        .orderBy('created_at', 'desc');
+
+      if (!includeComingSoon) {
+        q = db.collection('courses')
+          .where('instructor_id', '==', instructorId)
+          .where('coming_soon', '==', false)
+          .orderBy('created_at', 'desc');
+      }
+
+      const snapshot = await q.get();
+      const courses = [];
+      snapshot.forEach(doc => {
+        courses.push({ id: doc.id, ...doc.data() });
+      });
+
+      return this.enrichCoursesWithInstructors(courses);
+    } catch (error) {
+      console.error('❌ Error fetching courses by instructor:', error);
       throw error;
     }
   }
