@@ -10,11 +10,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const users = await FirestoreService.getUsers();
 
     console.log('📊 Total users fetched:', users.length);
-    console.log('👥 User roles:', users.map(u => ({ id: u.id, role: u.role })));
+    console.log('👥 All users with roles:', users.map(u => ({
+      id: u.id,
+      email: u.email,
+      role: u.role,
+      roleType: typeof u.role
+    })));
 
-    const students = users.filter(user => user.role === 'user');
+    const students = users.filter(user => {
+      const isStudent = user.role === 'user';
+      console.log(`Checking user ${u.id}: role="${user.role}" (${typeof user.role}) => isStudent: ${isStudent}`);
+      return isStudent;
+    });
 
     console.log('📚 Students after filtering:', students.length);
+    console.log('📚 Filtered students:', students.map(s => ({ id: s.id, email: s.email, role: s.role })));
 
     return res.status(200).json({
       success: true,
