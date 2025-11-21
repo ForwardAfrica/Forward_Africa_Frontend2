@@ -3,6 +3,7 @@
 
 import { API_BASE_URL } from './mysql';
 import { Course, Category, Instructor, User, UserProgress, Certificate, Achievement } from '../types';
+import { authService } from './authService';
 import {
   getAllInstructorsFromFirestore,
   getInstructorFromFirestore,
@@ -171,9 +172,9 @@ export const instructorAPI = {
   // Create new instructor
   createInstructor: async (instructorData: Partial<Instructor>) => {
     try {
-      // Get JWT token from localStorage
+      // Get JWT token from cookie (secure HTTP-only cookie)
       const token = typeof window !== 'undefined'
-        ? localStorage.getItem('forward_africa_token')
+        ? authService.getToken()
         : null;
 
       if (!token) {
@@ -343,7 +344,7 @@ export const auditLogsAPI = {
     }
 
     try {
-      const token = localStorage.getItem('forward_africa_token');
+      const token = authService.getToken();
       const response = await fetch(`${API_BASE_URL}/audit-logs?${params.toString()}`, {
         method: 'GET',
         headers: {
@@ -385,7 +386,7 @@ export const auditLogsAPI = {
     details?: any;
   }) => {
     try {
-      const token = localStorage.getItem('forward_africa_token');
+      const token = authService.getToken();
       const response = await fetch(`${API_BASE_URL}/audit-logs`, {
         method: 'POST',
         headers: {
