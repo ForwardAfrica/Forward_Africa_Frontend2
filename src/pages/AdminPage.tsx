@@ -173,6 +173,13 @@ const AdminPage: React.FC = () => {
     }
   }, [permissionError]);
 
+  // Fetch students when students tab is active
+  useEffect(() => {
+    if (isClient && activeTab === 'students') {
+      fetchStudents();
+    }
+  }, [activeTab, isClient]);
+
   const logAuditEvent = (action: string, details: string) => {
     if (!isClient) return;
 
