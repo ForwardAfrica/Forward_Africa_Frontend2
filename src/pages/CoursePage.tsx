@@ -526,6 +526,29 @@ const CoursePage: React.FC = () => {
     );
   }
 
+  // Show error state
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center h-screen">
+          <div className="text-center max-w-md">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-bold text-white mb-2">Unable to Load Course</h2>
+            <p className="text-gray-400 mb-6">{error}</p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => router.push('/courses')} variant="primary">
+                Back to Courses
+              </Button>
+              <Button onClick={() => window.location.reload()} variant="outline">
+                Retry
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   if (!course) {
     return (
       <Layout>
