@@ -235,5 +235,130 @@ export const firebaseAuthService = {
       console.warn('Error creating user data:', error);
       // Don't throw - continue with app
     }
+  },
+
+  // Sign in with email and password
+  signIn: async (credentials: LoginCredentials): Promise<void> => {
+    try {
+      console.log('🔐 Auth: Signing in with email and password...');
+
+      const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+      const firebaseUser = userCredential.user;
+
+      // Get or create user data in backend
+      let userData = await getUserDataFromBackend(firebaseUser.uid);
+      if (!userData) {
+        userData = convertFirebaseUserWithFallback(
+          firebaseUser.uid,
+          firebaseUser.email,
+          firebaseUser.displayName,
+          firebaseUser.photoURL,
+          firebaseUser.emailVerified
+        );
+        await createUserDataInBackend(firebaseUser.uid, userData);
+      }
+
+      console.log('✅ Auth: Sign in successful');
+    } catch (error: any) {
+      console.error('❌ Auth: Sign in error:', error);
+      throw new FirebaseAuthError(error.code || 'SIGN_IN_FAILED', error.message || 'Sign in failed', error);
+    }
+  },
+
+  // Sign up with email and password
+  signUp: async (data: RegisterData): Promise<void> => {
+    try {
+      console.log('📝 Auth: Creating user account...');
+
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const firebaseUser = userCredential.user;
+
+      // Create user data in backend with additional profile information
+      const userData: Partial<FirebaseUser> = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        displayName: data.full_name,
+        photoURL: null,
+        emailVerified: false,
+        role: 'user',
+        permissions: [],
+        onboarding_completed: false,
+        industry: data.industry,
+        experience_level: data.experience_level,
+        business_stage: data.business_stage,
+        country: data.country,
+        state_province: data.state_province,
+        city: data.city
+      };
+
+      await createUserDataInBackend(firebaseUser.uid, userData);
+      console.log('✅ Auth: User account created successfully');
+    } catch (error: any) {
+      console.error('❌ Auth: Sign up error:', error);
+      throw new FirebaseAuthError(error.code || 'SIGN_UP_FAILED', error.message || 'Sign up failed', error);
+    }
+  },
+
+  // Sign in with Google
+  signInWithGoogle: async (): Promise<void> => {
+    try {
+      console.log('🔐 Auth: Signing in with Google...');
+
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const firebaseUser = userCredential.user;
+
+      // Get or create user data in backend
+      let userData = await getUserDataFromBackend(firebaseUser.uid);
+      if (!userData) {
+        userData = convertFirebaseUserWithFallback(
+          firebaseUser.uid,
+          firebaseUser.email,
+          firebaseUser.displayName,
+          firebaseUser.photoURL,
+          firebaseUser.emailVerified
+        );
+        await createUserDataInBackend(firebaseUser.uid, userData);
+      }
+
+      console.log('✅ Auth: Google sign in successful');
+    } catch (error: any) {
+      console.error('❌ Auth: Google sign in error:', error);
+      throw new FirebaseAuthError(error.code || 'GOOGLE_SIGN_IN_FAILED', error.message || 'Google sign in failed', error);
+    }
+  },
+
+  // Sign out
+  signOut: async (): Promise<void> => {
+    try {
+      console.log('🚪 Auth: Signing out...');
+      await firebaseSignOut(auth);
+      console.log('✅ Auth: Sign out successful');
+    } catch (error: any) {
+      console.error('❌ Auth: Sign out error:', error);
+      throw new FirebaseAuthError(error.code || 'SIGN_OUT_FAILED', error.message || 'Sign out failed', error);
+    }
+  },
+
+  // Reset password
+  resetPassword: async (email: string): Promise<void> => {
+    try {
+      console.log('🔄 Auth: Resetting password...');
+
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send reset password email');
+      }
+
+      console.log('✅ Auth: Reset password email sent');
+    } catch (error: any) {
+      console.error('❌ Auth: Reset password error:', error);
+      throw new FirebaseAuthError('RESET_PASSWORD_FAILED', error.message || 'Password reset failed', error);
+    }
   }
 };
