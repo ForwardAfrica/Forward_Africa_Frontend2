@@ -3,6 +3,7 @@
 
 import { API_BASE_URL } from './mysql';
 import { Course, Category, Instructor, User, UserProgress, Certificate, Achievement } from '../types';
+import { authService } from './authService';
 import {
   getAllInstructorsFromFirestore,
   getInstructorFromFirestore,
