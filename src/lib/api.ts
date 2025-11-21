@@ -385,7 +385,7 @@ export const auditLogsAPI = {
     details?: any;
   }) => {
     try {
-      const token = localStorage.getItem('forward_africa_token');
+      const token = authService.getToken();
       const response = await fetch(`${API_BASE_URL}/audit-logs`, {
         method: 'POST',
         headers: {
