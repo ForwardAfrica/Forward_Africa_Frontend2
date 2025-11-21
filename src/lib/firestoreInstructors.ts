@@ -1,215 +1,190 @@
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  CollectionReference,
-  DocumentReference,
-  Timestamp
-} from 'firebase/firestore';
-import { db } from './firebase';
+// Instructors Service - Now using Backend API Endpoints
+// All Firestore operations have been migrated to backend API routes
+
 import { Instructor } from '../types';
 
-const INSTRUCTORS_COLLECTION = 'instructors';
-
 /**
- * Get reference to the instructors collection
- */
-function getInstructorsCollection(): CollectionReference {
-  return collection(db, INSTRUCTORS_COLLECTION);
-}
-
-/**
- * Get reference to a specific instructor document
- */
-function getInstructorDocRef(instructorId: string): DocumentReference {
-  return doc(db, INSTRUCTORS_COLLECTION, instructorId);
-}
-
-/**
- * Convert Firestore document to Instructor type
- */
-function firestoreDocToInstructor(docId: string, data: any): Instructor {
-  return {
-    id: docId,
-    name: data.name || '',
-    title: data.title || '',
-    email: data.email || '',
-    phone: data.phone || undefined,
-    bio: data.bio || '',
-    image: data.image || '',
-    experience: data.experience || 0,
-    expertise: data.expertise || [],
-    socialLinks: data.socialLinks || {
-      linkedin: '',
-      twitter: '',
-      website: ''
-    },
-    createdAt: data.createdAt instanceof Timestamp
-      ? data.createdAt.toDate()
-      : new Date(data.createdAt || Date.now())
-  };
-}
-
-/**
- * Convert Instructor to Firestore document format
- */
-function instructorToFirestoreDoc(instructor: Omit<Instructor, 'id' | 'createdAt'> & { createdAt?: Date | Timestamp }): any {
-  return {
-    name: instructor.name,
-    title: instructor.title,
-    email: instructor.email,
-    phone: instructor.phone || null,
-    bio: instructor.bio,
-    image: instructor.image,
-    experience: instructor.experience,
-    expertise: instructor.expertise || [],
-    socialLinks: instructor.socialLinks || {
-      linkedin: '',
-      twitter: '',
-      website: ''
-    },
-    createdAt: instructor.createdAt instanceof Timestamp
-      ? instructor.createdAt
-      : Timestamp.fromDate(new Date(instructor.createdAt || Date.now())),
-    updatedAt: Timestamp.now()
-  };
-}
-
-/**
- * Fetch all instructors from Firestore
+ * Fetch all instructors from backend
  */
 export async function getAllInstructorsFromFirestore(): Promise<Instructor[]> {
   try {
-    const instructorsRef = getInstructorsCollection();
-    const snapshot = await getDocs(instructorsRef);
-    
-    const instructors: Instructor[] = [];
-    snapshot.forEach((doc) => {
-      instructors.push(firestoreDocToInstructor(doc.id, doc.data()));
+    const response = await fetch('/api/instructors', {
+      method: 'GET',
+      credentials: 'include'
     });
 
-    return instructors;
+    if (!response.ok) {
+      throw new Error(`Failed to fetch instructors: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data || [];
   } catch (error) {
-    console.error('Error fetching instructors from Firestore:', error);
+    console.error('Error fetching instructors from backend:', error);
     throw error;
   }
 }
 
 /**
- * Fetch a single instructor by ID
+ * Fetch a specific instructor by ID
  */
 export async function getInstructorFromFirestore(instructorId: string): Promise<Instructor | null> {
   try {
-    const docRef = getInstructorDocRef(instructorId);
-    const snapshot = await getDoc(docRef);
+    const response = await fetch(`/api/instructors/${instructorId}`, {
+      method: 'GET',
+      credentials: 'include'
+    });
 
-    if (!snapshot.exists()) {
+    if (response.status === 404) {
       return null;
     }
 
-    return firestoreDocToInstructor(snapshot.id, snapshot.data());
-  } catch (error) {
-    console.error('Error fetching instructor from Firestore:', error);
-    throw error;
-  }
-}
-
-/**
- * Create a new instructor in Firestore
- */
-export async function createInstructorInFirestore(
-  instructorData: Omit<Instructor, 'id' | 'createdAt'>
-): Promise<Instructor> {
-  try {
-    const instructorsRef = getInstructorsCollection();
-    
-    const firestoreData = instructorToFirestoreDoc(instructorData);
-    const docRef = await addDoc(instructorsRef, firestoreData);
-
-    return {
-      ...instructorData,
-      id: docRef.id,
-      createdAt: new Date()
-    };
-  } catch (error) {
-    console.error('Error creating instructor in Firestore:', error);
-    throw error;
-  }
-}
-
-/**
- * Update an existing instructor in Firestore
- */
-export async function updateInstructorInFirestore(
-  instructorId: string,
-  instructorData: Partial<Omit<Instructor, 'id' | 'createdAt'>>
-): Promise<Instructor> {
-  try {
-    const docRef = getInstructorDocRef(instructorId);
-    
-    // Fetch current instructor to preserve createdAt
-    const currentDoc = await getDoc(docRef);
-    if (!currentDoc.exists()) {
-      throw new Error('Instructor not found');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch instructor: ${response.statusText}`);
     }
 
-    const currentData = currentDoc.data();
-    const updatedData = instructorToFirestoreDoc({
-      ...currentData,
-      ...instructorData
-    } as any);
-
-    await updateDoc(docRef, updatedData);
-
-    // Fetch and return the updated instructor
-    const updatedInstructor = await getInstructorFromFirestore(instructorId);
-    if (!updatedInstructor) {
-      throw new Error('Failed to retrieve updated instructor');
-    }
-
-    return updatedInstructor;
+    const data = await response.json();
+    return data.data || null;
   } catch (error) {
-    console.error('Error updating instructor in Firestore:', error);
+    console.error('Error fetching instructor from backend:', error);
     throw error;
   }
 }
 
 /**
- * Delete an instructor from Firestore
- */
-export async function deleteInstructorFromFirestore(instructorId: string): Promise<void> {
-  try {
-    const docRef = getInstructorDocRef(instructorId);
-    await deleteDoc(docRef);
-  } catch (error) {
-    console.error('Error deleting instructor from Firestore:', error);
-    throw error;
-  }
-}
-
-/**
- * Get instructor by email
+ * Fetch instructor by email
  */
 export async function getInstructorByEmailFromFirestore(email: string): Promise<Instructor | null> {
   try {
-    const instructorsRef = getInstructorsCollection();
-    const q = query(instructorsRef, where('email', '==', email));
-    const snapshot = await getDocs(q);
+    const response = await fetch(`/api/instructors/by-email/${encodeURIComponent(email)}`, {
+      method: 'GET',
+      credentials: 'include'
+    });
 
-    if (snapshot.empty) {
+    if (response.status === 404) {
       return null;
     }
 
-    const doc = snapshot.docs[0];
-    return firestoreDocToInstructor(doc.id, doc.data());
+    if (!response.ok) {
+      throw new Error(`Failed to fetch instructor by email: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data || null;
   } catch (error) {
-    console.error('Error fetching instructor by email from Firestore:', error);
+    console.error('Error fetching instructor by email from backend:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new instructor
+ */
+export async function createInstructorInFirestore(instructor: Omit<Instructor, 'id' | 'createdAt'>): Promise<string> {
+  try {
+    const response = await fetch('/api/instructors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        name: instructor.name,
+        title: instructor.title,
+        email: instructor.email,
+        phone: instructor.phone || null,
+        bio: instructor.bio,
+        image: instructor.image,
+        experience: instructor.experience,
+        expertise: instructor.expertise || [],
+        socialLinks: instructor.socialLinks || {
+          linkedin: '',
+          twitter: '',
+          website: ''
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create instructor: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.instructorId;
+  } catch (error) {
+    console.error('Error creating instructor in backend:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update an existing instructor
+ */
+export async function updateInstructorInFirestore(instructorId: string, instructor: Partial<Instructor>): Promise<void> {
+  try {
+    const updateData: any = {};
+
+    if (instructor.name) updateData.name = instructor.name;
+    if (instructor.title) updateData.title = instructor.title;
+    if (instructor.email) updateData.email = instructor.email;
+    if (instructor.phone !== undefined) updateData.phone = instructor.phone;
+    if (instructor.bio) updateData.bio = instructor.bio;
+    if (instructor.image) updateData.image = instructor.image;
+    if (instructor.experience !== undefined) updateData.experience = instructor.experience;
+    if (instructor.expertise) updateData.expertise = instructor.expertise;
+    if (instructor.socialLinks) updateData.socialLinks = instructor.socialLinks;
+
+    const response = await fetch(`/api/instructors/${instructorId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(updateData)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update instructor: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error updating instructor in backend:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete an instructor
+ */
+export async function deleteInstructorFromFirestore(instructorId: string): Promise<void> {
+  try {
+    const response = await fetch(`/api/instructors/${instructorId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete instructor: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error deleting instructor from backend:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch all instructors with pagination
+ */
+export async function getInstructorsWithPaginationFromFirestore(pageSize: number = 10): Promise<Instructor[]> {
+  try {
+    const response = await fetch(`/api/instructors?limit=${pageSize}`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch instructors: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data || [];
+  } catch (error) {
+    console.error('Error fetching instructors with pagination from backend:', error);
     throw error;
   }
 }

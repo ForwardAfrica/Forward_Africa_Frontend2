@@ -1,18 +1,8 @@
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  User,
-  GoogleAuthProvider,
-  signInWithPopup,
-  updateProfile as firebaseUpdateProfile,
-  sendEmailVerification,
-  sendPasswordResetEmail
-} from 'firebase/auth';
+// Firebase Auth Service - Now using Backend Endpoints
+// All Firestore operations have been migrated to backend API routes
+// This service now provides minimal client-side auth functionality
+
 import { auth } from './firebase';
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from './firebase';
 
 export interface FirebaseUser {
   uid: string;
@@ -70,330 +60,87 @@ export class FirebaseAuthError extends Error {
   }
 }
 
-// Convert Firebase User to our custom user format
-const convertFirebaseUser = async (firebaseUser: User): Promise<FirebaseUser> => {
+// Get user data from backend
+const getUserDataFromBackend = async (userId: string): Promise<FirebaseUser | null> => {
   try {
-    // Get user profile from Firestore
-    const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+    const response = await fetch(`/api/users/data/${userId}`, {
+      method: 'GET',
+      credentials: 'include'
+    });
 
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      return {
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
-        photoURL: firebaseUser.photoURL,
-        emailVerified: firebaseUser.emailVerified,
-        role: userData.role || 'user',
-        permissions: userData.permissions || [],
-        onboarding_completed: userData.onboarding_completed || false,
-        industry: userData.industry,
-        experience_level: userData.experience_level,
-        business_stage: userData.business_stage,
-        country: userData.country,
-        state_province: userData.state_province,
-        city: userData.city,
-        created_at: userData.created_at,
-        updated_at: userData.updated_at
-      };
-    } else {
-      // Create default user profile
-      const defaultUser: FirebaseUser = {
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
-        photoURL: firebaseUser.photoURL,
-        emailVerified: firebaseUser.emailVerified,
-        role: 'user',
-        permissions: [],
-        onboarding_completed: false,
-        created_at: serverTimestamp(),
-        updated_at: serverTimestamp()
-      };
-
-      // Save to Firestore
-      try {
-        await setDoc(doc(db, 'users', firebaseUser.uid), defaultUser);
-      } catch (writeError: any) {
-        // If write fails due to permissions, return the default user anyway
-        // The user can still use the app, and the document will be created on next update
-        console.warn('⚠️ Could not create user document in Firestore:', writeError);
-        if (writeError.code !== 'permission-denied') {
-          throw writeError;
-        }
-      }
-      return defaultUser;
-    }
-  } catch (error: any) {
-    // If it's a permission error, return a minimal user object and warn (don't throw)
-    if (error?.code === 'permission-denied' || (error?.message && error.message.toLowerCase().includes('permission'))) {
-      console.warn('⚠️ Permission denied when accessing user document. Returning minimal user data. Check Firestore security rules to allow read access to user documents if desired.');
-      return {
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: firebaseUser.displayName,
-        photoURL: firebaseUser.photoURL,
-        emailVerified: firebaseUser.emailVerified,
-        role: 'user',
-        permissions: [],
-        onboarding_completed: false,
-        created_at: null,
-        updated_at: null
-      };
+    if (response.status === 404) {
+      return null;
     }
 
-    console.error('❌ Error converting Firebase user:', error);
-    throw new FirebaseAuthError('USER_CONVERSION_FAILED', error.message || 'Failed to convert user data', error);
+    if (!response.ok) {
+      console.warn('Failed to fetch user data from backend');
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data || null;
+  } catch (error) {
+    console.warn('Error fetching user data from backend:', error);
+    return null;
   }
 };
 
+// Create user data in backend
+const createUserDataInBackend = async (userId: string, userData: Partial<FirebaseUser>): Promise<void> => {
+  try {
+    await fetch(`/api/users/data/${userId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(userData)
+    });
+  } catch (error) {
+    console.warn('Error creating user data in backend:', error);
+    // Don't throw - continue with app
+  }
+};
+
+// Update user data in backend
+const updateUserDataInBackend = async (userId: string, userData: Partial<FirebaseUser>): Promise<void> => {
+  try {
+    await fetch(`/api/users/data/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(userData)
+    });
+  } catch (error) {
+    console.warn('Error updating user data in backend:', error);
+    // Don't throw - continue with app
+  }
+};
+
+// Convert Firebase User to our custom user format with fallback
+const convertFirebaseUserWithFallback = (uid: string, email: string | null, displayName: string | null, photoURL: string | null, emailVerified: boolean, backendData?: any): FirebaseUser => {
+  return {
+    uid,
+    email,
+    displayName,
+    photoURL,
+    emailVerified,
+    role: backendData?.role || 'user',
+    permissions: backendData?.permissions || [],
+    onboarding_completed: backendData?.onboarding_completed || false,
+    industry: backendData?.industry,
+    experience_level: backendData?.experience_level,
+    business_stage: backendData?.business_stage,
+    country: backendData?.country,
+    state_province: backendData?.state_province,
+    city: backendData?.city,
+    created_at: backendData?.created_at || null,
+    updated_at: backendData?.updated_at || null
+  };
+};
+
 export const firebaseAuthService = {
-  // Sign in with email and password
-  signIn: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    try {
-      console.log('🔐 Firebase Auth: Signing in...');
-
-      // If API key is not configured in environment, warn but continue using the default firebaseConfig
-      if (typeof window !== 'undefined' && !process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
-        console.warn('⚠️ NEXT_PUBLIC_FIREBASE_API_KEY not set — falling back to built-in firebaseConfig defaults. For production, set NEXT_PUBLIC_FIREBASE_API_KEY in project environment variables.');
-      }
-
-      const { user: firebaseUser } = await signInWithEmailAndPassword(
-        auth,
-        credentials.email,
-        credentials.password
-      );
-
-      const user = await convertFirebaseUser(firebaseUser);
-
-      console.log('✅ Firebase Auth: Sign in successful');
-      return {
-        user,
-        message: 'Sign in successful'
-      };
-    } catch (error: any) {
-      console.error('❌ Firebase Auth: Sign in failed:', error);
-
-      // Network error guidance
-      if (error?.code === 'auth/network-request-failed' || (error?.message && error.message.toLowerCase().includes('network'))) {
-        throw new FirebaseAuthError('NETWORK_ERROR', 'Network error: could not reach Firebase Auth. Check NEXT_PUBLIC_FIREBASE_API_KEY, authorized domains in Firebase console, and that Email/Password provider is enabled.');
-      }
-
-      // Handle specific Firebase error codes
-      switch (error.code) {
-        case 'auth/user-not-found':
-          throw new FirebaseAuthError('USER_NOT_FOUND', 'No user found with this email address');
-        case 'auth/wrong-password':
-          throw new FirebaseAuthError('WRONG_PASSWORD', 'Incorrect password');
-        case 'auth/invalid-email':
-          throw new FirebaseAuthError('INVALID_EMAIL', 'Invalid email address');
-        case 'auth/user-disabled':
-          throw new FirebaseAuthError('USER_DISABLED', 'This account has been disabled');
-        case 'auth/too-many-requests':
-          throw new FirebaseAuthError('TOO_MANY_REQUESTS', 'Too many failed attempts. Please try again later');
-        default:
-          throw new FirebaseAuthError('SIGN_IN_FAILED', error.message || 'Sign in failed');
-      }
-    }
-  },
-
-
-  // Sign up with email and password
-  signUp: async (userData: RegisterData): Promise<AuthResponse> => {
-    try {
-      console.log('📝 Firebase Auth: Signing up...');
-
-      // If API key is not configured in environment, warn but continue using the default firebaseConfig
-      if (typeof window !== 'undefined' && !process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
-        console.warn('⚠️ NEXT_PUBLIC_FIREBASE_API_KEY not set — falling back to built-in firebaseConfig defaults. For production, set NEXT_PUBLIC_FIREBASE_API_KEY in project environment variables.');
-      }
-
-      const { user: firebaseUser } = await createUserWithEmailAndPassword(
-        auth,
-        userData.email,
-        userData.password
-      );
-
-      // Update Firebase user profile
-      await firebaseUpdateProfile(firebaseUser, {
-        displayName: userData.full_name
-      });
-
-      // Create user profile in Firestore
-      const userProfile: FirebaseUser = {
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        displayName: userData.full_name,
-        photoURL: null,
-        emailVerified: false,
-        role: 'user',
-        permissions: [],
-        onboarding_completed: false,
-        industry: userData.industry,
-        experience_level: userData.experience_level,
-        business_stage: userData.business_stage,
-        country: userData.country,
-        state_province: userData.state_province,
-        city: userData.city,
-        created_at: serverTimestamp(),
-        updated_at: serverTimestamp()
-      };
-
-      await setDoc(doc(db, 'users', firebaseUser.uid), userProfile);
-
-      // Send email verification
-      await sendEmailVerification(firebaseUser);
-
-      const user = await convertFirebaseUser(firebaseUser);
-
-      console.log('✅ Firebase Auth: Sign up successful');
-      return {
-        user,
-        message: 'Account created successfully. Please check your email for verification.'
-      };
-    } catch (error: any) {
-      console.error('❌ Firebase Auth: Sign up failed:', error);
-
-      // Network error guidance
-      if (error?.code === 'auth/network-request-failed' || (error?.message && error.message.toLowerCase().includes('network'))) {
-        throw new FirebaseAuthError('NETWORK_ERROR', 'Network error: could not reach Firebase Auth. Check NEXT_PUBLIC_FIREBASE_API_KEY, authorized domains in Firebase console, and that Email/Password provider is enabled.');
-      }
-
-      // Handle specific Firebase error codes
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          throw new FirebaseAuthError('EMAIL_EXISTS', 'An account with this email already exists');
-        case 'auth/invalid-email':
-          throw new FirebaseAuthError('INVALID_EMAIL', 'Invalid email address');
-        case 'auth/weak-password':
-          throw new FirebaseAuthError('WEAK_PASSWORD', 'Password should be at least 6 characters');
-        case 'auth/operation-not-allowed':
-          throw new FirebaseAuthError('OPERATION_NOT_ALLOWED', 'Email/password accounts are not enabled');
-        default:
-          throw new FirebaseAuthError('SIGN_UP_FAILED', error.message || 'Sign up failed');
-      }
-    }
-  },
-
-  // Sign in with Google
-  signInWithGoogle: async (): Promise<AuthResponse> => {
-    try {
-      console.log('🔐 Firebase Auth: Signing in with Google...');
-
-      const provider = new GoogleAuthProvider();
-      const { user: firebaseUser } = await signInWithPopup(auth, provider);
-
-      // Check if user profile exists, create if not
-      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-
-      if (!userDoc.exists()) {
-        const userProfile: FirebaseUser = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          displayName: firebaseUser.displayName,
-          photoURL: firebaseUser.photoURL,
-          emailVerified: firebaseUser.emailVerified,
-          role: 'user',
-          permissions: [],
-          onboarding_completed: false,
-          created_at: serverTimestamp(),
-          updated_at: serverTimestamp()
-        };
-
-        await setDoc(doc(db, 'users', firebaseUser.uid), userProfile);
-      }
-
-      const user = await convertFirebaseUser(firebaseUser);
-
-      console.log('✅ Firebase Auth: Google sign in successful');
-      return {
-        user,
-        message: 'Google sign in successful'
-      };
-    } catch (error: any) {
-      console.error('❌ Firebase Auth: Google sign in failed:', error);
-
-      switch (error.code) {
-        case 'auth/popup-closed-by-user':
-          throw new FirebaseAuthError('POPUP_CLOSED', 'Sign in popup was closed');
-        case 'auth/cancelled-popup-request':
-          throw new FirebaseAuthError('POPUP_CANCELLED', 'Sign in was cancelled');
-        default:
-          throw new FirebaseAuthError('GOOGLE_SIGN_IN_FAILED', error.message || 'Google sign in failed');
-      }
-    }
-  },
-
-  // Sign out
-  signOut: async (): Promise<void> => {
-    try {
-      console.log('🚪 Firebase Auth: Signing out...');
-      await signOut(auth);
-      console.log('✅ Firebase Auth: Sign out successful');
-    } catch (error: any) {
-      console.error('❌ Firebase Auth: Sign out failed:', error);
-      throw new FirebaseAuthError('SIGN_OUT_FAILED', error.message || 'Sign out failed');
-    }
-  },
-
-  // Get current user
-  getCurrentUser: (): User | null => {
+  // Get current user from Firebase Auth
+  getCurrentUser: () => {
     return auth.currentUser;
-  },
-
-  // Update user profile
-  updateProfile: async (profileData: Partial<FirebaseUser>): Promise<FirebaseUser> => {
-    try {
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
-        throw new FirebaseAuthError('NO_USER', 'No authenticated user');
-      }
-
-      console.log('🔄 Firebase Auth: Updating profile...');
-
-      // Update Firebase Auth profile if display name or photo URL changed
-      if (profileData.displayName || profileData.photoURL) {
-        await firebaseUpdateProfile(currentUser, {
-          displayName: profileData.displayName || undefined,
-          photoURL: profileData.photoURL || undefined
-        });
-      }
-
-      // Update Firestore profile
-      const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
-        ...profileData,
-        updated_at: serverTimestamp()
-      });
-
-      const user = await convertFirebaseUser(currentUser);
-
-      console.log('✅ Firebase Auth: Profile updated successfully');
-      return user;
-    } catch (error: any) {
-      console.error('❌ Firebase Auth: Profile update failed:', error);
-      throw new FirebaseAuthError('PROFILE_UPDATE_FAILED', error.message || 'Profile update failed');
-    }
-  },
-
-  // Reset password
-  resetPassword: async (email: string): Promise<void> => {
-    try {
-      console.log('🔄 Firebase Auth: Sending password reset email...');
-      await sendPasswordResetEmail(auth, email);
-      console.log('✅ Firebase Auth: Password reset email sent');
-    } catch (error: any) {
-      console.error('❌ Firebase Auth: Password reset failed:', error);
-
-      switch (error.code) {
-        case 'auth/user-not-found':
-          throw new FirebaseAuthError('USER_NOT_FOUND', 'No user found with this email address');
-        case 'auth/invalid-email':
-          throw new FirebaseAuthError('INVALID_EMAIL', 'Invalid email address');
-        default:
-          throw new FirebaseAuthError('PASSWORD_RESET_FAILED', error.message || 'Password reset failed');
-      }
-    }
   },
 
   // Check if user is authenticated
@@ -411,20 +158,60 @@ export const firebaseAuthService = {
     return user?.role === 'Super Admin';
   },
 
-  // Auth state change listener
-  onAuthStateChanged: (callback: (user: FirebaseUser | null) => void) => {
-    return onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const user = await convertFirebaseUser(firebaseUser);
-          callback(user);
-        } catch (error) {
-          console.error('❌ Error in auth state change:', error);
-          callback(null);
-        }
-      } else {
-        callback(null);
+  // Update user profile via backend
+  updateProfile: async (userId: string, profileData: Partial<FirebaseUser>): Promise<FirebaseUser> => {
+    try {
+      console.log('🔄 Auth: Updating user profile via backend...');
+
+      await updateUserDataInBackend(userId, {
+        ...profileData,
+        updated_at: new Date()
+      });
+
+      // Return updated user object
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) {
+        throw new FirebaseAuthError('NO_USER', 'No authenticated user');
       }
-    });
+
+      const updated = convertFirebaseUserWithFallback(
+        firebaseUser.uid,
+        firebaseUser.email,
+        firebaseUser.displayName,
+        firebaseUser.photoURL,
+        firebaseUser.emailVerified,
+        profileData
+      );
+
+      console.log('✅ Auth: Profile updated successfully via backend');
+      return updated;
+    } catch (error: any) {
+      console.error('❌ Auth: Profile update failed:', error);
+      throw new FirebaseAuthError('PROFILE_UPDATE_FAILED', error.message || 'Profile update failed');
+    }
+  },
+
+  // Get user data from backend (if available)
+  getUserData: async (userId: string): Promise<FirebaseUser | null> => {
+    try {
+      return await getUserDataFromBackend(userId);
+    } catch (error) {
+      console.warn('Error getting user data:', error);
+      return null;
+    }
+  },
+
+  // Create user data in backend (called during registration)
+  createUserData: async (userId: string, userData: Partial<FirebaseUser>): Promise<void> => {
+    try {
+      await createUserDataInBackend(userId, {
+        ...userData,
+        created_at: new Date(),
+        updated_at: new Date()
+      });
+    } catch (error) {
+      console.warn('Error creating user data:', error);
+      // Don't throw - continue with app
+    }
   }
 };
