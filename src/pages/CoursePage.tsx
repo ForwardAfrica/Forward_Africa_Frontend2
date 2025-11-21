@@ -42,6 +42,7 @@ const CoursePage: React.FC = () => {
   });
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInstructorInfo, setShowInstructorInfo] = useState(false);
   const { courses: allCourses, loading: coursesLoading, fetchAllCourses } = useCourses();
 
   // Set client flag on mount to prevent hydration issues
