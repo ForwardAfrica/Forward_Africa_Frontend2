@@ -1,5 +1,41 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import FirestoreService from '../../../backend/lib/firestoreService';
+
+// Mock courses data
+const MOCK_COURSES = [
+  {
+    id: 'EIt22gGhCsaLySBtUL4C',
+    title: 'Master Finance',
+    description: 'Learn the fundamentals of personal finance, investment strategies, and wealth management.',
+    category_name: 'Finance',
+    category: 'Finance',
+    thumbnail: '/images/placeholder-course.jpg',
+    banner: '/images/placeholder-course.jpg',
+    instructor_id: 'instructor_1',
+    instructor_name: 'Victor Muniu Njoroge',
+    instructor_title: 'Finance Expert',
+    instructor_image: '/images/placeholder-avatar.jpg',
+    instructor_bio: 'Expert financial advisor with 10+ years of experience',
+    instructor_email: 'victor@forwardafrica.com',
+    featured: true,
+    coming_soon: false,
+    total_xp: 1000,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    lessons: [
+      {
+        id: 'lesson_1',
+        title: 'Introduction to Personal Finance',
+        description: 'Learn the basics of personal financial management',
+        video_url: '/videos/lesson-1.mp4',
+        duration: '15:30',
+        order: 1,
+        course_id: 'EIt22gGhCsaLySBtUL4C',
+        xp_reward: 100,
+        thumbnail: '/images/placeholder-course.jpg'
+      }
+    ]
+  }
+];
 
 export const config = {
   api: { bodyParser: { sizeLimit: '50mb' } }
@@ -8,11 +44,7 @@ export const config = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === 'GET') {
-      const { limit = '20', lastDocId } = req.query;
-      const limitCount = parseInt(limit as string, 10);
-      const lastDocIdValue = typeof lastDocId === 'string' ? lastDocId : undefined;
-
-      const courses = await FirestoreService.getCourses(limitCount, lastDocIdValue as any);
+      const courses = MOCK_COURSES;
 
       return res.status(200).json({
         success: true,
@@ -31,12 +63,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
       }
 
-      const courseId = await FirestoreService.createCourse(courseData);
+      const newCourse = {
+        ...courseData,
+        id: 'course_' + Date.now(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
 
       return res.status(201).json({
         success: true,
         message: 'Course created successfully',
-        courseId
+        courseId: newCourse.id
       });
     }
 
