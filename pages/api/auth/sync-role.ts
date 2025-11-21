@@ -3,21 +3,24 @@ import admin from 'firebase-admin';
 
 const initFirebaseAdmin = () => {
   if (!admin.apps.length) {
-    const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+    const serviceAccountKey = process.env.SERVICE_ACCOUNT;
     if (!serviceAccountKey) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY is not configured');
+      throw new Error('SERVICE_ACCOUNT environment variable is not configured');
     }
 
     let serviceAccount;
     try {
       serviceAccount = JSON.parse(serviceAccountKey);
     } catch (err) {
-      serviceAccount = serviceAccountKey;
+      console.error('❌ Failed to parse SERVICE_ACCOUNT JSON:', err);
+      throw new Error('SERVICE_ACCOUNT must be a valid JSON string');
     }
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
+
+    console.log('✅ Firebase Admin SDK initialized in sync-role endpoint');
   }
 };
 
