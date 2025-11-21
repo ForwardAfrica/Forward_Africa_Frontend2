@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import FirestoreService from '../../../backend/lib/firestoreService';
 
+export const config = {
+  api: { bodyParser: { sizeLimit: '50mb' } }
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { courseId } = req.query;
 
