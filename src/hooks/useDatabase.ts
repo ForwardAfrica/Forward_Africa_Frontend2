@@ -703,9 +703,10 @@ export const useAnalytics = () => {
     setError(null);
     try {
       console.log('📊 Fetching platform stats...');
-      const data = await analyticsAPI.getPlatformStats();
-      console.log('📊 Platform stats received:', data);
-      setStats(data);
+      const response = await analyticsAPI.getPlatformStats();
+      console.log('📊 Platform stats received:', response);
+      const statsData = response.data || response;
+      setStats(statsData);
     } catch (err) {
       // Handle authentication error gracefully
       if (err instanceof Error && err.message === 'Authentication required') {
