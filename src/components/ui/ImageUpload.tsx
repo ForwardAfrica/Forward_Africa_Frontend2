@@ -12,6 +12,7 @@ interface ImageUploadProps {
   className?: string;
   previewSize?: 'sm' | 'md' | 'lg';
   required?: boolean;
+  useBase64?: boolean;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
