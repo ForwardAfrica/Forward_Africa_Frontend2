@@ -132,10 +132,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Update Firestore user profile
-    const firestoreUpdateData = {
+    const firestoreUpdateData: any = {
       ...profileData,
       updated_at: admin.firestore.FieldValue.serverTimestamp()
     };
+
+    // Ensure both field name variants are written
+    if (profileData.full_name) {
+      firestoreUpdateData.full_name = profileData.full_name;
+      firestoreUpdateData.displayName = profileData.full_name;
+    } else if (profileData.displayName) {
+      firestoreUpdateData.displayName = profileData.displayName;
+      firestoreUpdateData.full_name = profileData.displayName;
+    }
+
+    if (profileData.avatar_url) {
+      firestoreUpdateData.avatar_url = profileData.avatar_url;
+      firestoreUpdateData.photoURL = profileData.avatar_url;
+    } else if (profileData.photoURL) {
+      firestoreUpdateData.photoURL = profileData.photoURL;
+      firestoreUpdateData.avatar_url = profileData.photoURL;
+    }
 
     // Remove email from firestore update if it was handled in auth
     if (authUpdateData.email) {
