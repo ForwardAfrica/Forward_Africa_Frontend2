@@ -285,7 +285,12 @@ export const FirebaseAuthProvider: React.FC<FirebaseAuthProviderProps> = ({ chil
     try {
       setError(null);
       console.log('🔄 FirebaseAuthContext: Updating profile with data:', profileData);
-      const updatedUser = await firebaseAuthService.updateProfile(profileData);
+
+      if (!user?.uid) {
+        throw new Error('User not authenticated');
+      }
+
+      const updatedUser = await firebaseAuthService.updateProfile(user.uid, profileData);
       console.log('✅ FirebaseAuthContext: Profile updated, new user data:', updatedUser);
 
       // Update the user state with the new data
