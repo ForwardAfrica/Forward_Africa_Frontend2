@@ -79,6 +79,20 @@ const ManageUsersPage: React.FC = () => {
     fetchAllUsers();
   }, []);
 
+  // Helper function to safely format dates
+  const formatDate = (dateValue: any): string => {
+    if (!dateValue) return 'Unknown';
+
+    const parsed = Date.parse(dateValue);
+    if (isNaN(parsed)) return 'Unknown';
+
+    try {
+      return new Date(dateValue).toISOString().split('T')[0];
+    } catch (error) {
+      return 'Unknown';
+    }
+  };
+
   // Convert database users to UserData format when dbUsers changes
   useEffect(() => {
     if (dbUsers && dbUsers.length > 0) {
@@ -88,8 +102,8 @@ const ManageUsersPage: React.FC = () => {
         email: dbUser.email,
         status: 'active', // Default to active since we don't have status field in DB
         role: dbUser.role || 'user',
-        joinDate: dbUser.created_at ? new Date(dbUser.created_at).toISOString().split('T')[0] : 'Unknown',
-        lastActive: dbUser.updated_at ? new Date(dbUser.updated_at).toISOString().split('T')[0] : 'Unknown',
+        joinDate: formatDate(dbUser.created_at),
+        lastActive: formatDate(dbUser.updated_at),
         coursesEnrolled: 0, // Will be calculated from user_progress table later
         coursesCompleted: 0, // Will be calculated from user_progress table later
         avatar: dbUser.avatar_url
