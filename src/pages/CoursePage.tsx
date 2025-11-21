@@ -91,7 +91,7 @@ const CoursePage: React.FC = () => {
           console.log('Fetching course data for:', courseId);
 
           // First: Try to find the course in the already-loaded courses list
-          let foundCourse = allCourses.find(c => c.id === courseId);
+          let foundCourse: any = allCourses.find(c => c.id === courseId);
 
           if (foundCourse) {
             console.log('✅ Found course in local cache:', foundCourse.id);
@@ -99,9 +99,9 @@ const CoursePage: React.FC = () => {
             // Second: If not found locally, try to fetch from API with retry logic
             console.log('📡 Course not in cache, fetching from API...');
 
-            let courseResponse;
             try {
-              courseResponse = await courseAPI.getCourse(courseId);
+              const courseResponse = await courseAPI.getCourse(courseId);
+              foundCourse = courseResponse.data || courseResponse;
             } catch (error) {
               console.error('API Request error:', error);
 
@@ -118,23 +118,8 @@ const CoursePage: React.FC = () => {
                 console.error('Fallback fetch error:', fallbackError);
                 throw new Error('Failed to fetch course data. Please check your connection and try again.');
               }
-
-              if (foundCourse) {
-                // Skip the response processing below and go straight to course setup
-                const baseFoundCourse = foundCourse;
-                const transformedCourse = { ...baseFoundCourse };
-                setCourse(transformedCourse);
-                setLoading(false);
-                return;
-              }
             }
-
-            // If API call succeeded, process the response
-            foundCourse = courseResponse.data || courseResponse;
           }
-
-          // Handle wrapped response from API
-          const foundCourse = courseResponse.data || courseResponse;
 
           if (!foundCourse || !foundCourse.id) {
             throw new Error('Course data is invalid or missing');
