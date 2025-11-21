@@ -582,6 +582,7 @@ const UploadCoursePage: React.FC = () => {
                   label="Course Thumbnail"
                   previewSize="sm"
                   required
+                  useBase64={true}
                 />
 
                 <ImageUpload
@@ -591,6 +592,7 @@ const UploadCoursePage: React.FC = () => {
                   label="Course Banner"
                   previewSize="sm"
                   required
+                  useBase64={true}
                 />
               </div>
 
