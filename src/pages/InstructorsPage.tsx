@@ -59,6 +59,7 @@ const InstructorsPage: React.FC = () => {
         experience: instructor.experience || 0,
         expertise: instructor.expertise || [],
         socialLinks: instructor.socialLinks || { linkedin: '', twitter: '', website: '' },
+        createdAt: instructor.createdAt ? new Date(instructor.createdAt) : new Date(),
         coursesCount: Math.floor(Math.random() * 10), // Placeholder
         studentsCount: Math.floor(Math.random() * 500) // Placeholder
       }));
