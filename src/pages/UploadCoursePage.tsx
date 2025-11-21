@@ -706,6 +706,7 @@ const UploadCoursePage: React.FC = () => {
                             label="Lesson Thumbnail"
                             previewSize="sm"
                             required
+                            useBase64={true}
                           />
 
                           <div>
