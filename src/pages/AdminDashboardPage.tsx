@@ -69,8 +69,11 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // Calculate active users (users who have completed at least one course)
-  const activeUsers = users.filter(user => user.onboardingCompleted).length;
+  // Calculate total students (users with "user" role only)
+  const totalStudents = users.filter(user => user.role === 'user').length;
+
+  // Calculate active users (students who have completed at least one course)
+  const activeUsers = users.filter(user => user.role === 'user' && user.onboardingCompleted).length;
 
   // Check if user is super admin
   const isSuperAdmin = userRole === 'Super Admin';
