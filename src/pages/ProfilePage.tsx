@@ -113,8 +113,8 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     if (user) {
       setEditProfileForm({
-        full_name: user.full_name || '',
-        avatar_url: user.avatar_url || '',
+        full_name: user.full_name || user.displayName || user.fullName || '',
+        avatar_url: user.avatar_url || user.photoURL || user.avatarUrl || '',
         industry: user.industry || '',
         experience_level: user.experience_level || '',
         business_stage: user.business_stage || '',
