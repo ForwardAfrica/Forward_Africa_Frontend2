@@ -3,6 +3,7 @@
 // This service now provides minimal client-side auth functionality
 
 import { auth, onAuthStateChanged } from './firebase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 export interface FirebaseUser {
   uid: string;
