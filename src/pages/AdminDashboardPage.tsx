@@ -57,8 +57,8 @@ export default function AdminDashboardPage() {
     if (!isClient) return;
 
     fetchPlatformStats();
-    fetchAllUsers();
-  }, [fetchPlatformStats, fetchAllUsers, isClient]);
+    fetchStudents();
+  }, [fetchPlatformStats, fetchStudents, isClient]);
 
   function getDisplayName(role: string): string {
     switch (role) {
