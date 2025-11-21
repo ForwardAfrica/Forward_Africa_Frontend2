@@ -156,7 +156,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 px-8 py-4">
         <div className="bg-gray-800 rounded-lg p-6 flex flex-col items-center">
           <span className="text-2xl font-bold text-white">
-            {statsLoading ? '...' : (platformStats?.totalUsers || users.length)}
+            {usersLoading ? '...' : totalStudents}
           </span>
           <span className="text-gray-400 text-sm mt-2">Total Students</span>
         </div>
