@@ -31,7 +31,9 @@ import {
   MessageSquare,
   Globe,
   Crown,
-  X
+  X,
+  Grid3X3,
+  List
 } from 'lucide-react';
 import { useNavigate } from '../lib/router';
 import Button from '../components/ui/Button';
