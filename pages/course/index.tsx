@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
 import { validateTokenInCookie } from '@/lib/validateToken';
+import { courseAPI } from '@/lib/api';
 
 export default function CourseIndex() {
   const router = useRouter();
