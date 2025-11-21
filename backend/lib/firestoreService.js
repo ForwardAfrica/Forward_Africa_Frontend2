@@ -107,62 +107,17 @@ class FirestoreService {
     }
   }
 
-  static async getCoursesByCategory(category) {
-    try {
-      const db = getFirestore();
-      const snapshot = await db.collection('courses')
-        .where('category', '==', category)
-        .where('coming_soon', '==', false)
-        .orderBy('created_at', 'desc')
-        .limit(20)
-        .get();
-
-      const courses = [];
-      snapshot.forEach(doc => {
-        courses.push({ id: doc.id, ...doc.data() });
-      });
-
-      return this.enrichCoursesWithInstructors(courses);
-    } catch (error) {
-      console.error('❌ Error fetching courses by category:', error);
-      throw error;
-    }
-  }
-
-  static async getFeaturedCourses() {
-    try {
-      const db = getFirestore();
-      const snapshot = await db.collection('courses')
-        .where('featured', '==', true)
-        .where('coming_soon', '==', false)
-        .orderBy('created_at', 'desc')
-        .limit(6)
-        .get();
-
-      const courses = [];
-      snapshot.forEach(doc => {
-        courses.push({ id: doc.id, ...doc.data() });
-      });
-
-      return this.enrichCoursesWithInstructors(courses);
-    } catch (error) {
-      console.error('❌ Error fetching featured courses:', error);
-      throw error;
-    }
-  }
-
   static async createCourse(courseData) {
     try {
       const db = getFirestore();
       const docRef = db.collection('courses').doc();
 
-      const course = {
+      await docRef.set({
         ...courseData,
         created_at: admin.firestore.FieldValue.serverTimestamp(),
         updated_at: admin.firestore.FieldValue.serverTimestamp()
-      };
+      });
 
-      await docRef.set(course);
       return docRef.id;
     } catch (error) {
       console.error('❌ Error creating course:', error);
@@ -195,7 +150,53 @@ class FirestoreService {
     }
   }
 
-  static async getCoursesByInstructor(instructorId, includeComingSoon = false) {
+  static async getFeaturedCourses() {
+    try {
+      const db = getFirestore();
+      const snapshot = await db.collection('courses')
+        .where('featured', '==', true)
+        .where('coming_soon', '==', false)
+        .orderBy('created_at', 'desc')
+        .limit(10)
+        .get();
+
+      const courses = [];
+      snapshot.forEach(doc => {
+        courses.push({ id: doc.id, ...doc.data() });
+      });
+
+      return this.enrichCoursesWithInstructors(courses);
+    } catch (error) {
+      console.error('❌ Error fetching featured courses:', error);
+      throw error;
+    }
+  }
+
+  static async getAllCourses(includeComingSoon = true) {
+    try {
+      const db = getFirestore();
+      let q = db.collection('courses').orderBy('created_at', 'desc');
+
+      if (!includeComingSoon) {
+        q = db.collection('courses')
+          .where('coming_soon', '==', false)
+          .orderBy('created_at', 'desc');
+      }
+
+      const snapshot = await q.get();
+      const courses = [];
+      snapshot.forEach(doc => {
+        courses.push({ id: doc.id, ...doc.data() });
+      });
+
+      return this.enrichCoursesWithInstructors(courses);
+    } catch (error) {
+      console.error('❌ Error fetching all courses:', error);
+      throw error;
+    }
+  }
+
+  static async getCoursesByInstructor(instructorId, includeComingSoon = true) {
     try {
       const db = getFirestore();
       let q = db.collection('courses')
@@ -294,7 +295,7 @@ class FirestoreService {
         updated_at: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
     } catch (error) {
-      console.error('��� Error marking lesson complete:', error);
+      console.error('❌ Error marking lesson complete:', error);
       throw error;
     }
   }
@@ -669,6 +670,67 @@ class FirestoreService {
       });
     } catch (error) {
       console.error('❌ Error creating user data:', error);
+      throw error;
+    }
+  }
+
+  static async getUsers() {
+    try {
+      const db = getFirestore();
+      const snapshot = await db.collection('users')
+        .orderBy('created_at', 'desc')
+        .get();
+
+      const users = [];
+      snapshot.forEach(doc => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+
+      return users;
+    } catch (error) {
+      console.error('❌ Error fetching users:', error);
+      throw error;
+    }
+  }
+
+  // ============================================================================
+  // ANALYTICS
+  // ============================================================================
+
+  static async getPlatformStats() {
+    try {
+      const db = getFirestore();
+
+      const usersSnapshot = await db.collection('users').get();
+      const coursesSnapshot = await db.collection('courses').get();
+      const instructorsSnapshot = await db.collection('instructors').get();
+      const certificatesSnapshot = await db.collection('certificates').get();
+
+      const totalUsers = usersSnapshot.size;
+      const totalCourses = coursesSnapshot.size;
+      const totalInstructors = instructorsSnapshot.size;
+      const totalCertificates = certificatesSnapshot.size;
+
+      let activeUsers = 0;
+      usersSnapshot.forEach(doc => {
+        const userData = doc.data();
+        if (userData.onboardingCompleted || userData.last_login) {
+          activeUsers++;
+        }
+      });
+
+      return {
+        totalUsers,
+        totalCourses,
+        totalInstructors,
+        totalCertificates,
+        activeUsers,
+        completedCourses: totalCertificates,
+        totalLessons: 0,
+        totalXP: 0
+      };
+    } catch (error) {
+      console.error('❌ Error fetching platform stats:', error);
       throw error;
     }
   }
