@@ -623,37 +623,8 @@ const CoursePage: React.FC = () => {
     }
   })();
 
-  // Debug info for troubleshooting
-  const debugInfo = {
-    courseId: courseId,
-    courseTitle: course.title,
-    lessonsCount: course.lessons.length,
-    selectedLesson: selectedLesson,
-    progress: progress,
-    hasLessons: course.lessons.length > 0,
-    isComingSoon: course.comingSoon,
-    instructor: instructorInfo.name,
-    category: course.category,
-    featured: course.featured,
-    totalXP: course.totalXP
-  };
-
   return (
     <Layout>
-      {/* Debug Info - Remove in production */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed top-4 right-4 bg-black bg-opacity-90 text-white p-4 rounded-lg text-xs max-w-xs z-50">
-          <h4 className="font-bold mb-2">🐛 Debug Info</h4>
-          <div className="space-y-1">
-            <div><strong>Course:</strong> {debugInfo.courseTitle}</div>
-            <div><strong>Lesson:</strong> {course.lessons[0]?.title || 'None'}</div>
-            <div><strong>Progress:</strong> {debugInfo.progress.toFixed(1)}%</div>
-            <div><strong>Auth:</strong> Logged in</div>
-            <div><strong>Error:</strong> {course.lessons.length === 0 ? 'No lessons available' : 'None'}</div>
-          </div>
-        </div>
-      )}
-
       <div className="pb-16">
         {/* Course Completion Notification */}
         {showCompletionNotification && (
