@@ -3,6 +3,55 @@ const admin = require('firebase-admin');
 
 class FirestoreService {
   // ============================================================================
+  // HELPER METHODS
+  // ============================================================================
+
+  static async enrichCourseWithInstructor(course) {
+    if (!course || !course.instructor_id) {
+      return course;
+    }
+
+    try {
+      const db = getFirestore();
+      const instructorDoc = await db.collection('instructors').doc(course.instructor_id).get();
+
+      if (instructorDoc.exists) {
+        const instructorData = instructorDoc.data();
+        return {
+          ...course,
+          instructor: {
+            id: course.instructor_id,
+            name: instructorData.name || 'Unknown Instructor',
+            title: instructorData.title || 'Instructor',
+            image: instructorData.image || '/images/placeholder-avatar.jpg',
+            bio: instructorData.bio || 'Experienced instructor',
+            email: instructorData.email || 'instructor@forwardafrica.com',
+            expertise: instructorData.expertise || ['Education'],
+            experience: instructorData.experience || 5,
+            createdAt: instructorData.createdAt || instructorData.created_at
+          },
+          instructor_name: instructorData.name,
+          instructor_title: instructorData.title,
+          instructor_image: instructorData.image,
+          instructor_bio: instructorData.bio,
+          instructor_email: instructorData.email,
+          instructor_expertise: JSON.stringify(instructorData.expertise || ['Education']),
+          instructor_experience: instructorData.experience,
+          instructor_created_at: instructorData.createdAt || instructorData.created_at
+        };
+      }
+    } catch (error) {
+      console.error('⚠️ Error enriching course with instructor data:', error);
+    }
+
+    return course;
+  }
+
+  static async enrichCoursesWithInstructors(courses) {
+    return Promise.all(courses.map(course => this.enrichCourseWithInstructor(course)));
+  }
+
+  // ============================================================================
   // COURSES
   // ============================================================================
 
@@ -29,7 +78,7 @@ class FirestoreService {
         courses.push({ id: doc.id, ...doc.data() });
       });
 
-      return courses;
+      return this.enrichCoursesWithInstructors(courses);
     } catch (error) {
       console.error('❌ Error fetching courses:', error);
       throw error;
