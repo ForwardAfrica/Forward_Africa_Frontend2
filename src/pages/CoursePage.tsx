@@ -79,7 +79,7 @@ const CoursePage: React.FC = () => {
   }, [courseId, getCertificate, isClient]);
 
   useEffect(() => {
-    if (authLoading || !isAuthenticated || !hasCheckedToken) {
+    if (authLoading || !isAuthenticated || !hasCheckedToken || coursesLoading) {
       return;
     }
 
@@ -96,28 +96,18 @@ const CoursePage: React.FC = () => {
           if (foundCourse) {
             console.log('✅ Found course in local cache:', foundCourse.id);
           } else {
-            // Second: If not found locally, try to fetch from API with retry logic
-            console.log('📡 Course not in cache, fetching from API...');
-
+            // Second: If not found locally, fetch all courses first
+            console.log('📡 Course not in cache, fetching all courses...');
             try {
-              const courseResponse = await courseAPI.getCourse(courseId);
-              foundCourse = courseResponse.data || courseResponse;
-            } catch (error) {
-              console.error('API Request error:', error);
+              await fetchAllCourses();
+              foundCourse = allCourses.find(c => c.id === courseId);
 
-              // Third: If API fails, try to fetch all courses and find it
-              console.log('🔄 API request failed, attempting to fetch all courses...');
-              try {
-                await fetchAllCourses();
-                foundCourse = allCourses.find(c => c.id === courseId);
-
-                if (!foundCourse) {
-                  throw new Error('Course not found in database');
-                }
-              } catch (fallbackError) {
-                console.error('Fallback fetch error:', fallbackError);
-                throw new Error('Failed to fetch course data. Please check your connection and try again.');
+              if (!foundCourse) {
+                throw new Error('Course not found in database');
               }
+            } catch (fallbackError) {
+              console.error('Fallback fetch error:', fallbackError);
+              throw new Error('Failed to fetch course data. Please check your connection and try again.');
             }
           }
 
