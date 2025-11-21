@@ -69,8 +69,11 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // Calculate active users (users who have completed at least one course)
-  const activeUsers = users.filter(user => user.onboardingCompleted).length;
+  // Calculate total students (users with "user" role only)
+  const totalStudents = users.filter(user => user.role === 'user').length;
+
+  // Calculate active users (students who have completed at least one course)
+  const activeUsers = users.filter(user => user.role === 'user' && user.onboardingCompleted).length;
 
   // Check if user is super admin
   const isSuperAdmin = userRole === 'Super Admin';
@@ -153,7 +156,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 px-8 py-4">
         <div className="bg-gray-800 rounded-lg p-6 flex flex-col items-center">
           <span className="text-2xl font-bold text-white">
-            {statsLoading ? '...' : (platformStats?.totalUsers || users.length)}
+            {usersLoading ? '...' : totalStudents}
           </span>
           <span className="text-gray-400 text-sm mt-2">Total Students</span>
         </div>
