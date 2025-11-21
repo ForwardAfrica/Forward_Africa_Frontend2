@@ -11,6 +11,7 @@ import { downloadCertificate } from '../utils/certificateGenerator';
 import Image from 'next/image';
 import CourseProgressDashboard from '../components/ui/CourseProgressDashboard';
 import { courseAPI } from '../lib/api';
+import { useCourses } from '../hooks/useDatabase';
 
 const CoursePage: React.FC = () => {
   const router = useRouter();
