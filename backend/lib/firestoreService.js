@@ -223,6 +223,33 @@ class FirestoreService {
     }
   }
 
+  static async getCoursesByCategory(category, includeComingSoon = true) {
+    try {
+      const db = getFirestore();
+      let q = db.collection('courses')
+        .where('category_name', '==', category)
+        .orderBy('created_at', 'desc');
+
+      if (!includeComingSoon) {
+        q = db.collection('courses')
+          .where('category_name', '==', category)
+          .where('coming_soon', '==', false)
+          .orderBy('created_at', 'desc');
+      }
+
+      const snapshot = await q.get();
+      const courses = [];
+      snapshot.forEach(doc => {
+        courses.push({ id: doc.id, ...doc.data() });
+      });
+
+      return this.enrichCoursesWithInstructors(courses);
+    } catch (error) {
+      console.error('❌ Error fetching courses by category:', error);
+      throw error;
+    }
+  }
+
   // ============================================================================
   // USER PROGRESS
   // ============================================================================
