@@ -41,6 +41,7 @@ const CoursePage: React.FC = () => {
     completionPercentage: 0
   });
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Set client flag on mount to prevent hydration issues
   useEffect(() => {
