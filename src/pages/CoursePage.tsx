@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { downloadCertificate } from '../utils/certificateGenerator';
 import Image from 'next/image';
 import CourseProgressDashboard from '../components/ui/CourseProgressDashboard';
-import { courseAPI } from '../lib/api';
+import { useCourses } from '../hooks/useDatabase';
 
 const CoursePage: React.FC = () => {
   const router = useRouter();
@@ -42,6 +42,7 @@ const CoursePage: React.FC = () => {
   });
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { courses: allCourses, loading: coursesLoading, fetchAllCourses } = useCourses();
 
   // Set client flag on mount to prevent hydration issues
   useEffect(() => {
@@ -58,6 +59,17 @@ const CoursePage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
+  // Fetch all courses on component mount
+  useEffect(() => {
+    if (authLoading || !isAuthenticated || !hasCheckedToken) {
+      return;
+    }
+
+    if (allCourses.length === 0 && !coursesLoading) {
+      fetchAllCourses();
+    }
+  }, [authLoading, isAuthenticated, hasCheckedToken, allCourses.length, coursesLoading, fetchAllCourses]);
+
   useEffect(() => {
     if (courseId && isClient) {
       const cert = getCertificate(courseId as string);
@@ -66,7 +78,7 @@ const CoursePage: React.FC = () => {
   }, [courseId, getCertificate, isClient]);
 
   useEffect(() => {
-    if (authLoading || !isAuthenticated || !hasCheckedToken) {
+    if (authLoading || !isAuthenticated || !hasCheckedToken || coursesLoading) {
       return;
     }
 
@@ -74,19 +86,29 @@ const CoursePage: React.FC = () => {
       if (courseId && typeof courseId === 'string') {
         try {
           setLoading(true);
+          setError(null);
           console.log('Fetching course data for:', courseId);
 
-          // Fetch course from database API using the authenticated API request
-          let courseResponse;
-          try {
-            courseResponse = await courseAPI.getCourse(courseId);
-          } catch (error) {
-            console.error('API Request error:', error);
-            throw new Error('Failed to fetch course data. Please check your connection and try again.');
-          }
+          // First: Try to find the course in the already-loaded courses list
+          let foundCourse: any = allCourses.find(c => c.id === courseId);
 
-          // Handle wrapped response from API
-          const foundCourse = courseResponse.data || courseResponse;
+          if (foundCourse) {
+            console.log('✅ Found course in local cache:', foundCourse.id);
+          } else {
+            // Second: If not found locally, fetch all courses first
+            console.log('📡 Course not in cache, fetching all courses...');
+            try {
+              await fetchAllCourses();
+              foundCourse = allCourses.find(c => c.id === courseId);
+
+              if (!foundCourse) {
+                throw new Error('Course not found in database');
+              }
+            } catch (fallbackError) {
+              console.error('Fallback fetch error:', fallbackError);
+              throw new Error('Failed to fetch course data. Please check your connection and try again.');
+            }
+          }
 
           if (!foundCourse || !foundCourse.id) {
             throw new Error('Course data is invalid or missing');
@@ -117,13 +139,10 @@ const CoursePage: React.FC = () => {
               lessonsCount: foundCourse.lessons?.length || 0
             });
 
-            // Fetch all courses to find alternative
+            // Find alternative courses with same title that have lessons
             try {
-              const allCoursesResponse = await courseAPI.getAllCourses(true);
-              const allCoursesData = Array.isArray(allCoursesResponse) ? allCoursesResponse : allCoursesResponse.data || allCoursesResponse.courses || [];
-
-              // Find courses with the same title that have lessons
-              const alternativeCourses = allCoursesData.filter((course: any) =>
+              // Use already loaded courses
+              const alternativeCourses = allCourses.filter((course: any) =>
                 course.title === foundCourse.title &&
                 course.id !== foundCourse.id &&
                 course.lessons &&
@@ -332,7 +351,7 @@ const CoursePage: React.FC = () => {
     };
 
     fetchCourseData();
-  }, [courseId, router, authLoading, isAuthenticated, hasCheckedToken]);
+  }, [courseId, router, authLoading, isAuthenticated, hasCheckedToken, allCourses, fetchAllCourses, coursesLoading]);
 
   // Reset redirect state when courseId changes
   useEffect(() => {
