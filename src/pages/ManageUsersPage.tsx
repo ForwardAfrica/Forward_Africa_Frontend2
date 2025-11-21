@@ -539,7 +539,7 @@ const ManageUsersPage: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                           <div className="flex items-center">
                             <Activity className="h-4 w-4 mr-2 text-gray-400" />
-                            {new Date(user.lastActive).toLocaleDateString()}
+                            {user.lastActive === 'Unknown' ? 'Unknown' : new Date(user.lastActive).toLocaleDateString()}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
