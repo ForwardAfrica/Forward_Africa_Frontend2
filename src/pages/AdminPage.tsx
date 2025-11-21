@@ -1068,95 +1068,185 @@ const AdminPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Instructors Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredInstructors.map((instructor) => {
-              const instructorCourses = courses.filter(course => course.instructorId === instructor.id);
+          {/* Card View */}
+          {instructorViewType === 'card' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredInstructors.map((instructor) => {
+                const instructorCourses = courses.filter(course => course.instructorId === instructor.id);
 
-              return (
-                <div key={instructor.id} className="bg-gray-800 rounded-lg p-6">
-                  <div className="flex items-center mb-4">
-                    <img
-                      src={instructor.image}
-                      alt={instructor.name}
-                      className="h-16 w-16 rounded-full object-cover mr-4"
-                    />
-                    <div className="flex-1">
-                      <h3 className="text-white font-semibold">{instructor.name}</h3>
-                      <p className="text-gray-400 text-sm">{instructor.title}</p>
-                      <p className="text-gray-500 text-xs">{instructor.email}</p>
-                    </div>
-                  </div>
-
-                  {/* Expertise Tags */}
-                  {instructor.expertise && instructor.expertise.length > 0 && (
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-1">
-                        {instructor.expertise.slice(0, 3).map((skill, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                        {instructor.expertise.length > 3 && (
-                          <span className="px-2 py-1 bg-gray-600 text-gray-300 rounded text-xs">
-                            +{instructor.expertise.length - 3} more
-                          </span>
-                        )}
+                return (
+                  <div key={instructor.id} className="bg-gray-800 rounded-lg p-6">
+                    <div className="flex items-center mb-4">
+                      <img
+                        src={instructor.image}
+                        alt={instructor.name}
+                        className="h-16 w-16 rounded-full object-cover mr-4"
+                      />
+                      <div className="flex-1">
+                        <h3 className="text-white font-semibold">{instructor.name}</h3>
+                        <p className="text-gray-400 text-sm">{instructor.title}</p>
+                        <p className="text-gray-500 text-xs">{instructor.email}</p>
                       </div>
                     </div>
-                  )}
 
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-white">{instructorCourses.length}</div>
-                      <div className="text-xs text-gray-400">Courses</div>
+                    {/* Expertise Tags */}
+                    {instructor.expertise && instructor.expertise.length > 0 && (
+                      <div className="mb-4">
+                        <div className="flex flex-wrap gap-1">
+                          {instructor.expertise.slice(0, 3).map((skill, index) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                          {instructor.expertise.length > 3 && (
+                            <span className="px-2 py-1 bg-gray-600 text-gray-300 rounded text-xs">
+                              +{instructor.expertise.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-white">{instructorCourses.length}</div>
+                        <div className="text-xs text-gray-400">Courses</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-white">{instructor.experience}</div>
+                        <div className="text-xs text-gray-400">Years Exp.</div>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-white">{instructor.experience}</div>
-                      <div className="text-xs text-gray-400">Years Exp.</div>
+
+                    {/* Actions */}
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          console.log('Navigating to instructor profile:', instructor.id);
+                          navigate(`/instructor/${instructor.id}`);
+                        }}
+                        className="flex-1"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/admin/add-instructor?edit=${instructor.id}`)}
+                        className="flex-1"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteInstructor(instructor.id)}
+                        className="text-red-500 border-red-500 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+          )}
 
-                  {/* Actions */}
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        console.log('Navigating to instructor profile:', instructor.id);
-                        navigate(`/instructor/${instructor.id}`);
-                      }}
-                      className="flex-1"
-                    >
-                      <Eye className="h-3 w-3 mr-1" />
-                      View
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/admin/add-instructor?edit=${instructor.id}`)}
-                      className="flex-1"
-                    >
-                      <Edit className="h-3 w-3 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDeleteInstructor(instructor.id)}
-                      className="text-red-500 border-red-500 hover:bg-red-500/10"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {/* Table View */}
+          {instructorViewType === 'table' && (
+            <div className="bg-gray-800 rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-700 bg-gray-900">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Name</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Email</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Title</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Expertise</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-300">Courses</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-300">Experience</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-300">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredInstructors.map((instructor) => {
+                    const instructorCourses = courses.filter(course => course.instructorId === instructor.id);
+
+                    return (
+                      <tr key={instructor.id} className="border-b border-gray-700 hover:bg-gray-750 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={instructor.image}
+                              alt={instructor.name}
+                              className="h-8 w-8 rounded-full object-cover"
+                            />
+                            <span className="text-white font-medium">{instructor.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-300 text-sm">{instructor.email}</td>
+                        <td className="px-6 py-4 text-gray-300 text-sm">{instructor.title}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-wrap gap-1">
+                            {instructor.expertise && instructor.expertise.slice(0, 2).map((skill, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                            {instructor.expertise && instructor.expertise.length > 2 && (
+                              <span className="px-2 py-1 bg-gray-600 text-gray-300 rounded text-xs">
+                                +{instructor.expertise.length - 2}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center text-white font-semibold">{instructorCourses.length}</td>
+                        <td className="px-6 py-4 text-center text-white font-semibold">{instructor.experience} yrs</td>
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex justify-center gap-2">
+                            <button
+                              onClick={() => {
+                                console.log('Navigating to instructor profile:', instructor.id);
+                                navigate(`/instructor/${instructor.id}`);
+                              }}
+                              className="p-2 hover:bg-blue-600/20 text-blue-400 rounded transition-colors"
+                              title="View instructor"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => navigate(`/admin/add-instructor?edit=${instructor.id}`)}
+                              className="p-2 hover:bg-blue-600/20 text-blue-400 rounded transition-colors"
+                              title="Edit instructor"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteInstructor(instructor.id)}
+                              className="p-2 hover:bg-red-600/20 text-red-400 rounded transition-colors"
+                              title="Delete instructor"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {filteredInstructors.length === 0 && (
             <div className="text-center py-12">
