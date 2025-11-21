@@ -84,12 +84,20 @@ const InstructorPage: React.FC = () => {
           throw new Error('Instructor not found');
         }
 
-                 // Fetch instructor courses
+         // Fetch instructor courses
          try {
-          const coursesData: any = await instructorAPI.getInstructorCourses(instructorId);
-          console.log('📚 Courses data received:', coursesData);
+          const response: any = await instructorAPI.getInstructorCourses(instructorId);
+          console.log('📚 Courses data received:', response);
 
-          const coursesArray: any[] = Array.isArray(coursesData) ? coursesData : [];
+          // Extract courses array from response
+          let coursesArray: any[] = [];
+          if (Array.isArray(response)) {
+            coursesArray = response;
+          } else if (response && response.data && Array.isArray(response.data)) {
+            coursesArray = response.data;
+          } else if (response && response.courses && Array.isArray(response.courses)) {
+            coursesArray = response.courses;
+          }
 
           // Transform the data to match the expected types
           const transformedCourses = coursesArray.map((course: any) => ({
@@ -153,7 +161,7 @@ const InstructorPage: React.FC = () => {
         <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white">
           <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-center justify-center py-20">
-              <div className="text-red-500 text-6xl mb-4">⚠️</div>
+              <div className="text-red-500 text-6xl mb-4">⚠���</div>
               <h1 className="text-2xl font-bold mb-2">Error Loading Profile</h1>
               <p className="text-gray-400 mb-4">{error}</p>
               <button
