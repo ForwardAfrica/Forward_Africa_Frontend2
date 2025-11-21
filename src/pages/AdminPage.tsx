@@ -55,6 +55,7 @@ const AdminPage: React.FC = () => {
   const [isClient, setIsClient] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showCourseModal, setShowCourseModal] = useState(false);
+  const [instructorViewType, setInstructorViewType] = useState<'card' | 'table'>('card');
 
   // Get user permissions
   const { userRole, hasPermission } = usePermissions();
