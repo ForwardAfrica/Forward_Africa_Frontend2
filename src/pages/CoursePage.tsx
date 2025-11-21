@@ -139,13 +139,10 @@ const CoursePage: React.FC = () => {
               lessonsCount: foundCourse.lessons?.length || 0
             });
 
-            // Fetch all courses to find alternative
+            // Find alternative courses with same title that have lessons
             try {
-              const allCoursesResponse = await courseAPI.getAllCourses(true);
-              const allCoursesData = Array.isArray(allCoursesResponse) ? allCoursesResponse : allCoursesResponse.data || allCoursesResponse.courses || [];
-
-              // Find courses with the same title that have lessons
-              const alternativeCourses = allCoursesData.filter((course: any) =>
+              // Use already loaded courses
+              const alternativeCourses = allCourses.filter((course: any) =>
                 course.title === foundCourse.title &&
                 course.id !== foundCourse.id &&
                 course.lessons &&
