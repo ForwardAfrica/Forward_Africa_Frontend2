@@ -19,13 +19,24 @@ export const useCourses = () => {
 
     try {
       console.log('📡 useDatabase: Making API call to getAllCourses...');
-      const data = await courseAPI.getAllCourses(includeComingSoon);
-      const dataArray: any[] = Array.isArray(data) ? (data as any[]) : ([] as any[]);
+      const response = await courseAPI.getAllCourses(includeComingSoon);
+
+      // Extract data array from response - handle both wrapped and unwrapped responses
+      let dataArray: any[] = [];
+      if (Array.isArray(response)) {
+        dataArray = response as any[];
+      } else if (response && response.data && Array.isArray(response.data)) {
+        dataArray = response.data as any[];
+      } else if (response && response.courses && Array.isArray(response.courses)) {
+        dataArray = response.courses as any[];
+      }
+
       const first = dataArray[0] as any | undefined;
       console.log('✅ useDatabase: API call successful, received data:', {
         dataLength: dataArray.length,
-        dataType: typeof data,
-        isArray: Array.isArray(data),
+        dataType: typeof response,
+        isArray: Array.isArray(response),
+        hasDataProperty: response?.data !== undefined,
         firstItem: first ? { id: first.id, title: first.title, coming_soon: first.coming_soon } : null
       });
 
@@ -152,7 +163,7 @@ export const useCourses = () => {
 
       setCourses(transformedCourses);
     } catch (err) {
-      console.error('❌ useDatabase: Failed to fetch courses from API:', err);
+      console.error('��� useDatabase: Failed to fetch courses from API:', err);
       setError('Failed to load courses from server');
       setCourses([]); // Set empty array instead of mock data
     } finally {
