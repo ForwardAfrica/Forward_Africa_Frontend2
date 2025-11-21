@@ -315,8 +315,15 @@ const CoursePage: React.FC = () => {
           }, [courseId, course]);
         } catch (error) {
           console.error('Error fetching course:', error);
-          // Redirect to courses page if course not found
-          router.push('/courses');
+          let errorMessage = 'Failed to load course. Please try again.';
+
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          // Show error state or redirect
+          setError(errorMessage);
+          console.error('Setting error state:', errorMessage);
         } finally {
           setLoading(false);
         }
