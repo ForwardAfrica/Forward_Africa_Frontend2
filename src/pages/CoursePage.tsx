@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { downloadCertificate } from '../utils/certificateGenerator';
 import Image from 'next/image';
 import CourseProgressDashboard from '../components/ui/CourseProgressDashboard';
+import { courseAPI } from '../lib/api';
 
 const CoursePage: React.FC = () => {
   const router = useRouter();
@@ -40,6 +41,7 @@ const CoursePage: React.FC = () => {
     completionPercentage: 0
   });
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Set client flag on mount to prevent hydration issues
   useEffect(() => {
@@ -74,13 +76,22 @@ const CoursePage: React.FC = () => {
           setLoading(true);
           console.log('Fetching course data for:', courseId);
 
-          // Fetch course from database API
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/courses/${courseId}`);
-          if (!response.ok) {
-            throw new Error('Course not found');
+          // Fetch course from database API using the authenticated API request
+          let courseResponse;
+          try {
+            courseResponse = await courseAPI.getCourse(courseId);
+          } catch (error) {
+            console.error('API Request error:', error);
+            throw new Error('Failed to fetch course data. Please check your connection and try again.');
           }
 
-          const foundCourse = await response.json();
+          // Handle wrapped response from API
+          const foundCourse = courseResponse.data || courseResponse;
+
+          if (!foundCourse || !foundCourse.id) {
+            throw new Error('Course data is invalid or missing');
+          }
+
           console.log('Course data from API:', foundCourse);
           console.log('Instructor data from API:', {
             instructor_name: foundCourse.instructor_name,
@@ -107,12 +118,12 @@ const CoursePage: React.FC = () => {
             });
 
             // Fetch all courses to find alternative
-            const allCoursesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/courses`);
-            if (allCoursesResponse.ok) {
-              const allCourses = await allCoursesResponse.json();
+            try {
+              const allCoursesResponse = await courseAPI.getAllCourses(true);
+              const allCoursesData = Array.isArray(allCoursesResponse) ? allCoursesResponse : allCoursesResponse.data || allCoursesResponse.courses || [];
 
               // Find courses with the same title that have lessons
-              const alternativeCourses = allCourses.filter((course: any) =>
+              const alternativeCourses = allCoursesData.filter((course: any) =>
                 course.title === foundCourse.title &&
                 course.id !== foundCourse.id &&
                 course.lessons &&
@@ -142,6 +153,8 @@ const CoursePage: React.FC = () => {
               } else {
                 console.log('❌ No alternative courses found with lessons');
               }
+            } catch (error) {
+              console.error('Error fetching alternative courses:', error);
             }
           }
 
@@ -303,8 +316,15 @@ const CoursePage: React.FC = () => {
           }, [courseId, course]);
         } catch (error) {
           console.error('Error fetching course:', error);
-          // Redirect to courses page if course not found
-          router.push('/courses');
+          let errorMessage = 'Failed to load course. Please try again.';
+
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          }
+
+          // Show error state or redirect
+          setError(errorMessage);
+          console.error('Setting error state:', errorMessage);
         } finally {
           setLoading(false);
         }
@@ -500,6 +520,29 @@ const CoursePage: React.FC = () => {
             <p className="mt-4 text-gray-400">
               {redirecting ? 'Redirecting to video lessons...' : 'Loading course...'}
             </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center h-screen">
+          <div className="text-center max-w-md">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-bold text-white mb-2">Unable to Load Course</h2>
+            <p className="text-gray-400 mb-6">{error}</p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => router.push('/courses')} variant="primary">
+                Back to Courses
+              </Button>
+              <Button onClick={() => window.location.reload()} variant="outline">
+                Retry
+              </Button>
+            </div>
           </div>
         </div>
       </Layout>

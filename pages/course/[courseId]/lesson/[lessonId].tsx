@@ -5,6 +5,7 @@ import VideoPlayer from '../../../../src/components/ui/VideoPlayer';
 import { Course, Lesson } from '../../../../src/types';
 import { useAuth } from '../../../../src/contexts/AuthContext';
 import { validateTokenInCookie } from '../../../../src/lib/validateToken';
+import { courseAPI } from '../../../../src/lib/api';
 
 // Debug utility
 const DEBUG = {
@@ -146,24 +147,29 @@ export default function LessonPage() {
         setError(null);
         DEBUG.log('📡 Starting course data fetch', {
           courseId,
-          lessonId,
-          apiUrl: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/courses/${courseId}`
+          lessonId
         });
 
-          // Fetch course from database API
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/courses/${courseId}`);
+          // Fetch course from database API using authenticated request
+          let courseResponse;
+          try {
+            courseResponse = await courseAPI.getCourse(courseId as string);
+          } catch (error) {
+            console.error('API Request error:', error);
+            throw new Error('Failed to fetch course data. Please check your connection and try again.');
+          }
 
-        DEBUG.log('📡 API Response received', {
-          status: response.status,
-          statusText: response.statusText,
-          ok: response.ok
-        });
+        // Handle wrapped response from API
+        const foundCourse = courseResponse.data || courseResponse;
 
-        if (!response.ok) {
-          throw new Error(`Course not found: ${response.status} ${response.statusText}`);
+        if (!foundCourse || !foundCourse.id) {
+          throw new Error('Course data is invalid or missing');
         }
 
-        const foundCourse = await response.json();
+        DEBUG.log('📡 API Response received', {
+          courseId: foundCourse.id,
+          title: foundCourse.title
+        });
         DEBUG.log('📦 Course data received', {
           courseId: foundCourse.id,
           title: foundCourse.title,

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/contexts/AuthContext';
 import { validateTokenInCookie } from '@/lib/validateToken';
+import { courseAPI } from '@/lib/api';
 
 export default function CourseIndex() {
   const router = useRouter();
@@ -42,58 +43,46 @@ export default function CourseIndex() {
           return;
         }
 
-        // Fetch available courses from the API
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/courses`);
+        // Fetch available courses from the API using authenticated request
+        const coursesResponse = await courseAPI.getAllCourses(false);
+        const coursesData = Array.isArray(coursesResponse) ? coursesResponse : coursesResponse.data || coursesResponse.courses || [];
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch courses');
-        }
-
-        const courses = await response.json();
-
-        if (courses && courses.length > 0) {
+        if (coursesData && coursesData.length > 0) {
           // Get the first available course (or you can implement logic to select a specific course)
-          const selectedCourse = courses[0];
+          const selectedCourse = coursesData[0];
           console.log('Redirecting to course:', selectedCourse.id);
 
           // Fetch the specific course to get its lessons
-          const courseResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/courses/${selectedCourse.id}`);
+          const courseResponse = await courseAPI.getCourse(selectedCourse.id);
+          const courseData = courseResponse.data || courseResponse;
 
-          if (courseResponse.ok) {
-            const courseData = await courseResponse.json();
+          if (courseData && courseData.lessons && courseData.lessons.length > 0) {
+            // Get the first lesson ID
+            const firstLesson = courseData.lessons[0];
+            console.log('Redirecting to lesson:', firstLesson.id);
 
-            if (courseData.lessons && courseData.lessons.length > 0) {
-              // Get the first lesson ID
-              const firstLesson = courseData.lessons[0];
-              console.log('Redirecting to lesson:', firstLesson.id);
+            // Redirect to the selected course's first lesson
+            const targetUrl = `/course/${selectedCourse.id}/lesson/${firstLesson.id}`;
 
-              // Redirect to the selected course's first lesson
-              const targetUrl = `/course/${selectedCourse.id}/lesson/${firstLesson.id}`;
-
-              // Prevent navigation if already on the target route
-              if (router.asPath === targetUrl) {
-                console.log('Already on target lesson, skipping navigation');
-                return;
-              }
-
-              router.replace(targetUrl);
-            } else {
-              // No lessons available, redirect to course page
-              console.log('No lessons available, redirecting to course page');
-              const targetUrl = `/course/${selectedCourse.id}`;
-
-              // Prevent navigation if already on the target route
-              if (router.asPath === targetUrl) {
-                console.log('Already on course page, skipping navigation');
-                return;
-              }
-
-              router.replace(targetUrl);
+            // Prevent navigation if already on the target route
+            if (router.asPath === targetUrl) {
+              console.log('Already on target lesson, skipping navigation');
+              return;
             }
+
+            router.replace(targetUrl);
           } else {
-            // Course not found, redirect to courses page
-            console.log('Course not found, redirecting to courses page');
-            router.replace('/courses');
+            // No lessons available, redirect to course page
+            console.log('No lessons available, redirecting to course page');
+            const targetUrl = `/course/${selectedCourse.id}`;
+
+            // Prevent navigation if already on the target route
+            if (router.asPath === targetUrl) {
+              console.log('Already on course page, skipping navigation');
+              return;
+            }
+
+            router.replace(targetUrl);
           }
         } else {
           // Fallback if no courses are available
