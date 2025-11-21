@@ -41,8 +41,10 @@ export default function AdminDashboardPage() {
 
   const {
     users,
+    students,
     loading: usersLoading,
-    fetchAllUsers
+    fetchAllUsers,
+    fetchStudents
   } = useUsers();
 
   // Check if we're on the client side
