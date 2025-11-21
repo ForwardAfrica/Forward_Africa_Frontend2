@@ -9,7 +9,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const users = await FirestoreService.getUsers();
 
+    console.log('📊 Total users fetched:', users.length);
+    console.log('👥 User roles:', users.map(u => ({ id: u.id, role: u.role })));
+
     const students = users.filter(user => user.role === 'user');
+
+    console.log('📚 Students after filtering:', students.length);
 
     return res.status(200).json({
       success: true,
