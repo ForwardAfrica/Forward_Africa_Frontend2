@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const students = users.filter(user => {
       const isStudent = user.role === 'user';
-      console.log(`Checking user ${u.id}: role="${user.role}" (${typeof user.role}) => isStudent: ${isStudent}`);
+      console.log(`Checking user ${user.id}: role="${user.role}" (${typeof user.role}) => isStudent: ${isStudent}`);
       return isStudent;
     });
 
