@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { limit = '20', lastDocId } = req.query;
       const limitCount = parseInt(limit as string, 10);
 
-      const courses = await FirestoreService.getCourses(limitCount, lastDocId as string);
+      const courses = await FirestoreService.getCourses(limitCount, typeof lastDocId === 'string' ? lastDocId : null);
 
       return res.status(200).json({
         success: true,
