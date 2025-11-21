@@ -66,7 +66,7 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
 // User API
 export const userAPI = {
   // Get all users
-  getUsers: () => apiRequest('/users'),
+  getUsers: () => apiRequest('/users/list'),
 
   // Get user by ID
   getUser: (userId: string) => apiRequest(`/users/${userId}`),
