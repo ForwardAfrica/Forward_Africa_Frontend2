@@ -22,7 +22,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   label,
   className = '',
   previewSize = 'md',
-  required = false
+  required = false,
+  useBase64 = false
 }) => {
   const [preview, setPreview] = useState<string | null>(currentImage || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
