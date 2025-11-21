@@ -5,6 +5,7 @@ import VideoPlayer from '../../../../src/components/ui/VideoPlayer';
 import { Course, Lesson } from '../../../../src/types';
 import { useAuth } from '../../../../src/contexts/AuthContext';
 import { validateTokenInCookie } from '../../../../src/lib/validateToken';
+import { courseAPI } from '../../../../src/lib/api';
 
 // Debug utility
 const DEBUG = {
