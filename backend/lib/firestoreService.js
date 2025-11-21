@@ -138,7 +138,7 @@ class FirestoreService {
         courses.push({ id: doc.id, ...doc.data() });
       });
 
-      return courses;
+      return this.enrichCoursesWithInstructors(courses);
     } catch (error) {
       console.error('❌ Error fetching featured courses:', error);
       throw error;
