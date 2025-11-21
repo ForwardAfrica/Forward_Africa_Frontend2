@@ -617,6 +617,7 @@ export const useAchievements = (userId: string) => {
 // Hook for managing users
 export const useUsers = () => {
   const [users, setUsers] = useState<any[]>([]); // Changed to any[] as User type is removed
+  const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -637,6 +638,28 @@ export const useUsers = () => {
       } catch (err) {
       setError('Failed to fetch users');
       console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchStudents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await userAPI.getStudents();
+      let dataArray: any[] = [];
+      if (Array.isArray(response)) {
+        dataArray = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        dataArray = response.data;
+      } else if (response?.users && Array.isArray(response.users)) {
+        dataArray = response.users;
+      }
+      setStudents(dataArray);
+    } catch (err) {
+      setError('Failed to fetch students');
+      console.error('Error fetching students:', err);
     } finally {
       setLoading(false);
     }
