@@ -43,6 +43,7 @@ const CoursePage: React.FC = () => {
   });
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { courses: allCourses, loading: coursesLoading, fetchAllCourses } = useCourses();
 
   // Set client flag on mount to prevent hydration issues
   useEffect(() => {
@@ -58,6 +59,17 @@ const CoursePage: React.FC = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
+
+  // Fetch all courses on component mount
+  useEffect(() => {
+    if (authLoading || !isAuthenticated || !hasCheckedToken) {
+      return;
+    }
+
+    if (allCourses.length === 0 && !coursesLoading) {
+      fetchAllCourses();
+    }
+  }, [authLoading, isAuthenticated, hasCheckedToken, allCourses.length, coursesLoading, fetchAllCourses]);
 
   useEffect(() => {
     if (courseId && isClient) {
@@ -75,15 +87,50 @@ const CoursePage: React.FC = () => {
       if (courseId && typeof courseId === 'string') {
         try {
           setLoading(true);
+          setError(null);
           console.log('Fetching course data for:', courseId);
 
-          // Fetch course from database API using the authenticated API request
-          let courseResponse;
-          try {
-            courseResponse = await courseAPI.getCourse(courseId);
-          } catch (error) {
-            console.error('API Request error:', error);
-            throw new Error('Failed to fetch course data. Please check your connection and try again.');
+          // First: Try to find the course in the already-loaded courses list
+          let foundCourse = allCourses.find(c => c.id === courseId);
+
+          if (foundCourse) {
+            console.log('✅ Found course in local cache:', foundCourse.id);
+          } else {
+            // Second: If not found locally, try to fetch from API with retry logic
+            console.log('📡 Course not in cache, fetching from API...');
+
+            let courseResponse;
+            try {
+              courseResponse = await courseAPI.getCourse(courseId);
+            } catch (error) {
+              console.error('API Request error:', error);
+
+              // Third: If API fails, try to fetch all courses and find it
+              console.log('🔄 API request failed, attempting to fetch all courses...');
+              try {
+                await fetchAllCourses();
+                foundCourse = allCourses.find(c => c.id === courseId);
+
+                if (!foundCourse) {
+                  throw new Error('Course not found in database');
+                }
+              } catch (fallbackError) {
+                console.error('Fallback fetch error:', fallbackError);
+                throw new Error('Failed to fetch course data. Please check your connection and try again.');
+              }
+
+              if (foundCourse) {
+                // Skip the response processing below and go straight to course setup
+                const baseFoundCourse = foundCourse;
+                const transformedCourse = { ...baseFoundCourse };
+                setCourse(transformedCourse);
+                setLoading(false);
+                return;
+              }
+            }
+
+            // If API call succeeded, process the response
+            foundCourse = courseResponse.data || courseResponse;
           }
 
           // Handle wrapped response from API
