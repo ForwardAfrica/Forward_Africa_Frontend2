@@ -648,8 +648,26 @@ class FirestoreService {
       const db = getFirestore();
       const docRef = db.collection('users').doc(userId);
 
+      // Normalize field names - ensure both variants are written
+      const normalizedData = { ...userData };
+      if (userData.full_name) {
+        normalizedData.full_name = userData.full_name;
+        normalizedData.displayName = userData.full_name;
+      } else if (userData.displayName) {
+        normalizedData.displayName = userData.displayName;
+        normalizedData.full_name = userData.displayName;
+      }
+
+      if (userData.avatar_url) {
+        normalizedData.avatar_url = userData.avatar_url;
+        normalizedData.photoURL = userData.avatar_url;
+      } else if (userData.photoURL) {
+        normalizedData.photoURL = userData.photoURL;
+        normalizedData.avatar_url = userData.photoURL;
+      }
+
       await docRef.set({
-        ...userData,
+        ...normalizedData,
         updated_at: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
     } catch (error) {
@@ -663,8 +681,26 @@ class FirestoreService {
       const db = getFirestore();
       const docRef = db.collection('users').doc(userId);
 
+      // Normalize field names - ensure both variants are written
+      const normalizedData = { ...userData };
+      if (userData.full_name) {
+        normalizedData.full_name = userData.full_name;
+        normalizedData.displayName = userData.full_name;
+      } else if (userData.displayName) {
+        normalizedData.displayName = userData.displayName;
+        normalizedData.full_name = userData.displayName;
+      }
+
+      if (userData.avatar_url) {
+        normalizedData.avatar_url = userData.avatar_url;
+        normalizedData.photoURL = userData.avatar_url;
+      } else if (userData.photoURL) {
+        normalizedData.photoURL = userData.photoURL;
+        normalizedData.avatar_url = userData.photoURL;
+      }
+
       await docRef.set({
-        ...userData,
+        ...normalizedData,
         created_at: admin.firestore.FieldValue.serverTimestamp(),
         updated_at: admin.firestore.FieldValue.serverTimestamp()
       });

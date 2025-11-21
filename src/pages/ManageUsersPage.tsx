@@ -98,7 +98,7 @@ const ManageUsersPage: React.FC = () => {
     if (dbUsers && dbUsers.length > 0) {
       const convertedUsers: UserData[] = dbUsers.map(dbUser => ({
         id: dbUser.id,
-        name: dbUser.full_name || 'Unknown User',
+        name: dbUser.full_name || dbUser.displayName || dbUser.fullName || dbUser.email || 'Unknown User',
         email: dbUser.email,
         status: 'active', // Default to active since we don't have status field in DB
         role: dbUser.role || 'user',
@@ -106,7 +106,7 @@ const ManageUsersPage: React.FC = () => {
         lastActive: formatDate(dbUser.updated_at),
         coursesEnrolled: 0, // Will be calculated from user_progress table later
         coursesCompleted: 0, // Will be calculated from user_progress table later
-        avatar: dbUser.avatar_url
+        avatar: dbUser.avatar_url || dbUser.photoURL || dbUser.avatarUrl
       }));
       setUsers(convertedUsers);
     } else {

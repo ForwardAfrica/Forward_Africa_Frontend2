@@ -160,13 +160,19 @@ const Header: React.FC = () => {
                     aria-expanded={isProfileOpen}
                     aria-haspopup="true"
                   >
-                    {profile?.avatar_url ? (
+                    {profile?.avatar_url || profile?.photoURL || profile?.avatarUrl ? (
                       <Image
-                        src={profile.avatar_url}
-                        alt={profile.full_name || 'User'}
+                        src={profile.avatar_url || profile.photoURL || profile.avatarUrl || '/images/placeholder-avatar.jpg'}
+                        alt={profile.full_name || profile.displayName || profile.fullName || 'User'}
                         width={24}
                         height={24}
                         className="rounded-full object-cover border border-gray-600 w-5 h-5 sm:w-6 sm:h-6"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== '/images/placeholder-avatar.jpg') {
+                            target.src = '/images/placeholder-avatar.jpg';
+                          }
+                        }}
                       />
                     ) : (
                       <User className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -179,7 +185,7 @@ const Header: React.FC = () => {
                     <div className="absolute top-full right-0 mt-2 w-48 sm:w-56 brand-surface rounded-lg shadow-xl py-2 border border-white/10 z-50">
                       <div className="px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-700">
                         <p className="text-xs sm:text-sm font-medium text-white truncate">
-                          {profile?.full_name || user?.email || 'User'}
+                          {profile?.full_name || profile?.displayName || profile?.fullName || user?.email || 'User'}
                         </p>
                         <p className="text-[10px] sm:text-xs text-gray-400 mt-1 truncate">
                           {user?.email}
