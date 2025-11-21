@@ -17,9 +17,9 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('forward_africa_token') : null;
 
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(typeof options.headers === 'object' && !Array.isArray(options.headers) ? options.headers : {}),
     };
 
     if (token) {
