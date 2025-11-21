@@ -91,7 +91,8 @@ class FirestoreService {
       const doc = await db.collection('courses').doc(courseId).get();
 
       if (doc.exists) {
-        return { id: doc.id, ...doc.data() };
+        const course = { id: doc.id, ...doc.data() };
+        return this.enrichCourseWithInstructor(course);
       }
       return null;
     } catch (error) {
