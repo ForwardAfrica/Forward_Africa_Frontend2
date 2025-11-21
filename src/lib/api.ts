@@ -19,8 +19,20 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...(typeof options.headers === 'object' && !Array.isArray(options.headers) ? options.headers : {}),
     };
+
+    // Handle existing headers from options
+    if (options.headers) {
+      if (options.headers instanceof Headers) {
+        // Convert Headers object to plain object
+        options.headers.forEach((value, key) => {
+          headers[key] = value;
+        });
+      } else if (typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+        // Merge plain object headers
+        Object.assign(headers, options.headers);
+      }
+    }
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
