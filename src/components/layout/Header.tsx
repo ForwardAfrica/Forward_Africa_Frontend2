@@ -185,7 +185,7 @@ const Header: React.FC = () => {
                     <div className="absolute top-full right-0 mt-2 w-48 sm:w-56 brand-surface rounded-lg shadow-xl py-2 border border-white/10 z-50">
                       <div className="px-3 sm:px-4 py-2 sm:py-3 border-b border-gray-700">
                         <p className="text-xs sm:text-sm font-medium text-white truncate">
-                          {profile?.full_name || user?.email || 'User'}
+                          {profile?.full_name || profile?.displayName || profile?.fullName || user?.email || 'User'}
                         </p>
                         <p className="text-[10px] sm:text-xs text-gray-400 mt-1 truncate">
                           {user?.email}
