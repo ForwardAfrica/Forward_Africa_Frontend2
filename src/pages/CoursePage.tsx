@@ -42,6 +42,7 @@ const CoursePage: React.FC = () => {
   });
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInstructorInfo, setShowInstructorInfo] = useState(false);
   const { courses: allCourses, loading: coursesLoading, fetchAllCourses } = useCourses();
 
   // Set client flag on mount to prevent hydration issues
@@ -622,37 +623,8 @@ const CoursePage: React.FC = () => {
     }
   })();
 
-  // Debug info for troubleshooting
-  const debugInfo = {
-    courseId: courseId,
-    courseTitle: course.title,
-    lessonsCount: course.lessons.length,
-    selectedLesson: selectedLesson,
-    progress: progress,
-    hasLessons: course.lessons.length > 0,
-    isComingSoon: course.comingSoon,
-    instructor: instructorInfo.name,
-    category: course.category,
-    featured: course.featured,
-    totalXP: course.totalXP
-  };
-
   return (
     <Layout>
-      {/* Debug Info - Remove in production */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed top-4 right-4 bg-black bg-opacity-90 text-white p-4 rounded-lg text-xs max-w-xs z-50">
-          <h4 className="font-bold mb-2">🐛 Debug Info</h4>
-          <div className="space-y-1">
-            <div><strong>Course:</strong> {debugInfo.courseTitle}</div>
-            <div><strong>Lesson:</strong> {course.lessons[0]?.title || 'None'}</div>
-            <div><strong>Progress:</strong> {debugInfo.progress.toFixed(1)}%</div>
-            <div><strong>Auth:</strong> Logged in</div>
-            <div><strong>Error:</strong> {course.lessons.length === 0 ? 'No lessons available' : 'None'}</div>
-          </div>
-        </div>
-      )}
-
       <div className="pb-16">
         {/* Course Completion Notification */}
         {showCompletionNotification && (
@@ -885,44 +857,102 @@ const CoursePage: React.FC = () => {
 
         {/* Instructor Bio */}
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <h2 className="text-white text-2xl font-bold mb-6">About {instructorInfo.name}</h2>
-          <div className="flex flex-col md:flex-row md:space-x-8">
-            <div className="md:w-1/3 mb-6 md:mb-0">
-              {instructorInfo.image.startsWith('http') ? (
-                <img
-                  src={instructorInfo.image}
-                  alt={instructorInfo.name}
-                  className="w-full h-auto rounded-lg"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== '/images/placeholder-avatar.jpg') {
-                      target.src = '/images/placeholder-avatar.jpg';
-                    }
-                  }}
-                />
-              ) : (
-                <Image
-                  src={instructorInfo.image}
-                  alt={instructorInfo.name}
-                  width={400}
-                  height={300}
-                  className="w-full h-auto rounded-lg"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== '/images/placeholder-avatar.jpg') {
-                      target.src = '/images/placeholder-avatar.jpg';
-                    }
-                  }}
-                />
-              )}
-            </div>
-            <div className="md:w-2/3">
-              <h3 className="text-white text-xl font-medium mb-2">{instructorInfo.name}</h3>
-              <p className="text-red-500 font-medium mb-4">{instructorInfo.title}</p>
-              <p className="text-gray-300">{instructorInfo.bio}</p>
-              <Button className="mt-6" variant="primary">View All Classes</Button>
+          {/* Instructor Header with View More Button */}
+          <div className="bg-gray-800 rounded-lg p-6 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                {instructorInfo.image.startsWith('http') ? (
+                  <img
+                    src={instructorInfo.image}
+                    alt={instructorInfo.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== '/images/placeholder-avatar.jpg') {
+                        target.src = '/images/placeholder-avatar.jpg';
+                      }
+                    }}
+                  />
+                ) : (
+                  <Image
+                    src={instructorInfo.image}
+                    alt={instructorInfo.name}
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== '/images/placeholder-avatar.jpg') {
+                        target.src = '/images/placeholder-avatar.jpg';
+                      }
+                    }}
+                  />
+                )}
+                <div>
+                  <h3 className="text-white text-lg font-medium">{instructorInfo.name}</h3>
+                  <p className="text-red-500 font-medium text-sm">{instructorInfo.title}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowInstructorInfo(!showInstructorInfo)}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors font-medium flex items-center"
+              >
+                {showInstructorInfo ? (
+                  <>
+                    <ChevronUp className="h-4 w-4 mr-2" />
+                    Hide Information
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4 mr-2" />
+                    View More Information
+                  </>
+                )}
+              </button>
             </div>
           </div>
+
+          {/* Expanded Instructor Info */}
+          {showInstructorInfo && (
+            <div className="flex flex-col md:flex-row md:space-x-8">
+              <div className="md:w-1/3 mb-6 md:mb-0">
+                {instructorInfo.image.startsWith('http') ? (
+                  <img
+                    src={instructorInfo.image}
+                    alt={instructorInfo.name}
+                    className="w-full h-auto rounded-lg"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== '/images/placeholder-avatar.jpg') {
+                        target.src = '/images/placeholder-avatar.jpg';
+                      }
+                    }}
+                  />
+                ) : (
+                  <Image
+                    src={instructorInfo.image}
+                    alt={instructorInfo.name}
+                    width={400}
+                    height={300}
+                    className="w-full h-auto rounded-lg"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (target.src !== '/images/placeholder-avatar.jpg') {
+                        target.src = '/images/placeholder-avatar.jpg';
+                      }
+                    }}
+                  />
+                )}
+              </div>
+              <div className="md:w-2/3 bg-gray-800 rounded-lg p-6">
+                <h3 className="text-white text-xl font-medium mb-2">{instructorInfo.name}</h3>
+                <p className="text-red-500 font-medium mb-4">{instructorInfo.title}</p>
+                <h4 className="text-white font-semibold mb-3">Professional Biography</h4>
+                <p className="text-gray-300 mb-6">{instructorInfo.bio}</p>
+                <Button className="mt-4" variant="primary">View All Classes</Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Layout>
