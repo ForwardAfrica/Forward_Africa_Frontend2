@@ -48,7 +48,7 @@ import Layout from '../components/layout/Layout';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'instructors' | 'analytics' | 'audit'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'instructors' | 'students' | 'analytics' | 'audit'>('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedInstructor, setSelectedInstructor] = useState<string>('all');
@@ -58,6 +58,9 @@ const AdminPage: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [instructorViewType, setInstructorViewType] = useState<'card' | 'table'>('card');
+  const [students, setStudents] = useState<any[]>([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsError, setStudentsError] = useState<string | null>(null);
 
   // Get user permissions
   const { userRole, hasPermission } = usePermissions();
@@ -170,6 +173,13 @@ const AdminPage: React.FC = () => {
     }
   }, [permissionError]);
 
+  // Fetch students when students tab is active
+  useEffect(() => {
+    if (isClient && activeTab === 'students') {
+      fetchStudents();
+    }
+  }, [activeTab, isClient]);
+
   const logAuditEvent = (action: string, details: string) => {
     if (!isClient) return;
 
@@ -268,6 +278,27 @@ const AdminPage: React.FC = () => {
   const handleViewCourse = (course: Course) => {
     setSelectedCourse(course);
     setShowCourseModal(true);
+  };
+
+  const fetchStudents = async () => {
+    try {
+      setStudentsLoading(true);
+      setStudentsError(null);
+      const response = await fetch('/api/admin/students');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch students');
+      }
+
+      const data = await response.json();
+      setStudents(data.data || []);
+    } catch (error) {
+      console.error('❌ Error fetching students:', error);
+      setStudentsError(error instanceof Error ? error.message : 'Failed to fetch students');
+    } finally {
+      setStudentsLoading(false);
+    }
   };
 
   // Show loading state during SSR
@@ -494,6 +525,7 @@ const AdminPage: React.FC = () => {
             { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
             { id: 'courses', label: 'Courses', icon: BookOpen },
             { id: 'instructors', label: 'Instructors', icon: Users },
+            { id: 'students', label: 'Students', icon: GraduationCap },
             { id: 'analytics', label: 'Analytics', icon: TrendingUp },
             { id: 'audit', label: 'Audit Logs', icon: Activity }
           ]).map(({ id, label, icon: Icon }) => (
@@ -1267,6 +1299,132 @@ const AdminPage: React.FC = () => {
               </Button>
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === 'students' && (
+        <div className="space-y-6">
+          {/* Students Management Header */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Students Management</h2>
+              <p className="text-gray-400">View and manage all registered students</p>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="bg-gray-800 rounded-lg p-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search students by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </div>
+          </div>
+
+          {/* Error Message */}
+          {studentsError && (
+            <div className="mb-6">
+              <ErrorMessage
+                title="Error Loading Students"
+                message={studentsError}
+                onClose={() => setStudentsError(null)}
+              />
+            </div>
+          )}
+
+          {/* Students Table */}
+          <div className="bg-gray-800 rounded-lg overflow-hidden">
+            {studentsLoading ? (
+              <div className="text-center py-12">
+                <div className="flex items-center justify-center h-20">
+                  <div className="flex items-center space-x-3">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+                    <span className="text-white text-lg">Loading students...</span>
+                  </div>
+                </div>
+              </div>
+            ) : students.length === 0 ? (
+              <div className="text-center py-12">
+                <GraduationCap className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-white text-lg font-medium mb-2">No students found</h3>
+                <p className="text-gray-400">There are currently no registered students in the system.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-700">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Phone</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Joined Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-700">
+                    {students
+                      .filter(student => {
+                        const fullName = `${student.first_name || ''} ${student.last_name || ''}`.toLowerCase();
+                        const email = (student.email || '').toLowerCase();
+                        const searchLower = searchTerm.toLowerCase();
+                        return fullName.includes(searchLower) || email.includes(searchLower);
+                      })
+                      .map((student) => (
+                        <tr key={student.id} className="hover:bg-gray-700/50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <img
+                                src={student.photoURL || '/images/placeholder-avatar.jpg'}
+                                alt={`${student.first_name} ${student.last_name}`}
+                                className="h-10 w-10 rounded-full object-cover mr-3"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/images/placeholder-avatar.jpg';
+                                }}
+                              />
+                              <div>
+                                <div className="text-sm font-medium text-white">
+                                  {student.first_name && student.last_name
+                                    ? `${student.first_name} ${student.last_name}`
+                                    : student.full_name || student.displayName || 'Unknown'}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {student.email || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {student.phone || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {student.created_at
+                              ? new Date(student.created_at.toDate ? student.created_at.toDate() : student.created_at).toLocaleDateString()
+                              : 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-500/20 text-green-400">
+                              Active
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Student Count */}
+          <div className="bg-gray-800 rounded-lg p-6">
+            <div className="text-sm text-gray-400">
+              Total Students: <span className="text-2xl font-bold text-white">{students.length}</span>
+            </div>
+          </div>
         </div>
       )}
 
