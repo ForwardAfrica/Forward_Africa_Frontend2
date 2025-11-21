@@ -273,6 +273,27 @@ const AdminPage: React.FC = () => {
     setShowCourseModal(true);
   };
 
+  const fetchStudents = async () => {
+    try {
+      setStudentsLoading(true);
+      setStudentsError(null);
+      const response = await fetch('/api/admin/students');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch students');
+      }
+
+      const data = await response.json();
+      setStudents(data.data || []);
+    } catch (error) {
+      console.error('❌ Error fetching students:', error);
+      setStudentsError(error instanceof Error ? error.message : 'Failed to fetch students');
+    } finally {
+      setStudentsLoading(false);
+    }
+  };
+
   // Show loading state during SSR
   if (!isClient) {
     return (
