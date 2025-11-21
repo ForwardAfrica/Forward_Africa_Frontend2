@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, User, Mail, Shield, Eye, EyeOff, Save, CheckCircle, AlertTriangle, Lock, Activity, Calendar, Crown, UserPlus } from 'lucide-react';
+import { ArrowLeft, User, Mail, Shield, Eye, EyeOff, Save, CheckCircle, AlertTriangle, Lock, Activity, Calendar, Crown, UserPlus, Users } from 'lucide-react';
 import Button from '../components/ui/Button';
 import { useNavigate } from '../lib/router';
 import { useAuth } from '../contexts/AuthContext';
