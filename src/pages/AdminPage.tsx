@@ -48,7 +48,7 @@ import Layout from '../components/layout/Layout';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'instructors' | 'analytics' | 'audit'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'courses' | 'instructors' | 'students' | 'analytics' | 'audit'>('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedInstructor, setSelectedInstructor] = useState<string>('all');
@@ -58,6 +58,9 @@ const AdminPage: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [instructorViewType, setInstructorViewType] = useState<'card' | 'table'>('card');
+  const [students, setStudents] = useState<any[]>([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsError, setStudentsError] = useState<string | null>(null);
 
   // Get user permissions
   const { userRole, hasPermission } = usePermissions();
