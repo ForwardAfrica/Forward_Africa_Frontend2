@@ -138,6 +138,27 @@ const convertFirebaseUserWithFallback = (uid: string, email: string | null, disp
 };
 
 export const firebaseAuthService = {
+  // Listen to Firebase Auth state changes
+  onAuthStateChanged: (callback: (user: FirebaseUser | null) => void) => {
+    return firebaseOnAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Get backend user data
+        const backendData = await getUserDataFromBackend(firebaseUser.uid);
+        const user = convertFirebaseUserWithFallback(
+          firebaseUser.uid,
+          firebaseUser.email,
+          firebaseUser.displayName,
+          firebaseUser.photoURL,
+          firebaseUser.emailVerified,
+          backendData
+        );
+        callback(user);
+      } else {
+        callback(null);
+      }
+    });
+  },
+
   // Get current user from Firebase Auth
   getCurrentUser: () => {
     return auth.currentUser;
