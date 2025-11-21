@@ -712,10 +712,12 @@ export const useUsers = () => {
 
   return {
     users,
+    students,
     loading,
     error,
     fetchAllUsers,
     fetchUserById,
+    fetchStudents,
     createUser,
     updateUser,
   };
