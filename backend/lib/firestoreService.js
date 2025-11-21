@@ -239,6 +239,26 @@ class FirestoreService {
     }
   }
 
+  static async createCategory(categoryData) {
+    try {
+      const db = getFirestore();
+      const categoryId = categoryData.id || categoryData.name.toLowerCase().replace(/\s+/g, '-');
+
+      const category = {
+        name: categoryData.name,
+        id: categoryId,
+        created_at: admin.firestore.FieldValue.serverTimestamp(),
+        updated_at: admin.firestore.FieldValue.serverTimestamp()
+      };
+
+      await db.collection('categories').doc(categoryId).set(category);
+      return { id: categoryId, ...category };
+    } catch (error) {
+      console.error('❌ Error creating category:', error);
+      throw error;
+    }
+  }
+
   // ============================================================================
   // INSTRUCTORS
   // ============================================================================
