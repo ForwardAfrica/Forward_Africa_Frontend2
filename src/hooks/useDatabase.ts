@@ -27,8 +27,8 @@ export const useCourses = () => {
         dataArray = response as any[];
       } else if (response && response.data && Array.isArray(response.data)) {
         dataArray = response.data as any[];
-      } else if (response && response.data && Array.isArray(response.data)) {
-        dataArray = response.data as any[];
+      } else if (response && response.courses && Array.isArray(response.courses)) {
+        dataArray = response.courses as any[];
       }
 
       const first = dataArray[0] as any | undefined;
