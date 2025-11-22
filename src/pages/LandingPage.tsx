@@ -177,6 +177,7 @@ const mockTrendingCourses: Course[] = [
 ];
 
 const LandingPage: React.FC = () => {
+  const router = useRouter();
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [trendingCourses, setTrendingCourses] = useState<Course[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
