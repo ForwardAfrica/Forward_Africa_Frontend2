@@ -182,12 +182,36 @@ const LandingPage: React.FC = () => {
   const [trendingCourses, setTrendingCourses] = useState<Course[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading, isAuthenticated } = useAuth();
   const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses } = useCourses();
 
   const handleGoogleSignIn = async () => {
-    // Navigate to the main login page for better user experience
-    router.push('/login');
+    // If not authenticated, go to login
+    // If authenticated, navigate to first available course and its first lesson
+
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+
+    // Get first available course with lessons
+    const availableCourses = courses.filter(course =>
+      !course.comingSoon && course.lessons && course.lessons.length > 0
+    );
+
+    if (availableCourses.length > 0) {
+      const firstCourse = availableCourses[0];
+      const firstLesson = firstCourse.lessons[0];
+
+      if (firstLesson && firstLesson.id) {
+        // Navigate to first lesson of first course (same pattern as CoursePage)
+        router.push(`/course/${firstCourse.id}/lesson/${firstLesson.id}`);
+        return;
+      }
+    }
+
+    // Fallback: navigate to courses page if no lessons available
+    router.push('/courses');
   };
 
   useEffect(() => {
