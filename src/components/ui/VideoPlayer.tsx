@@ -692,12 +692,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       cc_load_policy: '0',
       iv_load_policy: '3',
       playsinline: '1',
-      allowfullscreen: '1',
       disablekb: '0',
-      widget_referrer: window.location.origin
+      widget_referrer: window.location.origin,
+      ecver: '2'
     });
 
-    const embedUrl = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+    const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
     console.log('🎬 Generated YouTube embed URL:', embedUrl);
     return embedUrl;
   };
