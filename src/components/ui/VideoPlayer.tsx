@@ -42,30 +42,67 @@ const YouTubeHideBrandingStyles = `
 
   .youtube-container .ytp-watermark {
     display: none !important;
+    visibility: hidden !important;
   }
 
   .youtube-container .ytp-attribution {
     display: none !important;
+    visibility: hidden !important;
   }
 
   .youtube-container .ytp-title {
     display: none !important;
+    visibility: hidden !important;
   }
 
   .youtube-container .ytp-youtube-button {
     display: none !important;
+    visibility: hidden !important;
   }
 
   .youtube-container .ytp-endscreen-content {
     display: none !important;
+    visibility: hidden !important;
   }
 
   .youtube-container .ytp-endscreen-element {
     display: none !important;
+    visibility: hidden !important;
   }
 
   .youtube-container .ytp-suggestion-set {
     display: none !important;
+    visibility: hidden !important;
+  }
+
+  .youtube-container .ytp-logo {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  .youtube-container .ytp-watch-on-youtube {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  .youtube-container .ytp-pause-overlay {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  .youtube-container .ytp-pause-overlay-container {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  .youtube-container .ytp-show-cards-button {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  .youtube-container .ytp-cards-button {
+    display: none !important;
+    visibility: hidden !important;
   }
 `;
 
