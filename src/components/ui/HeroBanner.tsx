@@ -388,31 +388,14 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
             )}
             {bannerConfig?.homepage_banner_button_text && (
               <div className="flex space-x-4">
-                {bannerConfig.homepage_banner_button_url ? (
-                  <a
-                    href={bannerConfig.homepage_banner_button_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button
-                      variant="primary"
-                      size="lg"
-                      className="group"
-                    >
-                      <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                      {bannerConfig.homepage_banner_button_text}
-                    </Button>
-                  </a>
-                ) : (
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="group"
-                  >
-                    <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                    {bannerConfig.homepage_banner_button_text}
-                  </Button>
-                )}
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="group"
+                >
+                  <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+                  {bannerConfig.homepage_banner_button_text}
+                </Button>
               </div>
             )}
           </>
