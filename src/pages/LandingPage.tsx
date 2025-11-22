@@ -295,6 +295,7 @@ const LandingPage: React.FC = () => {
 
               <div className="mb-6 sm:mb-7 md:mb-8 lg:mb-10 px-4">
                 <Button
+                  onClick={handleStartLearning}
                   variant="primary"
                   size="lg"
                   className="group w-full sm:w-auto"
