@@ -597,7 +597,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       cc_load_policy: '0',
       iv_load_policy: '3',
       playsinline: '1',
-      allowfullscreen: '1'
+      allowfullscreen: '1',
+      disablekb: '0',
+      widget_referrer: window.location.origin
     });
 
     const embedUrl = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
