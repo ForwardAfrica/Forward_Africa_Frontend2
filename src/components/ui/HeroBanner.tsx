@@ -389,6 +389,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
             {bannerConfig?.homepage_banner_button_text && (
               <div className="flex space-x-4">
                 <Button
+                  onClick={() => onPlay(course.id || 'default-course')}
                   variant="primary"
                   size="lg"
                   className="group"
