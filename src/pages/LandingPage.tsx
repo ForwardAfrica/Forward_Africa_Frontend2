@@ -493,11 +493,9 @@ const LandingPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={handleGoogleSignIn}
-                  disabled={isSigningIn}
                   className="group w-full sm:w-auto"
                 >
-                  {isSigningIn ? 'Joining...' : 'Master Your Craft, Move Forward.'}
+                  Master Your Craft, Move Forward.
                   <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -558,11 +556,9 @@ const LandingPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={handleGoogleSignIn}
-                  disabled={isSigningIn}
                   className="group w-full sm:w-auto"
                 >
-                  {isSigningIn ? 'Investing...' : 'Invest in your Career.'}
+                  Invest in your Career.
                   <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -636,11 +632,9 @@ const LandingPage: React.FC = () => {
               <Button
                 variant="primary"
                 size="lg"
-                onClick={handleGoogleSignIn}
-                disabled={isSigningIn}
                 className="group w-full sm:w-auto"
               >
-                {isSigningIn ? 'Starting...' : 'Start Learning Today'}
+                Start Learning Today
                 <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
