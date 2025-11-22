@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ChevronRight, ChevronLeft, ChevronDown, Brain, Users, TrendingUp, Globe, Clock } from 'lucide-react';
 import Button from '../components/ui/Button';
@@ -177,43 +176,12 @@ const mockTrendingCourses: Course[] = [
 ];
 
 const LandingPage: React.FC = () => {
-  const [isSigningIn, setIsSigningIn] = useState(false);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [trendingCourses, setTrendingCourses] = useState<Course[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
   const { loading: authLoading, isAuthenticated } = useAuth();
-  const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses, loading: coursesLoading } = useCourses();
+  const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses } = useCourses();
 
-  const handleGoogleSignIn = async () => {
-    setIsSigningIn(true);
-
-    try {
-      // Use trendingCourses if available, otherwise find first available course
-      let courseToNavigateTo: Course | undefined;
-
-      if (trendingCourses.length > 0) {
-        courseToNavigateTo = trendingCourses[0];
-      } else if (courses.length > 0) {
-        // If trendingCourses not set yet, use first available course from all courses
-        courseToNavigateTo = courses.find(c => !c.comingSoon);
-      }
-
-      if (courseToNavigateTo && courseToNavigateTo.id) {
-        // Navigate to the course - same as clicking a course card
-        // CoursePage will automatically load the course data and select the first lesson
-        router.push(`/course/${courseToNavigateTo.id}`);
-      } else {
-        // No available courses, go to courses list page
-        router.push('/courses');
-      }
-    } catch (error) {
-      console.error('Error navigating to course:', error);
-      router.push('/courses');
-    } finally {
-      setIsSigningIn(false);
-    }
-  };
 
   useEffect(() => {
     fetchAllCourses(false); // Don't include coming soon courses
@@ -321,11 +289,9 @@ const LandingPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={handleGoogleSignIn}
-                  disabled={isSigningIn}
                   className="group w-full sm:w-auto"
                 >
-                  {isSigningIn ? 'Preparing...' : 'Start Learning Today'}
+                  Start Learning Today
                   <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -524,11 +490,9 @@ const LandingPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={handleGoogleSignIn}
-                  disabled={isSigningIn}
                   className="group w-full sm:w-auto"
                 >
-                  {isSigningIn ? 'Joining...' : 'Master Your Craft, Move Forward.'}
+                  Master Your Craft, Move Forward.
                   <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -589,11 +553,9 @@ const LandingPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={handleGoogleSignIn}
-                  disabled={isSigningIn}
                   className="group w-full sm:w-auto"
                 >
-                  {isSigningIn ? 'Investing...' : 'Invest in your Career.'}
+                  Invest in your Career.
                   <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
@@ -667,11 +629,9 @@ const LandingPage: React.FC = () => {
               <Button
                 variant="primary"
                 size="lg"
-                onClick={handleGoogleSignIn}
-                disabled={isSigningIn}
                 className="group w-full sm:w-auto"
               >
-                {isSigningIn ? 'Starting...' : 'Start Learning Today'}
+                Start Learning Today
                 <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
