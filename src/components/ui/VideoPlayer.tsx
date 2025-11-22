@@ -28,6 +28,47 @@ import { useVideoTracking } from '../../hooks/useVideoTracking';
 import RealTimeProgress from './RealTimeProgress';
 import videoProgressService from '../../lib/videoProgressService';
 
+// CSS to hide YouTube branding
+const YouTubeHideBrandingStyles = `
+  .youtube-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .youtube-container iframe {
+    border: none !important;
+    display: block;
+  }
+
+  .youtube-container .ytp-watermark {
+    display: none !important;
+  }
+
+  .youtube-container .ytp-attribution {
+    display: none !important;
+  }
+
+  .youtube-container .ytp-title {
+    display: none !important;
+  }
+
+  .youtube-container .ytp-youtube-button {
+    display: none !important;
+  }
+
+  .youtube-container .ytp-endscreen-content {
+    display: none !important;
+  }
+
+  .youtube-container .ytp-endscreen-element {
+    display: none !important;
+  }
+
+  .youtube-container .ytp-suggestion-set {
+    display: none !important;
+  }
+`;
+
 interface VideoPlayerProps {
   /** Lesson containing video information */
   lesson: Lesson;
@@ -318,6 +359,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
   }, [isYouTube, youTubeId, lesson.title]);
 
+  // Inject YouTube branding hiding styles
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const styleId = 'youtube-hide-branding-styles';
+    if (!document.getElementById(styleId)) {
+      const styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      styleElement.innerHTML = YouTubeHideBrandingStyles;
+      document.head.appendChild(styleElement);
+    }
+
+    return () => {
+      // Keep the styles in document for duration of app
+    };
+  }, []);
+
   // Start video session when component mounts
   useEffect(() => {
     if (courseId && lesson.id) {
@@ -597,7 +655,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       cc_load_policy: '0',
       iv_load_policy: '3',
       playsinline: '1',
-      allowfullscreen: '1'
+      allowfullscreen: '1',
+      disablekb: '0',
+      widget_referrer: window.location.origin
     });
 
     const embedUrl = `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
