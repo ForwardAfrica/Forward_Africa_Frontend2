@@ -177,13 +177,11 @@ const mockTrendingCourses: Course[] = [
 ];
 
 const LandingPage: React.FC = () => {
-  const [isSigningIn, setIsSigningIn] = useState(false);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [trendingCourses, setTrendingCourses] = useState<Course[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
   const { loading: authLoading, isAuthenticated } = useAuth();
-  const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses, loading: coursesLoading } = useCourses();
+  const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses } = useCourses();
 
 
   useEffect(() => {
