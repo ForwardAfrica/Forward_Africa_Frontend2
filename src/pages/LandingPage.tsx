@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ChevronRight, ChevronLeft, ChevronDown, Brain, Users, TrendingUp, Globe, Clock } from 'lucide-react';
 import Button from '../components/ui/Button';
