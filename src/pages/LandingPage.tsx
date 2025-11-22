@@ -182,13 +182,12 @@ const LandingPage: React.FC = () => {
   const [trendingCourses, setTrendingCourses] = useState<Course[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading, isAuthenticated } = useAuth();
   const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses } = useCourses();
 
   const handleGoogleSignIn = async () => {
     // If not authenticated, go to login
     // If authenticated, navigate to first available course and its first lesson
-    const { isAuthenticated } = useAuth();
 
     if (!isAuthenticated) {
       router.push('/login');
