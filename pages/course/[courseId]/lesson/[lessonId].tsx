@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { Play, Clock, ChevronLeft, ChevronRight, BookOpen, CheckCircle, Trash2 } from 'lucide-react';
+import { Play, Clock, ChevronLeft, ChevronRight, BookOpen, CheckCircle } from 'lucide-react';
 import VideoPlayer from '../../../../src/components/ui/VideoPlayer';
 import { Course, Lesson } from '../../../../src/types';
 import { useAuth } from '../../../../src/contexts/AuthContext';
