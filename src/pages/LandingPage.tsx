@@ -292,11 +292,9 @@ const LandingPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={handleGoogleSignIn}
-                  disabled={isSigningIn}
                   className="group w-full sm:w-auto"
                 >
-                  {isSigningIn ? 'Preparing...' : 'Start Learning Today'}
+                  Start Learning Today
                   <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
