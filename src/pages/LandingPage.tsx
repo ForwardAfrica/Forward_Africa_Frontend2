@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { ChevronRight, ChevronLeft, ChevronDown, Brain, Users, TrendingUp, Globe, Clock } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Image from 'next/image';
@@ -176,6 +177,7 @@ const mockTrendingCourses: Course[] = [
 ];
 
 const LandingPage: React.FC = () => {
+  const router = useRouter();
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [trendingCourses, setTrendingCourses] = useState<Course[]>([]);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -215,6 +217,12 @@ const LandingPage: React.FC = () => {
   const scrollRight = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: 400, behavior: 'smooth' });
+    }
+  };
+
+  const handleStartLearning = () => {
+    if (trendingCourses.length > 0) {
+      router.push(`/course/${trendingCourses[0].id}`);
     }
   };
 
@@ -287,6 +295,7 @@ const LandingPage: React.FC = () => {
 
               <div className="mb-6 sm:mb-7 md:mb-8 lg:mb-10 px-4">
                 <Button
+                  onClick={handleStartLearning}
                   variant="primary"
                   size="lg"
                   className="group w-full sm:w-auto"
