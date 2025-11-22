@@ -33,6 +33,7 @@ export default function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [debugInfo, setDebugInfo] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
+  const [showInstructorBio, setShowInstructorBio] = useState(false);
   const lastFetchedKey = useRef<string>('');
 
   // Debug: Log component mount and initial state
