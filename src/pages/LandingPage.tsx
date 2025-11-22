@@ -186,9 +186,13 @@ const LandingPage: React.FC = () => {
   const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses } = useCourses();
 
   const handleGoogleSignIn = async () => {
-    // Always navigate to courses page - authentication is handled by ProtectedRoute
-    // CoursePage will handle course selection and first lesson navigation
-    router.push('/courses');
+    // Navigate to first trending course (same as clicking the first course card)
+    // CoursePage will handle authentication checks and lesson selection
+    if (trendingCourses.length > 0) {
+      router.push(`/course/${trendingCourses[0].id}`);
+    } else {
+      router.push('/courses');
+    }
   };
 
   useEffect(() => {
