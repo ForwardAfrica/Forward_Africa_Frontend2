@@ -220,6 +220,12 @@ const LandingPage: React.FC = () => {
     }
   };
 
+  const handleStartLearning = () => {
+    if (trendingCourses.length > 0) {
+      router.push(`/course/${trendingCourses[0].id}`);
+    }
+  };
+
   const formatDuration = (lessons: any[]) => {
     if (!lessons || lessons.length === 0) return '0 minutes';
     const totalSeconds = lessons.reduce((acc, lesson) => {
