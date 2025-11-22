@@ -359,6 +359,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
   }, [isYouTube, youTubeId, lesson.title]);
 
+  // Inject YouTube branding hiding styles
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const styleId = 'youtube-hide-branding-styles';
+    if (!document.getElementById(styleId)) {
+      const styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      styleElement.innerHTML = YouTubeHideBrandingStyles;
+      document.head.appendChild(styleElement);
+    }
+
+    return () => {
+      // Keep the styles in document for duration of app
+    };
+  }, []);
+
   // Start video session when component mounts
   useEffect(() => {
     if (courseId && lesson.id) {
