@@ -20,23 +20,6 @@ const DEBUG = {
   }
 };
 
-// Local storage utility
-const clearLocalStorage = () => {
-  try {
-    // Clear all local storage
-    localStorage.clear();
-    DEBUG.log('🧹 Local storage cleared successfully');
-
-    // Show success message
-    alert('Local storage cleared successfully!');
-
-    // Clear local storage action completed
-    alert('Local storage cleared successfully');
-  } catch (error) {
-    DEBUG.error('❌ Error clearing local storage', error);
-    alert('Error clearing local storage: ' + (error instanceof Error ? error.message : 'Unknown error'));
-  }
-};
 
 export default function LessonPage() {
   const router = useRouter();
