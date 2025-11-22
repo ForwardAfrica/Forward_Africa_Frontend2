@@ -528,27 +528,6 @@ export default function LessonPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Debug Panel - Only show on client side */}
-      {typeof window !== 'undefined' && (
-        <div className="fixed top-4 right-4 bg-black bg-opacity-80 p-4 rounded-lg text-xs max-w-sm z-50">
-          <h3 className="font-bold mb-2">🐛 Debug Info</h3>
-          <div className="space-y-1">
-            <div>Course: {course?.title}</div>
-            <div>Lesson: {currentLesson?.title}</div>
-            <div>Progress: {progress.toFixed(1)}%</div>
-            <div>Auth: {user ? 'Logged in' : 'Not logged in'}</div>
-            <div>Error: {error || 'None'}</div>
-            <button
-              onClick={clearLocalStorage}
-              className="flex items-center space-x-2 px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span>Clear Local Storage</span>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
