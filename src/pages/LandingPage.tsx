@@ -183,15 +183,38 @@ const LandingPage: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { loading: authLoading, isAuthenticated } = useAuth();
-  const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses } = useCourses();
+  const { courses, featuredCourses, fetchAllCourses, fetchFeaturedCourses, loading: coursesLoading } = useCourses();
 
   const handleGoogleSignIn = async () => {
-    // Navigate to first trending course (same as clicking the first course card)
-    // CoursePage will handle authentication checks and lesson selection
-    if (trendingCourses.length > 0) {
-      router.push(`/course/${trendingCourses[0].id}`);
-    } else {
+    setIsSigningIn(true);
+
+    try {
+      // Wait for courses to be loaded if not already loaded
+      let coursesToUse = courses;
+
+      if (courses.length === 0 && !coursesLoading) {
+        // Fetch courses if they haven't been loaded yet
+        await fetchAllCourses();
+        coursesToUse = courses;
+      }
+
+      // Find the first available course (not coming soon)
+      const availableCourse = coursesToUse.find(course => !course.comingSoon);
+
+      if (availableCourse && availableCourse.id) {
+        // Navigate to the course - CoursePage will handle everything
+        // including authentication, loading first lesson, etc.
+        router.push(`/course/${availableCourse.id}`);
+      } else {
+        // No available courses, go to courses page
+        router.push('/courses');
+      }
+    } catch (error) {
+      console.error('Error in handleGoogleSignIn:', error);
+      // Fallback to courses page if there's an error
       router.push('/courses');
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
