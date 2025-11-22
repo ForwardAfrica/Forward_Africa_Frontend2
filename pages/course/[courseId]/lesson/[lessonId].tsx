@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { Play, Clock, ChevronLeft, ChevronRight, BookOpen, CheckCircle, Trash2 } from 'lucide-react';
+import { Play, Clock, ChevronLeft, ChevronRight, BookOpen, CheckCircle } from 'lucide-react';
 import VideoPlayer from '../../../../src/components/ui/VideoPlayer';
 import { Course, Lesson } from '../../../../src/types';
 import { useAuth } from '../../../../src/contexts/AuthContext';
@@ -20,23 +20,6 @@ const DEBUG = {
   }
 };
 
-// Local storage utility
-const clearLocalStorage = () => {
-  try {
-    // Clear all local storage
-    localStorage.clear();
-    DEBUG.log('🧹 Local storage cleared successfully');
-
-    // Show success message
-    alert('Local storage cleared successfully!');
-
-    // Clear local storage action completed
-    alert('Local storage cleared successfully');
-  } catch (error) {
-    DEBUG.error('❌ Error clearing local storage', error);
-    alert('Error clearing local storage: ' + (error instanceof Error ? error.message : 'Unknown error'));
-  }
-};
 
 export default function LessonPage() {
   const router = useRouter();
@@ -50,6 +33,7 @@ export default function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [debugInfo, setDebugInfo] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
+  const [showInstructorBio, setShowInstructorBio] = useState(false);
   const lastFetchedKey = useRef<string>('');
 
   // Debug: Log component mount and initial state
@@ -544,27 +528,6 @@ export default function LessonPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Debug Panel - Only show on client side */}
-      {typeof window !== 'undefined' && (
-        <div className="fixed top-4 right-4 bg-black bg-opacity-80 p-4 rounded-lg text-xs max-w-sm z-50">
-          <h3 className="font-bold mb-2">🐛 Debug Info</h3>
-          <div className="space-y-1">
-            <div>Course: {course?.title}</div>
-            <div>Lesson: {currentLesson?.title}</div>
-            <div>Progress: {progress.toFixed(1)}%</div>
-            <div>Auth: {user ? 'Logged in' : 'Not logged in'}</div>
-            <div>Error: {error || 'None'}</div>
-            <button
-              onClick={clearLocalStorage}
-              className="flex items-center space-x-2 px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span>Clear Local Storage</span>
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -632,88 +595,95 @@ export default function LessonPage() {
                   />
                   <div>
                     <h3 className="text-white font-medium text-lg">{course.instructor?.name || 'Instructor'}</h3>
-                    <p className="text-gray-400 text-sm">{course.instructor?.title || 'Expert Educator'}</p>
+                    <p className="text-gray-400 text-sm">{course.instructor?.expertise && course.instructor.expertise.length > 0 ? course.instructor.expertise[0] : course.instructor?.title || 'Expert Educator'}</p>
                   </div>
                 </div>
 
-                {/* Professional Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm">
-                      <span className="text-gray-400 w-24">Professional Title:</span>
-                      <span className="text-white">{course.instructor?.title || 'Expert Educator'}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="text-gray-400 w-24">Email Address:</span>
-                      <span className="text-white">{course.instructor?.email || 'instructor@forwardafrica.com'}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="text-gray-400 w-24">Phone Number:</span>
-                      <span className="text-white">{course.instructor?.phone || 'Not provided'}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="text-gray-400 w-24">Experience:</span>
-                      <span className="text-white">{course.instructor?.experience || 5} years</span>
-                    </div>
-                  </div>
+                {/* Read More Button */}
+                <button
+                  onClick={() => setShowInstructorBio(!showInstructorBio)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                >
+                  {showInstructorBio ? 'Show Less' : 'Read More'}
+                </button>
 
-                  {/* Social Links */}
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm">
-                      <span className="text-gray-400 w-24">LinkedIn:</span>
-                      {course.instructor?.socialLinks?.linkedin ? (
-                        <a
-                          href={course.instructor.socialLinks.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:text-blue-300 transition-colors"
-                        >
-                          View Profile
-                        </a>
-                      ) : (
-                        <span className="text-gray-500">Not provided</span>
-                      )}
+                {/* Expanded Details */}
+                {showInstructorBio && (
+                  <div className="mt-6 space-y-6">
+                    {/* Professional Details */}
+                    <div>
+                      <h4 className="text-white font-medium mb-3">Professional Information</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center text-sm">
+                          <span className="text-gray-400 w-24">Title:</span>
+                          <span className="text-white">{course.instructor?.title || 'Expert Educator'}</span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <span className="text-gray-400 w-24">Phone Number:</span>
+                          <span className="text-white">{course.instructor?.phone || 'Not provided'}</span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <span className="text-gray-400 w-24">Experience:</span>
+                          <span className="text-white">{course.instructor?.experience || 5} years</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center text-sm">
-                      <span className="text-gray-400 w-24">Twitter:</span>
-                      {course.instructor?.socialLinks?.twitter ? (
-                        <a
-                          href={course.instructor.socialLinks.twitter}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:text-blue-300 transition-colors"
-                        >
-                          @{course.instructor.socialLinks.twitter.split('/').pop()}
-                        </a>
-                      ) : (
-                        <span className="text-gray-500">Not provided</span>
-                      )}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="text-gray-400 w-24">Website:</span>
-                      {course.instructor?.socialLinks?.website ? (
-                        <a
-                          href={course.instructor.socialLinks.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:text-blue-300 transition-colors"
-                        >
-                          Visit Website
-                        </a>
-                      ) : (
-                        <span className="text-gray-500">Not provided</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
 
-                {/* Biography */}
-                {course.instructor?.bio && (
-                  <div className="mt-4">
-                    <h4 className="text-white font-medium mb-2">Professional Biography</h4>
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      {course.instructor.bio}
-                    </p>
+                    {/* Social Links */}
+                    <div>
+                      <h4 className="text-white font-medium mb-3">Connect</h4>
+                      <div className="space-y-2">
+                        {course.instructor?.socialLinks?.linkedin && (
+                          <div className="flex items-center text-sm">
+                            <span className="text-gray-400 w-24">LinkedIn:</span>
+                            <a
+                              href={course.instructor.socialLinks.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 transition-colors"
+                            >
+                              View Profile
+                            </a>
+                          </div>
+                        )}
+                        {course.instructor?.socialLinks?.twitter && (
+                          <div className="flex items-center text-sm">
+                            <span className="text-gray-400 w-24">Twitter:</span>
+                            <a
+                              href={course.instructor.socialLinks.twitter}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 transition-colors"
+                            >
+                              @{course.instructor.socialLinks.twitter.split('/').pop()}
+                            </a>
+                          </div>
+                        )}
+                        {course.instructor?.socialLinks?.website && (
+                          <div className="flex items-center text-sm">
+                            <span className="text-gray-400 w-24">Website:</span>
+                            <a
+                              href={course.instructor.socialLinks.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 transition-colors"
+                            >
+                              Visit Website
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Biography */}
+                    {course.instructor?.bio && (
+                      <div>
+                        <h4 className="text-white font-medium mb-3">Professional Biography</h4>
+                        <p className="text-gray-300 text-sm leading-relaxed">
+                          {course.instructor.bio}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
