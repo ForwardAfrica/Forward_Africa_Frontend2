@@ -389,7 +389,15 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
             {bannerConfig?.homepage_banner_button_text && (
               <div className="flex space-x-4">
                 <Button
-                  onClick={() => onPlay(course.id || 'default-course')}
+                  onClick={() => {
+                    if (course.lessons && course.lessons.length > 0) {
+                      const firstLessonId = course.lessons[0].id;
+                      const lessonUrl = `/course/${course.id}/lesson/${firstLessonId}`;
+                      window.location.href = lessonUrl;
+                    } else {
+                      onPlay(course.id || 'default-course');
+                    }
+                  }}
                   variant="primary"
                   size="lg"
                   className="group"
@@ -408,7 +416,15 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
             </p>
             <div className="flex space-x-4">
               <Button
-                onClick={() => onPlay(course.id || 'default-course')}
+                onClick={() => {
+                  if (course.lessons && course.lessons.length > 0) {
+                    const firstLessonId = course.lessons[0].id;
+                    const lessonUrl = `/course/${course.id}/lesson/${firstLessonId}`;
+                    window.location.href = lessonUrl;
+                  } else {
+                    onPlay(course.id || 'default-course');
+                  }
+                }}
                 variant="primary"
                 size="lg"
                 className="group"
