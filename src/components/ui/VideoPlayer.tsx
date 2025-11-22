@@ -28,6 +28,41 @@ import { useVideoTracking } from '../../hooks/useVideoTracking';
 import RealTimeProgress from './RealTimeProgress';
 import videoProgressService from '../../lib/videoProgressService';
 
+// CSS to hide YouTube branding
+const YouTubeHideBrandingStyles = `
+  .youtube-container iframe {
+    border: none !important;
+  }
+
+  .youtube-container .ytp-chrome-bottom {
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important;
+  }
+
+  .youtube-container .ytp-chrome-top {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent) !important;
+  }
+
+  .youtube-container .ytp-watermark {
+    display: none !important;
+  }
+
+  .youtube-container .ytp-attribution,
+  .youtube-container .ytp-big-play-button-svg,
+  .youtube-container .ytp-title {
+    opacity: 0 !important;
+  }
+`;
+
+// Inject CSS into document
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.innerHTML = YouTubeHideBrandingStyles;
+  if (!document.head.querySelector('style[data-youtube-hide-branding]')) {
+    styleElement.setAttribute('data-youtube-hide-branding', 'true');
+    document.head.appendChild(styleElement);
+  }
+}
+
 interface VideoPlayerProps {
   /** Lesson containing video information */
   lesson: Lesson;
