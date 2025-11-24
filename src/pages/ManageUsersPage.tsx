@@ -978,6 +978,172 @@ const ManageUsersPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Password Change Modal */}
+      {showPasswordModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Change Password</h2>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setNewPassword('');
+                    setPasswordError(null);
+                  }}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-gray-400 mb-4">Change password for <span className="text-white font-semibold">{selectedUser.name}</span></p>
+
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      setPasswordError(null);
+                    }}
+                    placeholder="Enter new password (minimum 6 characters)"
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+
+                  {passwordError && (
+                    <div className="mt-2 text-sm text-red-400">{passwordError}</div>
+                  )}
+
+                  <div className="mt-2 text-sm text-gray-400">
+                    Password must be at least 6 characters long
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex space-x-3 pt-4 border-t border-gray-700">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowPasswordModal(false);
+                      setNewPassword('');
+                      setPasswordError(null);
+                    }}
+                    className="flex-1"
+                    disabled={passwordChangeLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleChangePassword}
+                    className="flex-1"
+                    disabled={passwordChangeLoading || !newPassword}
+                  >
+                    {passwordChangeLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Changing...
+                      </>
+                    ) : (
+                      'Change Password'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Role Change Modal */}
+      {showRoleModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Change User Role</h2>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowRoleModal(false);
+                    setSelectedRole('user');
+                  }}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-gray-400 mb-4">Change role for <span className="text-white font-semibold">{selectedUser.name}</span></p>
+
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    Select Role
+                  </label>
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="user">User</option>
+                    <option value="Content Manager">Content Manager</option>
+                    <option value="Community Manager">Community Manager</option>
+                    <option value="User Support">User Support</option>
+                    <option value="Super Admin">Super Admin</option>
+                  </select>
+
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                    <p className="text-sm text-gray-300">
+                      <span className="font-semibold">Current role:</span> {selectedUser.role}
+                    </p>
+                    <p className="text-sm text-gray-300 mt-2">
+                      <span className="font-semibold">New role:</span> {selectedRole}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex space-x-3 pt-4 border-t border-gray-700">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowRoleModal(false);
+                      setSelectedRole('user');
+                    }}
+                    className="flex-1"
+                    disabled={roleChangeLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleChangeRole}
+                    className="flex-1"
+                    disabled={roleChangeLoading || selectedRole === selectedUser.role}
+                  >
+                    {roleChangeLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Changing...
+                      </>
+                    ) : (
+                      'Change Role'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
