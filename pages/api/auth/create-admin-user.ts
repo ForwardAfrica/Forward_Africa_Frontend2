@@ -44,6 +44,20 @@ const validation = {
 
 const validRoles = ['Content Manager', 'Community Manager', 'User Support', 'Super Admin'];
 
+const decodeToken = (token: string): any => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Invalid token format');
+    }
+
+    const decoded = Buffer.from(parts[1], 'base64').toString('utf8');
+    return JSON.parse(decoded);
+  } catch (error) {
+    return null;
+  }
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -51,6 +65,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     initFirebaseAdmin();
+
+    // Check authorization - must have valid JWT token
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'Authorization required'
+      });
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = decodeToken(token);
+
+    if (!decoded) {
+      return res.status(401).json({
+        error: 'Invalid authorization token'
+      });
+    }
+
+    // Verify user is a Super Admin
+    const userRole = decoded.role || 'user';
+    if (userRole !== 'Super Admin') {
+      return res.status(403).json({
+        error: 'Only Super Admins can create admin users'
+      });
+    }
 
     const { email, password, full_name, role } = req.body;
 
