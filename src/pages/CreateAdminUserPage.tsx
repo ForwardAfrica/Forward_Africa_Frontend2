@@ -35,7 +35,6 @@ const CreateAdminUserPage: React.FC = () => {
   const [errors, setErrors] = useState<string[]>([]);
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCheckingServer, setIsCheckingServer] = useState(false);
 
   // Check if current user can create admin users
   const currentUserRole = profile?.role || 'user';
