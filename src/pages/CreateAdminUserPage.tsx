@@ -428,12 +428,7 @@ const CreateAdminUserPage: React.FC = () => {
                 disabled={isSubmitting}
                 className="flex-1"
               >
-                {isCheckingServer ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Checking Server...
-                  </>
-                ) : isSubmitting ? (
+                {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Creating...
