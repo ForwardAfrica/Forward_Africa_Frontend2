@@ -39,10 +39,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Log instructor update
       try {
-        const userInfo = extractUserFromRequest(req);
+        const userInfo = JWTHelper.extractUserFromRequest(req);
         if (userInfo) {
-          const ipAddress = AuditService.getClientIp(req);
-          const userAgent = AuditService.getUserAgent(req);
+          const ipAddress = JWTHelper.getClientIp(req);
+          const userAgent = JWTHelper.getUserAgent(req);
           await AuditService.logInstructorAction(
             'update',
             userInfo.userId,
@@ -72,10 +72,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Log instructor deletion
       try {
-        const userInfo = extractUserFromRequest(req);
+        const userInfo = JWTHelper.extractUserFromRequest(req);
         if (userInfo) {
-          const ipAddress = AuditService.getClientIp(req);
-          const userAgent = AuditService.getUserAgent(req);
+          const ipAddress = JWTHelper.getClientIp(req);
+          const userAgent = JWTHelper.getUserAgent(req);
           await AuditService.logInstructorAction(
             'delete',
             userInfo.userId,
