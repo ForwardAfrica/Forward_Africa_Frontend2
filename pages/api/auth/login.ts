@@ -214,9 +214,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       throw error;
     }
 
-    // Get user's role from Firestore
+    // Get user's role and status from Firestore
     let userRole = 'user';
     let userData: any = {};
+    let isSuspended = false;
 
     try {
       const db = admin.firestore();
@@ -227,11 +228,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (userDoc.exists) {
         const data = userDoc.data();
         userRole = data?.role || 'user';
-        console.log('📋 User document found:', { role: userRole, userData: data });
+        isSuspended = data?.suspended === true;
+        console.log('📋 User document found:', { role: userRole, suspended: isSuspended, userData: data });
         userData = data || {};
       }
     } catch (error) {
       console.warn('Could not fetch user role from Firestore:', error);
+    }
+
+    // Check if user is suspended
+    if (isSuspended) {
+      console.log('⛔ Login attempt for suspended user:', email);
+      rateLimit.recordAttempt(email, false);
+
+      // Log failed login attempt for suspended account
+      try {
+        const ipAddress = AuditService.getClientIp(req);
+        const userAgent = AuditService.getUserAgent(req);
+        await AuditService.logLogin('', email, false, ipAddress, userAgent, 'ACCOUNT_SUSPENDED');
+      } catch (auditError) {
+        console.error('⚠️ Failed to log suspended account login audit event:', auditError);
+      }
+
+      return res.status(403).json({
+        error: 'Your account has been suspended. Please contact User Support.'
+      });
     }
 
     // Update Firebase Auth custom claims to match Firestore (Firestore is source of truth)
