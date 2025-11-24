@@ -188,6 +188,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       authResponse = await verifyPasswordWithFirebase(email, password, apiKey);
     } catch (error: any) {
       rateLimit.recordAttempt(email, false);
+      // Log failed login attempt
+      try {
+        const ipAddress = AuditService.getClientIp(req);
+        const userAgent = AuditService.getUserAgent(req);
+        await AuditService.logLogin('', email, false, ipAddress, userAgent, error.message);
+      } catch (auditError) {
+        console.error('⚠️ Failed to log failed login audit event:', auditError);
+      }
       if (error.message === 'INVALID_PASSWORD' || error.message === 'EMAIL_NOT_FOUND') {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
