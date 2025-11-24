@@ -39,10 +39,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Log course creation
       try {
-        const userInfo = extractUserFromRequest(req);
+        const userInfo = JWTHelper.extractUserFromRequest(req);
         if (userInfo) {
-          const ipAddress = AuditService.getClientIp(req);
-          const userAgent = AuditService.getUserAgent(req);
+          const ipAddress = JWTHelper.getClientIp(req);
+          const userAgent = JWTHelper.getUserAgent(req);
           await AuditService.logCourseAction(
             'create',
             userInfo.userId,
