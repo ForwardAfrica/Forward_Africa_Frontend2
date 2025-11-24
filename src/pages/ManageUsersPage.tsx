@@ -633,7 +633,7 @@ const ManageUsersPage: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-1 flex-wrap">
                             <Button
                               variant="outline"
                               size="sm"
@@ -646,10 +646,21 @@ const ManageUsersPage: React.FC = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleUserAction(user.id, 'permissions')}
+                              onClick={() => handleUserAction(user.id, 'password')}
+                              className="text-orange-500 border-orange-500 hover:bg-orange-500/10"
                             >
-                              <Settings className="h-3 w-3 mr-1" />
-                              Permissions
+                              <Shield className="h-3 w-3 mr-1" />
+                              Password
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUserAction(user.id, 'role')}
+                              className="text-blue-500 border-blue-500 hover:bg-blue-500/10"
+                            >
+                              <Shield className="h-3 w-3 mr-1" />
+                              Role
                             </Button>
 
                             {user.status === 'active' ? (
