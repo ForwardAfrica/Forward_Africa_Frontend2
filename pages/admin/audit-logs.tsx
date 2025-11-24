@@ -5,7 +5,6 @@ import Button from '../../src/components/ui/Button';
 import { useAuthEnhanced } from '../../src/hooks/useAuthEnhanced';
 import { usePermissions } from '../../src/contexts/PermissionContext';
 import AuthGuard from '../../src/components/ui/AuthGuard';
-import { apiClient } from '../../src/lib/authInterceptor';
 
 interface AuditLog {
   id: string;
