@@ -118,30 +118,18 @@ const CreateAdminUserPage: React.FC = () => {
     setErrors([]);
     setSuccess(false);
     setIsSubmitting(true);
-    setIsCheckingServer(true);
 
     // Validate form
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       setIsSubmitting(false);
-      setIsCheckingServer(false);
       return;
     }
 
     try {
-      // Check if backend server is running
-      try {
-        const healthCheck = await fetch('http://localhost:3002/api/health', { method: 'GET' });
-        if (!healthCheck.ok) {
-          throw new Error('Backend server is not responding');
-        }
-      } catch (healthError) {
-        throw new Error('Unable to connect to the backend server. Please make sure it is running on port 3002.');
-      }
-
       // Create user via API
-      const response = await fetch('http://localhost:3002/api/users', {
+      const response = await fetch('/api/auth/create-admin-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -185,7 +173,7 @@ const CreateAdminUserPage: React.FC = () => {
 
       // Handle different types of errors
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        setErrors(['Unable to connect to the server. Please make sure the backend server is running.']);
+        setErrors(['Unable to connect to the server. Please try again.']);
       } else if (error.message.includes('already exists')) {
         setErrors(['An admin user with this email already exists']);
       } else if (error.message.includes('JSON')) {
@@ -195,7 +183,6 @@ const CreateAdminUserPage: React.FC = () => {
       }
     } finally {
       setIsSubmitting(false);
-      setIsCheckingServer(false);
     }
   };
 
