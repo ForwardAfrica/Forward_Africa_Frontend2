@@ -2,6 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '../../../lib/firebaseAdmin';
 import JWTManager from '../../../backend/lib/jwtManager';
 
+// Import audit service
+const AuditService = require('../../../backend/lib/auditService');
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -55,6 +58,24 @@ export default async function handler(
       updatedAt: new Date(),
       createdBy: payload.userId
     });
+
+    // Log instructor creation
+    try {
+      const ipAddress = AuditService.getClientIp(req);
+      const userAgent = AuditService.getUserAgent(req);
+      await AuditService.logInstructorAction(
+        'create',
+        payload.userId,
+        payload.email,
+        docRef.id,
+        instructorData.name,
+        { email: instructorData.email, title: instructorData.title },
+        ipAddress,
+        userAgent
+      );
+    } catch (auditError) {
+      console.error('⚠️ Failed to log instructor creation audit event:', auditError);
+    }
 
     res.status(201).json({
       id: docRef.id,
