@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import admin from 'firebase-admin';
 
+// Import audit service for logging
+const AuditService = require('../../../backend/lib/auditService');
+
 // Initialize Firebase Admin
 const initFirebaseAdmin = () => {
   if (!admin.apps.length) {
