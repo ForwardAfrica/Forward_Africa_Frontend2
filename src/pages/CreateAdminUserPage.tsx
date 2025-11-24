@@ -127,11 +127,15 @@ const CreateAdminUserPage: React.FC = () => {
     }
 
     try {
+      // Get authentication token
+      const token = typeof window !== 'undefined' ? localStorage.getItem('forward_africa_token') : null;
+
       // Create user via API
       const response = await fetch('/api/auth/create-admin-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
           email: formData.email.trim(),
