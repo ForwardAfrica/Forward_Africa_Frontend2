@@ -62,10 +62,19 @@ const AuditLogsPage: React.FC = () => {
 
       console.log('📋 Fetching audit logs with params:', params.toString());
 
-      const response = await apiClient.get(`http://localhost:3002/api/audit-logs?${params.toString()}`);
-      console.log('📋 Audit logs response:', response);
+      const response = await fetch(`/api/audit-logs?${params.toString()}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      setAuditLogs(response.data || []);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch audit logs: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('📋 Audit logs response:', data);
+
+      setAuditLogs(data.data || []);
     } catch (err) {
       console.error('Failed to fetch audit logs:', err);
       setError('Failed to load audit logs. Please try again.');
