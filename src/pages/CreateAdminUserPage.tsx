@@ -35,7 +35,6 @@ const CreateAdminUserPage: React.FC = () => {
   const [errors, setErrors] = useState<string[]>([]);
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCheckingServer, setIsCheckingServer] = useState(false);
 
   // Check if current user can create admin users
   const currentUserRole = profile?.role || 'user';
@@ -118,33 +117,25 @@ const CreateAdminUserPage: React.FC = () => {
     setErrors([]);
     setSuccess(false);
     setIsSubmitting(true);
-    setIsCheckingServer(true);
 
     // Validate form
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       setIsSubmitting(false);
-      setIsCheckingServer(false);
       return;
     }
 
     try {
-      // Check if backend server is running
-      try {
-        const healthCheck = await fetch('http://localhost:3002/api/health', { method: 'GET' });
-        if (!healthCheck.ok) {
-          throw new Error('Backend server is not responding');
-        }
-      } catch (healthError) {
-        throw new Error('Unable to connect to the backend server. Please make sure it is running on port 3002.');
-      }
+      // Get authentication token
+      const token = typeof window !== 'undefined' ? localStorage.getItem('forward_africa_token') : null;
 
       // Create user via API
-      const response = await fetch('http://localhost:3002/api/users', {
+      const response = await fetch('/api/auth/create-admin-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
           email: formData.email.trim(),
@@ -185,7 +176,7 @@ const CreateAdminUserPage: React.FC = () => {
 
       // Handle different types of errors
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        setErrors(['Unable to connect to the server. Please make sure the backend server is running.']);
+        setErrors(['Unable to connect to the server. Please try again.']);
       } else if (error.message.includes('already exists')) {
         setErrors(['An admin user with this email already exists']);
       } else if (error.message.includes('JSON')) {
@@ -195,7 +186,6 @@ const CreateAdminUserPage: React.FC = () => {
       }
     } finally {
       setIsSubmitting(false);
-      setIsCheckingServer(false);
     }
   };
 
@@ -441,12 +431,7 @@ const CreateAdminUserPage: React.FC = () => {
                 disabled={isSubmitting}
                 className="flex-1"
               >
-                {isCheckingServer ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Checking Server...
-                  </>
-                ) : isSubmitting ? (
+                {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Creating...
@@ -468,8 +453,8 @@ const CreateAdminUserPage: React.FC = () => {
               <div>
                 <h3 className="text-green-500 font-medium">Ready to Create</h3>
                 <p className="text-green-400 text-sm mt-1">
-                  The new admin user will be created with the provided password and can log in immediately.
-                  Make sure the backend server is running on port 3002 and frontend on port 3000/3001.
+                  The new admin user will be created with the provided password in Firebase Authentication and stored in Firestore.
+                  They can log in immediately with the provided credentials and will appear in the User Management table.
                 </p>
               </div>
             </div>
