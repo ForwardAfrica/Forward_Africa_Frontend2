@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import FirestoreService from '../../../backend/lib/firestoreService';
 
+// Import audit service and JWT helper
+const AuditService = require('../../../backend/lib/auditService');
+const JWTHelper = require('../../../backend/lib/jwtHelper');
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { instructorId } = req.query;
 
@@ -28,7 +32,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'PUT') {
       const updateData = req.body;
 
+      // Get existing instructor to log what changed
+      const existingInstructor = await FirestoreService.getInstructorById(instructorId);
+
       await FirestoreService.updateInstructor(instructorId, updateData);
+
+      // Log instructor update
+      try {
+        const userInfo = JWTHelper.extractUserFromRequest(req);
+        if (userInfo) {
+          const ipAddress = JWTHelper.getClientIp(req);
+          const userAgent = JWTHelper.getUserAgent(req);
+          await AuditService.logInstructorAction(
+            'update',
+            userInfo.userId,
+            userInfo.email,
+            instructorId,
+            updateData.name || existingInstructor?.name || 'Unknown',
+            { updated_fields: Object.keys(updateData) },
+            ipAddress,
+            userAgent
+          );
+        }
+      } catch (auditError) {
+        console.error('⚠️ Failed to log instructor update audit event:', auditError);
+      }
 
       return res.status(200).json({
         success: true,
@@ -37,7 +65,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'DELETE') {
+      // Get instructor info before deletion for audit log
+      const instructorToDelete = await FirestoreService.getInstructorById(instructorId);
+
       await FirestoreService.deleteInstructor(instructorId);
+
+      // Log instructor deletion
+      try {
+        const userInfo = JWTHelper.extractUserFromRequest(req);
+        if (userInfo) {
+          const ipAddress = JWTHelper.getClientIp(req);
+          const userAgent = JWTHelper.getUserAgent(req);
+          await AuditService.logInstructorAction(
+            'delete',
+            userInfo.userId,
+            userInfo.email,
+            instructorId,
+            instructorToDelete?.name || 'Unknown',
+            {},
+            ipAddress,
+            userAgent
+          );
+        }
+      } catch (auditError) {
+        console.error('⚠️ Failed to log instructor deletion audit event:', auditError);
+      }
 
       return res.status(200).json({
         success: true,

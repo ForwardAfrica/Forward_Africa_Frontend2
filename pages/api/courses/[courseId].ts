@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import FirestoreService from '../../../backend/lib/firestoreService';
 
+// Import audit service and JWT helper
+const AuditService = require('../../../backend/lib/auditService');
+const JWTHelper = require('../../../backend/lib/jwtHelper');
+
 export const config = {
   api: { bodyParser: { sizeLimit: '50mb' } }
 };
@@ -32,7 +36,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'PUT') {
       const updateData = req.body;
 
+      // Get existing course to log what changed
+      const existingCourse = await FirestoreService.getCourseById(courseId);
+
       await FirestoreService.updateCourse(courseId, updateData);
+
+      // Log course update
+      try {
+        const userInfo = JWTHelper.extractUserFromRequest(req);
+        if (userInfo) {
+          const ipAddress = JWTHelper.getClientIp(req);
+          const userAgent = JWTHelper.getUserAgent(req);
+          await AuditService.logCourseAction(
+            'update',
+            userInfo.userId,
+            userInfo.email,
+            courseId,
+            updateData.title || existingCourse?.title || 'Unknown',
+            { updated_fields: Object.keys(updateData) },
+            ipAddress,
+            userAgent
+          );
+        }
+      } catch (auditError) {
+        console.error('⚠️ Failed to log course update audit event:', auditError);
+      }
 
       return res.status(200).json({
         success: true,
@@ -41,7 +69,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'DELETE') {
+      // Get course info before deletion for audit log
+      const courseToDelete = await FirestoreService.getCourseById(courseId);
+
       await FirestoreService.deleteCourse(courseId);
+
+      // Log course deletion
+      try {
+        const userInfo = JWTHelper.extractUserFromRequest(req);
+        if (userInfo) {
+          const ipAddress = JWTHelper.getClientIp(req);
+          const userAgent = JWTHelper.getUserAgent(req);
+          await AuditService.logCourseAction(
+            'delete',
+            userInfo.userId,
+            userInfo.email,
+            courseId,
+            courseToDelete?.title || 'Unknown',
+            {},
+            ipAddress,
+            userAgent
+          );
+        }
+      } catch (auditError) {
+        console.error('⚠️ Failed to log course deletion audit event:', auditError);
+      }
 
       return res.status(200).json({
         success: true,

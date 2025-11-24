@@ -5,7 +5,6 @@ import Button from '../../src/components/ui/Button';
 import { useAuthEnhanced } from '../../src/hooks/useAuthEnhanced';
 import { usePermissions } from '../../src/contexts/PermissionContext';
 import AuthGuard from '../../src/components/ui/AuthGuard';
-import { apiClient } from '../../src/lib/authInterceptor';
 
 interface AuditLog {
   id: string;
@@ -62,10 +61,19 @@ const AuditLogsPage: React.FC = () => {
 
       console.log('📋 Fetching audit logs with params:', params.toString());
 
-      const response = await apiClient.get(`http://localhost:3002/api/audit-logs?${params.toString()}`);
-      console.log('📋 Audit logs response:', response);
+      const response = await fetch(`/api/audit-logs?${params.toString()}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-      setAuditLogs(response.data || []);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch audit logs: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('📋 Audit logs response:', data);
+
+      setAuditLogs(data.data || []);
     } catch (err) {
       console.error('Failed to fetch audit logs:', err);
       setError('Failed to load audit logs. Please try again.');
@@ -84,10 +92,19 @@ const AuditLogsPage: React.FC = () => {
       if (selectedUser !== 'all') params.append('user_id', selectedUser);
       params.append('format', 'csv');
 
-      const response = await apiClient.get(`http://localhost:3002/api/audit-logs/export?${params.toString()}`);
+      const response = await fetch(`/api/audit-logs?${params.toString()}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to export audit logs: ${response.statusText}`);
+      }
+
+      const csvData = await response.text();
 
       // Create and download CSV file
-      const blob = new Blob([response.data], { type: 'text/csv' });
+      const blob = new Blob([csvData], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

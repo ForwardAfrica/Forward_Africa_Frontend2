@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import FirestoreService from '../../../backend/lib/firestoreService';
 
+// Import audit service and JWT helper
+const AuditService = require('../../../backend/lib/auditService');
+const JWTHelper = require('../../../backend/lib/jwtHelper');
+
 export const config = {
   api: { bodyParser: { sizeLimit: '50mb' } }
 };
@@ -32,6 +36,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const courseId = await FirestoreService.createCourse(courseData);
+
+      // Log course creation
+      try {
+        const userInfo = JWTHelper.extractUserFromRequest(req);
+        if (userInfo) {
+          const ipAddress = JWTHelper.getClientIp(req);
+          const userAgent = JWTHelper.getUserAgent(req);
+          await AuditService.logCourseAction(
+            'create',
+            userInfo.userId,
+            userInfo.email,
+            courseId,
+            courseData.title,
+            { category: courseData.category },
+            ipAddress,
+            userAgent
+          );
+        }
+      } catch (auditError) {
+        console.error('⚠️ Failed to log course creation audit event:', auditError);
+      }
 
       return res.status(201).json({
         success: true,

@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import admin from 'firebase-admin';
 
+// Import audit service for logging
+const AuditService = require('../../../backend/lib/auditService');
+
 // Initialize Firebase Admin
 const initFirebaseAdmin = () => {
   if (!admin.apps.length) {
@@ -185,6 +188,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       authResponse = await verifyPasswordWithFirebase(email, password, apiKey);
     } catch (error: any) {
       rateLimit.recordAttempt(email, false);
+      // Log failed login attempt
+      try {
+        const ipAddress = AuditService.getClientIp(req);
+        const userAgent = AuditService.getUserAgent(req);
+        await AuditService.logLogin('', email, false, ipAddress, userAgent, error.message);
+      } catch (auditError) {
+        console.error('⚠️ Failed to log failed login audit event:', auditError);
+      }
       if (error.message === 'INVALID_PASSWORD' || error.message === 'EMAIL_NOT_FOUND') {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
@@ -279,6 +290,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     rateLimit.recordAttempt(email, true);
 
     console.log('✅ Login successful for:', email, 'with role:', userRole);
+
+    // Log successful login
+    try {
+      const ipAddress = AuditService.getClientIp(req);
+      const userAgent = AuditService.getUserAgent(req);
+      await AuditService.logLogin(userRecord.uid, email, true, ipAddress, userAgent);
+    } catch (auditError) {
+      console.error('⚠️ Failed to log login audit event:', auditError);
+      // Don't fail the login if audit logging fails
+    }
 
     return res.status(200).json({
       message: 'Login successful',
