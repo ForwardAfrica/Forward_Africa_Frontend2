@@ -93,10 +93,19 @@ const AuditLogsPage: React.FC = () => {
       if (selectedUser !== 'all') params.append('user_id', selectedUser);
       params.append('format', 'csv');
 
-      const response = await apiClient.get(`http://localhost:3002/api/audit-logs/export?${params.toString()}`);
+      const response = await fetch(`/api/audit-logs?${params.toString()}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to export audit logs: ${response.statusText}`);
+      }
+
+      const csvData = await response.text();
 
       // Create and download CSV file
-      const blob = new Blob([response.data], { type: 'text/csv' });
+      const blob = new Blob([csvData], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
