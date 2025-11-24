@@ -449,8 +449,8 @@ const CreateAdminUserPage: React.FC = () => {
               <div>
                 <h3 className="text-green-500 font-medium">Ready to Create</h3>
                 <p className="text-green-400 text-sm mt-1">
-                  The new admin user will be created with the provided password and can log in immediately.
-                  Make sure the backend server is running on port 3002 and frontend on port 3000/3001.
+                  The new admin user will be created with the provided password in Firebase Authentication and stored in Firestore.
+                  They can log in immediately with the provided credentials and will appear in the User Management table.
                 </p>
               </div>
             </div>
