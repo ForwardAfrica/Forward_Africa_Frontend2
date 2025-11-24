@@ -44,8 +44,15 @@ const ManageUsersPage: React.FC = () => {
   // Modal states
   const [showUserModal, setShowUserModal] = useState(false);
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [userPermissions, setUserPermissions] = useState<Permission[]>([]);
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('user');
+  const [roleChangeLoading, setRoleChangeLoading] = useState(false);
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
 
   // Database hooks
   const {
@@ -166,7 +173,7 @@ const ManageUsersPage: React.FC = () => {
     setUserPermissions(allPermissions);
   };
 
-  const handleUserAction = (userId: string, action: 'view' | 'suspend' | 'activate' | 'delete' | 'permissions') => {
+  const handleUserAction = (userId: string, action: 'view' | 'suspend' | 'activate' | 'delete' | 'permissions' | 'password' | 'role') => {
     const user = users.find(u => u.id === userId);
     if (!user) return;
 
@@ -181,6 +188,11 @@ const ManageUsersPage: React.FC = () => {
       return;
     }
 
+    if ((action === 'password' || action === 'role') && !hasPermission('users:suspend')) {
+      setPermissionError('You do not have permission to modify user accounts. This action requires Admin or Super Admin privileges.');
+      return;
+    }
+
     switch (action) {
       case 'view':
         setSelectedUser(user);
@@ -191,14 +203,14 @@ const ManageUsersPage: React.FC = () => {
           u.id === userId ? { ...u, status: 'suspended' as const } : u
         ));
         // Update in database
-        updateUser(userId, { status: 'suspended' });
+        updateUser(userId, { suspended: true });
         break;
       case 'activate':
         setUsers(prev => prev.map(u =>
           u.id === userId ? { ...u, status: 'active' as const } : u
         ));
         // Update in database
-        updateUser(userId, { status: 'active' });
+        updateUser(userId, { suspended: false });
         break;
       case 'delete':
         if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
@@ -210,6 +222,17 @@ const ManageUsersPage: React.FC = () => {
         setSelectedUser(user);
         initializeUserPermissions(user);
         setShowPermissionsModal(true);
+        break;
+      case 'password':
+        setSelectedUser(user);
+        setNewPassword('');
+        setPasswordError(null);
+        setShowPasswordModal(true);
+        break;
+      case 'role':
+        setSelectedUser(user);
+        setSelectedRole(user.role);
+        setShowRoleModal(true);
         break;
     }
   };
@@ -259,6 +282,73 @@ const ManageUsersPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to update user permissions:', error);
       setPermissionError('Failed to update user permissions. Please try again.');
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!selectedUser || !newPassword) {
+      setPasswordError('Password is required');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      return;
+    }
+
+    setPasswordChangeLoading(true);
+    setPasswordError(null);
+
+    try {
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: selectedUser.id,
+          newPassword: newPassword
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to change password');
+      }
+
+      // Success - close modal and refresh users
+      setShowPasswordModal(false);
+      setNewPassword('');
+      setSelectedUser(null);
+      await fetch('/api/users/list').then(r => r.json()); // Refresh user list
+    } catch (error: any) {
+      console.error('Failed to change password:', error);
+      setPasswordError(error.message || 'Failed to change password. Please try again.');
+    } finally {
+      setPasswordChangeLoading(false);
+    }
+  };
+
+  const handleChangeRole = async () => {
+    if (!selectedUser) return;
+
+    setRoleChangeLoading(true);
+
+    try {
+      await updateUser(selectedUser.id, { role: selectedRole });
+
+      // Update local state
+      setUsers(prev => prev.map(u =>
+        u.id === selectedUser.id ? { ...u, role: selectedRole } : u
+      ));
+
+      setShowRoleModal(false);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('Failed to change user role:', error);
+      setPermissionError('Failed to change user role. Please try again.');
+    } finally {
+      setRoleChangeLoading(false);
     }
   };
 
@@ -543,7 +633,7 @@ const ManageUsersPage: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-1 flex-wrap">
                             <Button
                               variant="outline"
                               size="sm"
@@ -556,10 +646,21 @@ const ManageUsersPage: React.FC = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleUserAction(user.id, 'permissions')}
+                              onClick={() => handleUserAction(user.id, 'password')}
+                              className="text-orange-500 border-orange-500 hover:bg-orange-500/10"
                             >
-                              <Settings className="h-3 w-3 mr-1" />
-                              Permissions
+                              <Shield className="h-3 w-3 mr-1" />
+                              Password
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUserAction(user.id, 'role')}
+                              className="text-blue-500 border-blue-500 hover:bg-blue-500/10"
+                            >
+                              <Shield className="h-3 w-3 mr-1" />
+                              Role
                             </Button>
 
                             {user.status === 'active' ? (
@@ -870,6 +971,172 @@ const ManageUsersPage: React.FC = () => {
                     className="flex-1"
                   >
                     Save Permissions
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Change Modal */}
+      {showPasswordModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Change Password</h2>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setNewPassword('');
+                    setPasswordError(null);
+                  }}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-gray-400 mb-4">Change password for <span className="text-white font-semibold">{selectedUser.name}</span></p>
+
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      setPasswordError(null);
+                    }}
+                    placeholder="Enter new password (minimum 6 characters)"
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+
+                  {passwordError && (
+                    <div className="mt-2 text-sm text-red-400">{passwordError}</div>
+                  )}
+
+                  <div className="mt-2 text-sm text-gray-400">
+                    Password must be at least 6 characters long
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex space-x-3 pt-4 border-t border-gray-700">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowPasswordModal(false);
+                      setNewPassword('');
+                      setPasswordError(null);
+                    }}
+                    className="flex-1"
+                    disabled={passwordChangeLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleChangePassword}
+                    className="flex-1"
+                    disabled={passwordChangeLoading || !newPassword}
+                  >
+                    {passwordChangeLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Changing...
+                      </>
+                    ) : (
+                      'Change Password'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Role Change Modal */}
+      {showRoleModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Change User Role</h2>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setShowRoleModal(false);
+                    setSelectedRole('user');
+                  }}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-gray-400 mb-4">Change role for <span className="text-white font-semibold">{selectedUser.name}</span></p>
+
+                  <label className="block text-sm font-medium text-gray-200 mb-2">
+                    Select Role
+                  </label>
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="user">User</option>
+                    <option value="Content Manager">Content Manager</option>
+                    <option value="Community Manager">Community Manager</option>
+                    <option value="User Support">User Support</option>
+                    <option value="Super Admin">Super Admin</option>
+                  </select>
+
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                    <p className="text-sm text-gray-300">
+                      <span className="font-semibold">Current role:</span> {selectedUser.role}
+                    </p>
+                    <p className="text-sm text-gray-300 mt-2">
+                      <span className="font-semibold">New role:</span> {selectedRole}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex space-x-3 pt-4 border-t border-gray-700">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowRoleModal(false);
+                      setSelectedRole('user');
+                    }}
+                    className="flex-1"
+                    disabled={roleChangeLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleChangeRole}
+                    className="flex-1"
+                    disabled={roleChangeLoading || selectedRole === selectedUser.role}
+                  >
+                    {roleChangeLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Changing...
+                      </>
+                    ) : (
+                      'Change Role'
+                    )}
                   </Button>
                 </div>
               </div>
