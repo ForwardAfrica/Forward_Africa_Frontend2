@@ -285,6 +285,73 @@ const ManageUsersPage: React.FC = () => {
     }
   };
 
+  const handleChangePassword = async () => {
+    if (!selectedUser || !newPassword) {
+      setPasswordError('Password is required');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      return;
+    }
+
+    setPasswordChangeLoading(true);
+    setPasswordError(null);
+
+    try {
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: selectedUser.id,
+          newPassword: newPassword
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to change password');
+      }
+
+      // Success - close modal and refresh users
+      setShowPasswordModal(false);
+      setNewPassword('');
+      setSelectedUser(null);
+      await fetch('/api/users/list').then(r => r.json()); // Refresh user list
+    } catch (error: any) {
+      console.error('Failed to change password:', error);
+      setPasswordError(error.message || 'Failed to change password. Please try again.');
+    } finally {
+      setPasswordChangeLoading(false);
+    }
+  };
+
+  const handleChangeRole = async () => {
+    if (!selectedUser) return;
+
+    setRoleChangeLoading(true);
+
+    try {
+      await updateUser(selectedUser.id, { role: selectedRole });
+
+      // Update local state
+      setUsers(prev => prev.map(u =>
+        u.id === selectedUser.id ? { ...u, role: selectedRole } : u
+      ));
+
+      setShowRoleModal(false);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('Failed to change user role:', error);
+      setPermissionError('Failed to change user role. Please try again.');
+    } finally {
+      setRoleChangeLoading(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const styles = {
       active: 'bg-green-500/20 text-green-500',
