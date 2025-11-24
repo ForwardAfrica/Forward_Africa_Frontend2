@@ -127,15 +127,29 @@ const CreateAdminUserPage: React.FC = () => {
     }
 
     try {
-      // Get authentication token
-      const token = typeof window !== 'undefined' ? localStorage.getItem('forward_africa_token') : null;
+      // Get authentication token from cookie (same way authService does it)
+      let token = null;
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+          const [name, value] = cookie.trim().split('=');
+          if (name === 'app_user') {
+            token = value;
+            break;
+          }
+        }
+      }
+
+      if (!token) {
+        throw new Error('Authentication token not found. Please log in again.');
+      }
 
       // Create user via API
       const response = await fetch('/api/auth/create-admin-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           email: formData.email.trim(),
