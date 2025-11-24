@@ -283,6 +283,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log('✅ Login successful for:', email, 'with role:', userRole);
 
+    // Log successful login
+    try {
+      const ipAddress = AuditService.getClientIp(req);
+      const userAgent = AuditService.getUserAgent(req);
+      await AuditService.logLogin(userRecord.uid, email, true, ipAddress, userAgent);
+    } catch (auditError) {
+      console.error('⚠️ Failed to log login audit event:', auditError);
+      // Don't fail the login if audit logging fails
+    }
+
     return res.status(200).json({
       message: 'Login successful',
       user: responseUser,
