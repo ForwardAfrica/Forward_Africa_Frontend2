@@ -173,7 +173,7 @@ const ManageUsersPage: React.FC = () => {
     setUserPermissions(allPermissions);
   };
 
-  const handleUserAction = (userId: string, action: 'view' | 'suspend' | 'activate' | 'delete' | 'permissions') => {
+  const handleUserAction = (userId: string, action: 'view' | 'suspend' | 'activate' | 'delete' | 'permissions' | 'password' | 'role') => {
     const user = users.find(u => u.id === userId);
     if (!user) return;
 
@@ -188,6 +188,11 @@ const ManageUsersPage: React.FC = () => {
       return;
     }
 
+    if ((action === 'password' || action === 'role') && !hasPermission('users:suspend')) {
+      setPermissionError('You do not have permission to modify user accounts. This action requires Admin or Super Admin privileges.');
+      return;
+    }
+
     switch (action) {
       case 'view':
         setSelectedUser(user);
@@ -198,14 +203,14 @@ const ManageUsersPage: React.FC = () => {
           u.id === userId ? { ...u, status: 'suspended' as const } : u
         ));
         // Update in database
-        updateUser(userId, { status: 'suspended' });
+        updateUser(userId, { suspended: true });
         break;
       case 'activate':
         setUsers(prev => prev.map(u =>
           u.id === userId ? { ...u, status: 'active' as const } : u
         ));
         // Update in database
-        updateUser(userId, { status: 'active' });
+        updateUser(userId, { suspended: false });
         break;
       case 'delete':
         if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
@@ -217,6 +222,17 @@ const ManageUsersPage: React.FC = () => {
         setSelectedUser(user);
         initializeUserPermissions(user);
         setShowPermissionsModal(true);
+        break;
+      case 'password':
+        setSelectedUser(user);
+        setNewPassword('');
+        setPasswordError(null);
+        setShowPasswordModal(true);
+        break;
+      case 'role':
+        setSelectedUser(user);
+        setSelectedRole(user.role);
+        setShowRoleModal(true);
         break;
     }
   };
