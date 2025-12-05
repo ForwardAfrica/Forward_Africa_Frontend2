@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div
-      className="flex flex-col min-h-screen bg-brand-background/90"
+      className="flex flex-col min-h-screen bg-brand-background-gradient"
     >
       {/* Fixed header */}
       <Header />

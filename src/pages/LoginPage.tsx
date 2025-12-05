@@ -88,7 +88,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center pt-1 pb-12 px-4 sm:px-6 lg:px-8 bg-brand-background/90 py-8"
+      className="min-h-screen flex items-center justify-center pt-1 pb-12 px-4 sm:px-6 lg:px-8 bg-brand-background-gradient py-8"
     >
       <div className="max-w-md w-full">
         {/* Logo/Brand Section */}
@@ -208,7 +208,7 @@ const LoginPage: React.FC = () => {
               type="submit"
               variant="primary"
               size="lg"
-              className="w-full bg-[#ef4444] hover:bg-[#dc2626] text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02]"
+              className="w-full bg-[#ef4444] hover:bg-[#dc2626] text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
               disabled={loading}
             >
               {loading ? (

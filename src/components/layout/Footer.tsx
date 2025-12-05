@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-b from-brand-background via-brand-background to-black text-gray-400">
+    <footer className="bg-gradient-to-b from-transparent via-brand-background/30 to-brand-background/60 backdrop-blur-sm text-gray-400">
       {/* Main Footer Content */}
       <div className="max-w-screen-xl mx-auto pt-10 sm:pt-12 md:pt-16 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8">
         {/* Top Section */}

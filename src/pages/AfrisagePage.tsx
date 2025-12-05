@@ -116,7 +116,7 @@ const AfrisagePage: React.FC = () => {
   // Show error if component fails to load
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen bg-brand-background/90">
+      <div className="flex flex-col min-h-screen bg-brand-background-gradient">
         <Header />
         <main className="flex-grow pt-16">
           <div className="flex items-center justify-center min-h-screen">
@@ -138,7 +138,7 @@ const AfrisagePage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-brand-background/90">
+    <div className="flex flex-col min-h-screen bg-brand-background-gradient">
       {/* Fixed header */}
       <Header />
 

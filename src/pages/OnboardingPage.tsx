@@ -244,16 +244,16 @@ const OnboardingPage: React.FC = () => {
         onClose={() => setShowToast(false)}
         duration={2000}
       />
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white relative overflow-hidden">
+      <div className="min-h-screen bg-brand-background-gradient text-white relative overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(239,68,68,0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(93,88,242,0.1),transparent_50%)]" />
 
         {/* Animated Particles */}
         <div className="absolute inset-0">
           {particleStyles.map((style, i) => (
             <div
               key={i}
-              className="absolute w-1 h-1 bg-red-500/30 rounded-full animate-pulse"
+              className="absolute w-1 h-1 bg-brand-deepPurple/30 rounded-full animate-pulse"
               style={style}
             />
           ))}
@@ -263,7 +263,7 @@ const OnboardingPage: React.FC = () => {
         <div className="relative z-10 px-6 py-8">
           <div className="max-w-4xl mx-auto flex items-center justify-between">
             <div className="flex items-center">
-              <span className="text-red-600 font-bold text-2xl tracking-tight">FORWARD</span>
+              <span className="text-brand-deepPurple font-bold text-2xl tracking-tight">FORWARD</span>
               <span className="text-white font-bold text-2xl tracking-tight">AFRICA</span>
             </div>
             <div className="text-gray-400 text-sm">
@@ -398,7 +398,7 @@ const OnboardingPage: React.FC = () => {
                             onClick={() => handleTopicToggle(topic.id)}
                             className={`p-6 rounded-xl border-2 transition-all duration-300 text-left group hover:scale-[1.02] ${
                               isSelected
-                                ? 'border-red-500 bg-gradient-to-br from-red-500/20 to-red-600/20 shadow-lg shadow-red-500/20'
+                                ? 'border-brand-deepPurple bg-brand-gradient/20 shadow-lg shadow-brand-glow-purple'
                                 : 'border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-800'
                             }`}
                           >

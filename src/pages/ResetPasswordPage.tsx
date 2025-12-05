@@ -121,7 +121,7 @@ const ResetPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-brand-background/90">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-brand-background-gradient">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-4">
@@ -132,7 +132,7 @@ const ResetPasswordPage: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Forgot Password</span>
           </button>
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-red-600 to-red-500 rounded-2xl flex items-center justify-center mb-2 shadow-lg">
+          <div className="mx-auto w-16 h-16 bg-brand-gradient rounded-2xl flex items-center justify-center mb-2 shadow-brand-glow">
             <span className="text-white text-2xl font-bold">FA</span>
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">

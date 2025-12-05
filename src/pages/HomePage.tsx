@@ -147,7 +147,7 @@ const HomePage: React.FC = () => {
         <HeroBanner course={featuredCourse} onPlay={handlePlayCourse} />
 
         {/* Stats Section */}
-        <div className="bg-gradient-to-b from-black to-gray-900">
+        <div className="bg-brand-background-gradient">
           <div className="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               <div className="text-center p-6 bg-gray-800/50 rounded-lg backdrop-blur-sm border border-gray-700">

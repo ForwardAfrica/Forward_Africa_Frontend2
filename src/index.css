@@ -49,23 +49,57 @@
 
 :root {
   color-scheme: dark;
-  --brand-primary: #5D58F2;
+  /* Disney+ Primary Gradient Colors */
+  --brand-royal-blue: #006EFF;
+  --brand-vibrant-pink: #BD34FE;
+  --brand-deep-purple: #5D58F2;
+  /* Supporting & UI Colors */
+  --brand-background: #0F172A;
+  --brand-text-light: #FFFFFF;
+  --brand-text-gray: #94A3B8;
+  /* Legacy support (mapped to Disney+ colors) */
+  --brand-primary: #5D58F2; /* Deep Purple */
   --brand-primary-dark: #4B45DA;
   --brand-primary-muted: #7A76FF;
-  --brand-background: #0F172A;
   --brand-surface: #151F3A;
   --brand-surface-muted: #1B2644;
 }
 
 body {
-  background-color: var(--brand-background);
-  color: #E2E8F0;
-  @apply bg-brand-background text-gray-100;
+  background: linear-gradient(180deg, 
+    var(--brand-royal-blue) 0%, 
+    var(--brand-deep-purple) 30%, 
+    rgba(93, 88, 242, 0.8) 50%,
+    rgba(15, 23, 42, 0.9) 70%,
+    rgba(15, 23, 42, 0.95) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--brand-text-light);
   font-family: Poppins!important;
 }
 
 .brand-gradient {
-  background-image: linear-gradient(135deg, var(--brand-primary), var(--brand-background));
+  /* Disney+ Primary Gradient: Royal Blue -> Deep Purple -> Vibrant Pink */
+  background-image: linear-gradient(180deg, var(--brand-royal-blue) 0%, var(--brand-deep-purple) 50%, var(--brand-vibrant-pink) 100%);
+}
+
+.brand-gradient-horizontal {
+  background-image: linear-gradient(90deg, var(--brand-royal-blue) 0%, var(--brand-deep-purple) 50%, var(--brand-vibrant-pink) 100%);
+}
+
+.brand-gradient-diagonal {
+  background-image: linear-gradient(135deg, var(--brand-royal-blue) 0%, var(--brand-deep-purple) 50%, var(--brand-vibrant-pink) 100%);
+}
+
+.brand-background-gradient {
+  /* Royal Blue to Deep Purple to Dark - Bright at top, dark at bottom */
+  background: linear-gradient(180deg, 
+    var(--brand-royal-blue) 0%, 
+    var(--brand-deep-purple) 30%, 
+    rgba(93, 88, 242, 0.8) 50%,
+    rgba(15, 23, 42, 0.9) 70%,
+    rgba(15, 23, 42, 0.95) 100%);
+  background-attachment: fixed;
 }
 
 .brand-surface {
@@ -118,13 +152,16 @@ a, button {
   position: relative;
   margin-right: 0.25rem;
   transform: translateX(0) scale(1);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 3px solid transparent;
+  border-radius: 0.5rem;
 }
 
 /* Active card with white border */
 .card-container.active {
-  border: 2px solid white;
+  border: 3px solid white;
   border-radius: 0.5rem;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 /* Landscape expansion effect */
@@ -138,15 +175,7 @@ a, button {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Landscape image effect */
-.card-landscape-image {
-  transition: object-fit 0.5s ease-in-out;
-}
-
-.card-landscape-image:hover {
-  object-fit: contain;
-  object-position: center;
-}
+/* Landscape image effect - no hover zoom */
 
 /* Maintain card height during aspect ratio changes */
 .card-aspect-maintain {

@@ -242,7 +242,7 @@ const LandingPage: React.FC = () => {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-background">
+      <div className="min-h-screen flex items-center justify-center bg-brand-background-gradient">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-primary"></div>
       </div>
     );
@@ -250,7 +250,7 @@ const LandingPage: React.FC = () => {
 
   return (
     <div
-      className="relative min-h-screen bg-brand-background/90"
+      className="relative min-h-screen bg-brand-background-gradient"
     >
         {/* Simple Header with Logo and Login */}
         <header className="relative w-full z-50">
@@ -483,7 +483,7 @@ const LandingPage: React.FC = () => {
         </main>
 
         {/* Mission Section */}
-        <section className="relative z-10 bg-brand-background/90 backdrop-blur-sm pt-2 sm:pt-3 md:pt-4 lg:pt-6 pb-12 sm:pb-16 md:pb-24 lg:pb-32">
+        <section className="relative z-10 bg-brand-background-gradient backdrop-blur-sm pt-2 sm:pt-3 md:pt-4 lg:pt-6 pb-12 sm:pb-16 md:pb-24 lg:pb-32">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center mb-10 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24 py-2 sm:py-3 md:py-4">
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-5 md:mb-6 lg:mb-8 px-4">Our Mission</h2>
@@ -573,7 +573,7 @@ const LandingPage: React.FC = () => {
         </section>
 
         {/* Coming Soon Courses Section */}
-        <section className="relative z-10 bg-brand-background/90 backdrop-blur-sm pt-6 sm:pt-8 md:pt-12 pb-12 sm:pb-16 md:pb-24 lg:pb-32">
+        <section className="relative z-10 bg-brand-background-gradient backdrop-blur-sm pt-6 sm:pt-8 md:pt-12 pb-12 sm:pb-16 md:pb-24 lg:pb-32">
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-5 sm:mb-6 md:mb-8">
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">

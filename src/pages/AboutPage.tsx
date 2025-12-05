@@ -162,7 +162,7 @@ const AboutPage: React.FC = () => {
                 >
                   <button
                     onClick={() => setExpandedCard(expandedCard === index ? null : index)}
-                    className="w-full flex items-center justify-between p-4 sm:p-5 md:p-6 text-left hover:bg-[#ef4444]/10 transition-colors"
+                    className="w-full flex items-center justify-between p-4 sm:p-5 md:p-6 text-left hover:bg-brand-deepPurple/10 transition-colors"
                   >
                     <h3 className="text-white text-base sm:text-lg md:text-xl font-semibold pr-3 sm:pr-4">
                       {item.title}

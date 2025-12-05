@@ -149,8 +149,8 @@ const ProfileCompletionPrompt: React.FC<ProfileCompletionPromptProps> = ({
   return (
     <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
       <div className="flex items-start space-x-3">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-full">
-          <User className="h-4 w-4 text-white" />
+        <div className="bg-brand-gradient p-2 rounded-full">
+          <User className="h-4 w-4 text-brand-textLight" />
         </div>
         <div className="flex-1">
           <h4 className="font-semibold text-white mb-1">Complete Your Profile</h4>
@@ -168,7 +168,7 @@ const ProfileCompletionPrompt: React.FC<ProfileCompletionPromptProps> = ({
               variant="primary"
               size="sm"
               onClick={handleCompleteProfile}
-              className="bg-gradient-to-r from-blue-600 to-purple-600"
+              className=""
             >
               Complete Now
             </Button>

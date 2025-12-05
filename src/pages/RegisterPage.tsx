@@ -394,7 +394,7 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen pt-1 pb-12 px-4 sm:px-6 lg:px-8 bg-brand-background/90"
+      className="min-h-screen pt-1 pb-12 px-4 sm:px-6 lg:px-8 bg-brand-background-gradient"
     >
       <div className="max-w-4xl mx-auto">
         {/* Header */}

@@ -135,7 +135,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
   // Show loading state while banner config is loading
   if (loadingBannerConfig) {
     return (
-      <div className="relative w-full h-[70vh] min-h-[500px] overflow-hidden bg-brand-background">
+      <div className="relative w-full h-[70vh] min-h-[500px] overflow-hidden bg-brand-background-gradient">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
         </div>
@@ -286,7 +286,8 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 flex flex-col items-start">
-        {shouldUseCustomBanner ? (
+        {/* COMMENTED OUT: Category, title, instructor info, and description sections */}
+        {/* {shouldUseCustomBanner ? (
           // Custom banner content
           <>
             {bannerConfig?.homepage_banner_subtitle && (
@@ -307,8 +308,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">{course.title || 'Featured Course'}</h1>
           </>
         )}
-        {/* DUAL FALLBACK instructor handling - same logic as admin page */}
-        {(() => {
+        {/* {(() => {
           // Get instructor info with dual fallback
           let instructorName = 'Unknown Instructor';
           let instructorTitle = 'Course Instructor';
@@ -377,15 +377,15 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
               </div>
             </div>
           );
-        })()}
+        })()} */}
         {shouldUseCustomBanner ? (
           // Custom banner content
           <>
-            {bannerConfig?.homepage_banner_description && (
+            {/* {bannerConfig?.homepage_banner_description && (
               <p className="text-gray-200 text-sm md:text-base max-w-2xl mb-6">
                 {bannerConfig.homepage_banner_description}
               </p>
-            )}
+            )} */}
             {bannerConfig?.homepage_banner_button_text && (
               <div className="flex space-x-4">
                 <Button
@@ -411,9 +411,9 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
         ) : (
           // Default course content
           <>
-            <p className="text-gray-200 text-sm md:text-base max-w-2xl mb-6">
+            {/* <p className="text-gray-200 text-sm md:text-base max-w-2xl mb-6">
               {course.description || 'Learn from industry experts and advance your skills with our comprehensive course.'}
-            </p>
+            </p> */}
             <div className="flex space-x-4">
               <Button
                 onClick={() => {

@@ -583,7 +583,7 @@ const CommunityPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-brand-background/90">
+    <div className="min-h-screen bg-brand-background-gradient">
       {/* Mobile Header - Highest z-index to stay on top */}
       <div className="lg:hidden bg-gray-800/95 backdrop-blur-sm border-b border-gray-700/50 p-4 sticky top-0 z-[9999]">
         <div className="flex items-center justify-between">

@@ -43,103 +43,15 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
   } = useFavorites();
   const isFavorited = favorites.some(fav => fav.id === course.id);
 
-  // Handle card hover with React state
+  // Handle card hover - add white border to show active card
   const handleCardHover = (e: React.MouseEvent) => {
     const card = e.currentTarget as HTMLElement;
-    const gridContainer = card.closest('.card-grid-container');
-    if (!gridContainer) return;
-
-    // Get the row ID for this card
-    const currentRowId = rowId;
-    if (currentRowId === undefined) return;
-
-    // Set the row ID on the container for CSS targeting
-    gridContainer.setAttribute('data-active-row', currentRowId.toString());
-
-    // Get all cards in this specific row only using CSS selector
-    const rowCards = gridContainer.querySelectorAll(`[data-row-id="${currentRowId}"]`);
-    const currentIndex = Array.from(rowCards).indexOf(card);
-    const isLastCard = currentIndex === rowCards.length - 1;
-
-    console.log(`Row ${currentRowId}: Found ${rowCards.length} cards in this row`);
-    console.log(`Current card index: ${currentIndex}, Is last card: ${isLastCard}`);
-
-    // First, reset all cards in this row to ensure clean state
-    rowCards.forEach((adjacentCard) => {
-      (adjacentCard as HTMLElement).style.transform = 'translateX(0) scale(1)';
-      (adjacentCard as HTMLElement).style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-    });
-
-    if (isLastCard) {
-      // Last card in row: push container to the left and expand card to the left
-      // Only apply container push on course pages, not homepage
-      const isCoursePage = window.location.pathname.includes('/courses');
-      if (isCoursePage) {
-        (gridContainer as HTMLElement).style.transform = 'translateX(-12rem)';
-        (gridContainer as HTMLElement).style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-      }
-
-      (card as HTMLElement).style.transform = 'scale(1.05) translateX(-4rem)';
-      (card as HTMLElement).style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-      (card as HTMLElement).style.width = '200%';
-      (card as HTMLElement).classList.add('active');
-    } else {
-      // Other cards: expand to the right and push adjacent cards in the same row
-      (card as HTMLElement).style.transform = 'scale(1.05) translateX(1rem)';
-      (card as HTMLElement).style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-      (card as HTMLElement).style.width = '200%';
-      (card as HTMLElement).classList.add('active');
-
-      // Push cards to the right of the hovered card (only in this row)
-      rowCards.forEach((adjacentCard, index) => {
-        if (index > currentIndex) {
-          // Different push distance for homepage vs course pages
-          const isHomePage = window.location.pathname === '/' || window.location.pathname === '/home';
-          const pushDistance = isHomePage ? '14rem' : '18rem';
-
-          console.log(`Pushing card ${index} in row ${currentRowId} to the right by ${pushDistance}`);
-          (adjacentCard as HTMLElement).style.transform = `translateX(${pushDistance})`;
-          (adjacentCard as HTMLElement).style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-        }
-      });
-    }
+    card.classList.add('active');
   };
 
   const handleCardLeave = (e: React.MouseEvent) => {
     const card = e.currentTarget as HTMLElement;
-    const gridContainer = card.closest('.card-grid-container');
-    if (!gridContainer) return;
-
-    // Get the row ID for this card
-    const currentRowId = rowId;
-    if (currentRowId === undefined) return;
-
-    // Get all cards in this specific row only using CSS selector
-    const rowCards = gridContainer.querySelectorAll(`[data-row-id="${currentRowId}"]`);
-
-    // Reset container position only on course pages
-    const isCoursePage = window.location.pathname.includes('/courses');
-    if (isCoursePage) {
-      (gridContainer as HTMLElement).style.transform = 'translateX(0)';
-      (gridContainer as HTMLElement).style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-    }
-
-    // Immediately reset all cards in this row
-    rowCards.forEach((adjacentCard) => {
-      (adjacentCard as HTMLElement).style.transform = 'translateX(0) scale(1)';
-      (adjacentCard as HTMLElement).style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-      (adjacentCard as HTMLElement).style.width = '100%';
-      (adjacentCard as HTMLElement).classList.remove('active'); // Remove active border
-    });
-
-    // Reset hovered card immediately
-    (card as HTMLElement).style.transform = 'translateX(0) scale(1)';
-    (card as HTMLElement).style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-    (card as HTMLElement).style.width = '100%';
-    (card as HTMLElement).classList.remove('active'); // Remove active border
-
-    // Remove the active row attribute
-    gridContainer.removeAttribute('data-active-row');
+    card.classList.remove('active');
   };
 
   // Early return for null/undefined course
@@ -290,9 +202,9 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
       onClick={handleCardClick}
       data-row-id={rowId}
     >
-      <div className="relative w-full h-80 transition-all duration-500 ease-in-out card-expansion card-landscape-expand">
+      <div className="relative w-full h-80">
         {/* Poster Container */}
-        <div className="w-full h-full relative rounded-lg overflow-hidden shadow-xl card-orientation-transition">
+        <div className="w-full h-full relative rounded-lg overflow-hidden shadow-xl">
           {/* Thumbnail */}
           {thumbnail.startsWith('http') ? (
             // Use regular img tag for external URLs to avoid Next.js Image issues
@@ -336,8 +248,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
             />
           )}
 
-          {/* Gradient Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-100"></div>
 
           {/* Coming Soon Overlay */}
           {isComingSoon && (
@@ -352,7 +262,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
           {/* Red Circular Play Button - Center Overlay */}
           {isPlayable && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="bg-red-600 text-white rounded-full p-4 shadow-2xl transform transition-all duration-300 group-hover:scale-110 opacity-100 border-2 border-white">
+              <div className="bg-red-600 text-white rounded-full p-4 shadow-2xl opacity-100 border-2 border-white">
                 <Play className="h-8 w-8 ml-1" fill="currentColor" />
               </div>
             </div>
@@ -416,97 +326,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
             </div>
           )}
 
-          {/* Course Information */}
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <h3 className={`font-bold text-base leading-tight mb-1 line-clamp-2 ${isComingSoon ? 'text-yellow-100' : 'text-white'}`}>
-              {title}
-              {isComingSoon && <span className="text-yellow-300 ml-1">⏳</span>}
-            </h3>
-
-            {/* Course Description with Tooltip */}
-            <div className="relative group">
-              <div className="text-sm text-gray-400 line-clamp-1 mb-2">
-                {course.description}
-              </div>
-
-              {/* Course Description Tooltip - Limited to 10 characters */}
-              <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 max-w-xs">
-                <div className="font-medium text-white mb-1">{title}</div>
-                <div className="text-gray-300 text-xs leading-relaxed">
-                  {course.description && course.description.length > 10
-                    ? `${course.description.substring(0, 10)}...`
-                    : course.description
-                  }
-                </div>
-                <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2 mb-2">
-              {instructorImage.startsWith('http') ? (
-                // Use regular img tag for external URLs
-                <img
-                  src={instructorImage}
-                  alt={instructorName}
-                  className="w-5 h-5 rounded-full object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== '/images/placeholder-avatar.jpg') {
-                      target.src = '/images/placeholder-avatar.jpg';
-                    }
-                  }}
-                  onLoad={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.opacity = '1';
-                  }}
-                  style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
-                />
-              ) : (
-                // Use Next.js Image for local images
-                <Image
-                  src={instructorImage}
-                  alt={instructorName}
-                  width={20}
-                  height={20}
-                  className="w-5 h-5 rounded-full object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== '/images/placeholder-avatar.jpg') {
-                      target.src = '/images/placeholder-avatar.jpg';
-                    }
-                  }}
-                  onLoad={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.opacity = '1';
-                  }}
-                  style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
-                />
-              )}
-              <p className="text-gray-300 text-sm font-medium line-clamp-1">{instructorName}</p>
-            </div>
-
-            {/* Course Status Indicator */}
-            {isComingSoon ? (
-              <div className="flex items-center space-x-1 bg-yellow-500/10 px-2 py-1 rounded">
-                <Clock className="h-3 w-3 text-yellow-500" />
-                <span className="text-yellow-500 text-xs font-medium">Coming Soon</span>
-              </div>
-            ) : course.lessons && course.lessons.length > 0 ? (
-              <div className="flex items-center space-x-1">
-                <Play className="h-3 w-3 text-red-500" />
-                <span className="text-red-500 text-xs font-medium">
-                  {course.lessons.length} Lesson{course.lessons.length !== 1 ? 's' : ''}
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-1 bg-gray-500/10 px-2 py-1 rounded">
-                <AlertTriangle className="h-3 w-3 text-gray-500" />
-                <span className="text-gray-500 text-xs font-medium">No Lessons</span>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>
