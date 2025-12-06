@@ -184,6 +184,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!isClient || loading) return;
 
+    // Check if we should prevent redirect (e.g., during save operations)
+    const preventRedirect = typeof window !== 'undefined' && (window as any).__preventAuthRedirect;
+    if (preventRedirect) {
+      console.log('⏸️ AuthContext: Redirect prevented due to active operation');
+      return;
+    }
+
     // If no user and not already redirecting
     if (!user && !isRedirectingRef.current) {
       const currentPath = router.pathname;

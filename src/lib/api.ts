@@ -48,12 +48,22 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
       headers,
     });
 
+    const data = await response.json();
+    
     if (!response.ok) {
-      console.error('❌ API Error:', { status: response.status, url });
-      throw new Error(`API Error: ${response.statusText}`);
+      console.error('❌ API Error:', { status: response.status, url, data });
+      // If the response has an error message, use it
+      const errorMessage = data?.error || data?.message || `API Error: ${response.statusText}`;
+      throw new Error(errorMessage);
     }
 
-    const data = await response.json();
+    // Check if the response indicates failure even with 200 status
+    if (data.success === false) {
+      console.error('❌ API returned success: false:', { url, data });
+      const errorMessage = data?.error || data?.message || 'Request failed';
+      throw new Error(errorMessage);
+    }
+
     console.log('✅ API Response:', { url, dataLength: Array.isArray(data) ? data.length : 'not-array' });
 
     return data;

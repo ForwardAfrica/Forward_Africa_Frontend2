@@ -98,6 +98,55 @@ class FirestoreService {
 
       if (doc.exists) {
         const course = { id: doc.id, ...doc.data() };
+        
+        // Fetch lessons from the subcollection
+        try {
+          let lessonsSnapshot;
+          try {
+            // Try to fetch with orderBy first
+            lessonsSnapshot = await db.collection('courses')
+              .doc(courseId)
+              .collection('lessons')
+              .orderBy('order', 'asc')
+              .get();
+          } catch (orderByError) {
+            // If orderBy fails (e.g., missing index), fetch without ordering
+            console.warn('⚠️ orderBy failed, fetching lessons without ordering:', orderByError.message);
+            lessonsSnapshot = await db.collection('courses')
+              .doc(courseId)
+              .collection('lessons')
+              .get();
+          }
+          
+          const lessons = [];
+          lessonsSnapshot.forEach(lessonDoc => {
+            lessons.push({ 
+              id: lessonDoc.id, 
+              ...lessonDoc.data(),
+              course_id: courseId
+            });
+          });
+          
+          // Sort lessons by order field if orderBy wasn't used
+          if (lessons.length > 0 && !lessons[0].hasOwnProperty('order')) {
+            // If no order field, keep original order
+          } else {
+            lessons.sort((a, b) => {
+              const orderA = a.order || 0;
+              const orderB = b.order || 0;
+              return orderA - orderB;
+            });
+          }
+          
+          course.lessons = lessons;
+        } catch (lessonsError) {
+          console.warn('⚠️ Error fetching lessons for course:', lessonsError);
+          // If lessons subcollection doesn't exist or has an error, check if lessons are in course doc
+          if (!course.lessons || !Array.isArray(course.lessons)) {
+            course.lessons = [];
+          }
+        }
+        
         return this.enrichCourseWithInstructor(course);
       }
       return null;
@@ -150,20 +199,57 @@ class FirestoreService {
     }
   }
 
-  static async getFeaturedCourses() {
+  static async getFeaturedCourses(includeComingSoon = true) {
     try {
       const db = getFirestore();
-      const snapshot = await db.collection('courses')
-        .where('featured', '==', true)
-        .where('coming_soon', '==', false)
-        .orderBy('created_at', 'desc')
-        .limit(10)
-        .get();
+      let courses = [];
+      
+      try {
+        // Try to use optimized query with filters
+        let query = db.collection('courses')
+          .where('featured', '==', true);
 
-      const courses = [];
-      snapshot.forEach(doc => {
-        courses.push({ id: doc.id, ...doc.data() });
-      });
+        // Only filter out coming_soon if includeComingSoon is false
+        if (!includeComingSoon) {
+          query = query.where('coming_soon', '==', false);
+        }
+
+        const snapshot = await query
+          .orderBy('created_at', 'desc')
+          .limit(10)
+          .get();
+
+        snapshot.forEach(doc => {
+          courses.push({ id: doc.id, ...doc.data() });
+        });
+      } catch (queryError) {
+        // If query fails (e.g., missing index), fall back to fetching all featured and filtering in memory
+        console.warn('⚠️ Featured courses query failed, using fallback method:', queryError.message);
+        
+        const snapshot = await db.collection('courses')
+          .where('featured', '==', true)
+          .get();
+
+        courses = [];
+        snapshot.forEach(doc => {
+          const courseData = { id: doc.id, ...doc.data() };
+          // Filter in memory if needed
+          if (!includeComingSoon && (courseData.coming_soon === true || courseData.coming_soon === 1)) {
+            return; // Skip coming soon courses
+          }
+          courses.push(courseData);
+        });
+
+        // Sort by created_at in memory
+        courses.sort((a, b) => {
+          const aDate = a.created_at?.toDate ? a.created_at.toDate() : new Date(a.created_at);
+          const bDate = b.created_at?.toDate ? b.created_at.toDate() : new Date(b.created_at);
+          return bDate - aDate; // Descending order
+        });
+
+        // Limit to 10
+        courses = courses.slice(0, 10);
+      }
 
       return this.enrichCoursesWithInstructors(courses);
     } catch (error) {

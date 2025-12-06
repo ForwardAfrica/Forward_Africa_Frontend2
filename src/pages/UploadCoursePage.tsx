@@ -51,6 +51,12 @@ const UploadCoursePage: React.FC = () => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
+  
+  // Certificate fields
+  const [enableCertificate, setEnableCertificate] = useState(false);
+  const [certificateType, setCertificateType] = useState('');
+  const [certificateCourseTitle, setCertificateCourseTitle] = useState('');
+  const [skillsAcquired, setSkillsAcquired] = useState('');
 
   // Progress and status states
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -109,6 +115,12 @@ const UploadCoursePage: React.FC = () => {
               setUseInstructor(true);
               setSelectedInstructorId(existingCourse.instructor_id);
             }
+
+            // Load certificate fields if they exist
+            setEnableCertificate(existingCourse.enable_certificate || existingCourse.certificate_enabled || false);
+            setCertificateType(existingCourse.certificate_type || '');
+            setCertificateCourseTitle(existingCourse.certificate_course_title || existingCourse.certificate_title || '');
+            setSkillsAcquired(existingCourse.skills_acquired || '');
           } else {
             console.error('Failed to load course for editing');
             setErrorMessage({ show: true, message: 'Failed to load course for editing' });
@@ -245,6 +257,10 @@ const UploadCoursePage: React.FC = () => {
     setIsFeatured(false);
     setUseInstructor(false);
     setSelectedInstructorId('');
+    setEnableCertificate(false);
+    setCertificateType('');
+    setCertificateCourseTitle('');
+    setSkillsAcquired('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -293,7 +309,12 @@ const UploadCoursePage: React.FC = () => {
           duration: '10:00',
           xp_points: 100,
           order_index: index
-        }))
+        })),
+        // Certificate fields
+        enable_certificate: enableCertificate,
+        certificate_type: enableCertificate ? certificateType : null,
+        certificate_course_title: enableCertificate ? certificateCourseTitle : null,
+        skills_acquired: enableCertificate ? skillsAcquired : null
       };
 
       console.log('Course data prepared:', courseData);
@@ -642,6 +663,71 @@ const UploadCoursePage: React.FC = () => {
                   />
                 </div>
               )}
+
+              {/* Certificate Fields Section */}
+              <div className="border-t border-gray-700 pt-6">
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    id="enableCertificate"
+                    checked={enableCertificate}
+                    onChange={(e) => setEnableCertificate(e.target.checked)}
+                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-600 rounded bg-gray-700"
+                  />
+                  <label htmlFor="enableCertificate" className="ml-2 text-gray-300">
+                    Enable Certificate for this Course
+                  </label>
+                </div>
+
+                {enableCertificate && (
+                  <div className="space-y-4 mt-4 bg-gray-700 rounded-lg p-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Certificate Type <span className="text-red-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={certificateType}
+                        onChange={(e) => setCertificateType(e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                        placeholder="Enter certificate type (e.g., Completion Certificate, Professional Certificate)"
+                        required={enableCertificate}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Course Title (for Certificate) <span className="text-blue-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={certificateCourseTitle}
+                        onChange={(e) => setCertificateCourseTitle(e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                        placeholder="Enter course title as it should appear on the certificate"
+                        required={enableCertificate}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Skills Acquired <span className="text-green-400">*</span>
+                      </label>
+                      <textarea
+                        value={skillsAcquired}
+                        onChange={(e) => setSkillsAcquired(e.target.value)}
+                        rows={4}
+                        className="w-full px-4 py-3 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                        placeholder="List the skills students will acquire upon completion (one per line or comma-separated)"
+                        required={enableCertificate}
+                      />
+                      <p className="text-xs text-gray-400 mt-1">
+                        Enter the skills that will be listed on the certificate
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Lessons Section */}
               <div className="border-t border-gray-700 pt-6">

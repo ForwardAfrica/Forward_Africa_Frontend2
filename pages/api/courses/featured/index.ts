@@ -7,7 +7,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const courses = await FirestoreService.getFeaturedCourses();
+    // Get include_coming_soon query parameter (defaults to true)
+    const includeComingSoon = req.query.include_coming_soon === 'true' || req.query.include_coming_soon === undefined;
+    
+    const courses = await FirestoreService.getFeaturedCourses(includeComingSoon);
 
     return res.status(200).json({
       success: true,

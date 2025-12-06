@@ -1,0 +1,24 @@
+{
+  "siteName": "Forward Africa",
+  "siteDescription": "Empowering African professionals through expert-led courses",
+  "maintenanceMode": false,
+  "debugMode": false,
+  "maxUploadSize": 50,
+  "sessionTimeout": 30,
+  "emailNotifications": true,
+  "autoBackup": true,
+  "backupFrequency": "daily",
+  "securityLevel": "high",
+  "rateLimiting": true,
+  "maxRequestsPerMinute": 100,
+  "databaseConnectionPool": 10,
+  "cacheEnabled": true,
+  "cacheTTL": 3600,
+  "cdnEnabled": false,
+  "sslEnabled": true,
+  "corsEnabled": true,
+  "allowedOrigins": [
+    "https://forwardafrica.com",
+    "https://www.forwardafrica.com"
+  ]
+}

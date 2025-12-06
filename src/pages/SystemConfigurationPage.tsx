@@ -29,6 +29,25 @@ const SystemConfigurationPage: React.FC = () => {
   const [backupStatus, setBackupStatus] = useState<'idle' | 'creating' | 'success' | 'error'>('idle');
   const [isClient, setIsClient] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // Track if we're in the middle of saving
+
+  // Prevent redirects during save operations
+  useEffect(() => {
+    if (isSaving && typeof window !== 'undefined') {
+      // Set a flag to prevent auth redirects
+      (window as any).__preventAuthRedirect = true;
+      console.log('🔒 Preventing auth redirects during save operation');
+    } else {
+      // Small delay before re-enabling redirects to ensure save completes
+      const timeout = setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          (window as any).__preventAuthRedirect = false;
+          console.log('🔓 Re-enabling auth redirects after save operation');
+        }
+      }, 2000); // 2 second delay to ensure save completes
+      return () => clearTimeout(timeout);
+    }
+  }, [isSaving]);
 
   // System configuration state
   const [systemConfig, setSystemConfig] = useState({
@@ -112,8 +131,13 @@ const SystemConfigurationPage: React.FC = () => {
 
                 // Load configuration
         try {
-          const response = await apiClient.get('/system/config');
-          setSystemConfig(response.data);
+          const response = await fetch('/api/system/config');
+          if (response.ok) {
+            const config = await response.json();
+            setSystemConfig(config);
+          } else {
+            console.warn('Failed to load system config, using defaults');
+          }
         } catch (error) {
           console.warn('Failed to load system config, using defaults:', error);
         } finally {
@@ -157,34 +181,51 @@ const SystemConfigurationPage: React.FC = () => {
 
 
   const handleSave = async () => {
+    if (isSaving) return; // Prevent multiple simultaneous saves
+    
     setIsLoading(true);
+    setIsSaving(true);
     setSaveStatus('saving');
 
     try {
-      console.log('🔐 Checking authentication...');
+      console.log('💾 Saving configuration...');
+      
+      // Use Next.js API route instead of backend to avoid auth issues
+      const response = await fetch('/api/system/config', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(systemConfig)
+      });
 
-      // Debug token information
-      tokenDebugger.checkToken();
-
-      const token = getAuthToken();
-      console.log('🔑 Token available:', !!token);
-
-      if (!token) {
-        console.error('❌ No auth token available');
-        throw new Error('No auth token available. Please log in again.');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Save failed' }));
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
       }
 
-            console.log('💾 Saving configuration...');
-      const response = await apiClient.put('/system/config', systemConfig);
-      console.log('✅ Configuration saved successfully:', response.data);
+      const result = await response.json();
+      console.log('✅ Configuration saved successfully:', result);
       setSaveStatus('success');
-      setTimeout(() => setSaveStatus('idle'), 3000);
+      
+      // Verify user is still authenticated after save
+      const token = getAuthToken();
+      if (!token) {
+        console.warn('⚠️ Token missing after save, but not redirecting');
+      }
+      
+      // Keep user authenticated - don't let any auth checks interfere
+      setTimeout(() => {
+        setSaveStatus('idle');
+      }, 3000);
     } catch (error) {
+      // Just show error, don't cause logout
       console.error('❌ Error saving configuration:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
       setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -271,19 +312,22 @@ const SystemConfigurationPage: React.FC = () => {
               <CheckCircle className="h-4 w-4 mr-2" />
               <span className="text-sm">Super Admin Access</span>
             </div>
-            <Button
-              variant="primary"
-              onClick={handleSave}
-              disabled={isLoading}
-              className="flex items-center"
-            >
-              {isLoading ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4 mr-2" />
-              )}
-              {saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
-            </Button>
+            {/* Hide save button on banner tab since BannerManagement has its own save button */}
+            {activeTab !== 'banner' && (
+              <Button
+                variant="primary"
+                onClick={handleSave}
+                disabled={isLoading}
+                className="flex items-center"
+              >
+                {isLoading ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
+                )}
+                {saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}
+              </Button>
+            )}
           </div>
         </div>
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { Search, Menu, X, Bell, User, ChevronDown, LogOut, Settings } from 'lucide-react';
+import { Search, Menu, X, Bell, User, ChevronDown, LogOut, Settings, BookOpen, Heart } from 'lucide-react';
 import NotificationsDropdown from '../ui/NotificationsDropdown';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useAuthEnhanced } from '../../hooks/useAuthEnhanced';
@@ -199,6 +199,22 @@ const Header: React.FC = () => {
                         >
                           <User className="h-3 w-3 sm:h-4 sm:w-4 mr-2 sm:mr-3" />
                           Profile Settings
+                        </Link>
+                        <Link
+                          href="/learn-later"
+                          className="flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 mr-2 sm:mr-3" />
+                          Learn Later
+                        </Link>
+                        <Link
+                          href="/favorites"
+                          className="flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <Heart className="h-3 w-3 sm:h-4 sm:w-4 mr-2 sm:mr-3" />
+                          Favorites
                         </Link>
                         {canAccessAdmin && (
                           <Link

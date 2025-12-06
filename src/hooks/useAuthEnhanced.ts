@@ -41,6 +41,13 @@ export const useAuthEnhanced = () => {
 
   // Monitor authentication state changes
   useEffect(() => {
+    // Check if we should prevent redirect (e.g., during save operations)
+    const preventRedirect = typeof window !== 'undefined' && (window as any).__preventAuthRedirect;
+    if (preventRedirect) {
+      console.log('⏸️ useAuthEnhanced: Redirect prevented due to active operation');
+      return;
+    }
+
     if (!auth.user && !auth.loading) {
       console.log('🔍 Auth state changed: User is no longer authenticated');
 

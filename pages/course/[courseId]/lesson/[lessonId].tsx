@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { Play, Clock, ChevronLeft, ChevronRight, BookOpen, CheckCircle } from 'lucide-react';
+import { Play, Clock, ChevronLeft, ChevronRight, BookOpen, CheckCircle, Heart } from 'lucide-react';
 import VideoPlayer from '../../../../src/components/ui/VideoPlayer';
 import { Course, Lesson } from '../../../../src/types';
 import { useAuth } from '../../../../src/contexts/AuthContext';
 import { validateTokenInCookie } from '../../../../src/lib/validateToken';
 import { courseAPI } from '../../../../src/lib/api';
+import { useLearnLater } from '../../../../src/hooks/useLearnLater';
 
 // Debug utility
 const DEBUG = {
@@ -35,6 +36,8 @@ export default function LessonPage() {
   const [error, setError] = useState<string | null>(null);
   const [showInstructorBio, setShowInstructorBio] = useState(false);
   const lastFetchedKey = useRef<string>('');
+  const { addToLearnLater, isInLearnLater, fetchLearnLater } = useLearnLater();
+  const [isAddingToLearnLater, setIsAddingToLearnLater] = useState(false);
 
   // Debug: Log component mount and initial state
   useEffect(() => {
@@ -108,6 +111,13 @@ export default function LessonPage() {
       DEBUG.warn('⚠️ User has not completed onboarding, but allowing access to course content');
     }
   }, [user, authLoading, router.isReady, courseId, lessonId]);
+
+  // Fetch learn later items when user is available
+  useEffect(() => {
+    if (user?.id && !authLoading) {
+      fetchLearnLater();
+    }
+  }, [user?.id, authLoading, fetchLearnLater]);
 
   // Fetch course data with detailed debugging
     useEffect(() => {
@@ -580,9 +590,64 @@ export default function LessonPage() {
 
              {/* Lesson Info */}
              <div className="mt-6">
-              <h1 className="text-2xl font-bold text-white mb-4">
-                {currentLesson.title}
-              </h1>
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-2xl font-bold text-white">
+                  {currentLesson.title}
+                </h1>
+                <button
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (!user) {
+                      router.push('/login');
+                      return;
+                    }
+
+                    setIsAddingToLearnLater(true);
+                    try {
+                      // Fetch learn later first if not initialized
+                      await fetchLearnLater();
+                      
+                      const isAlreadyAdded = isInLearnLater(courseId as string, currentLesson.id);
+                      
+                      if (!isAlreadyAdded) {
+                        const success = await addToLearnLater(courseId as string, currentLesson.id);
+                        if (success) {
+                          // Navigate to learn later page
+                          router.push('/learn-later');
+                        } else {
+                          // Show error if add failed
+                          setError('Failed to add to learn later. Please try again.');
+                        }
+                      } else {
+                        // Already added, just navigate
+                        router.push('/learn-later');
+                      }
+                    } catch (error) {
+                      console.error('Error adding to learn later:', error);
+                      setError('Failed to add to learn later. Please try again.');
+                    } finally {
+                      setIsAddingToLearnLater(false);
+                    }
+                  }}
+                  disabled={isAddingToLearnLater}
+                  className={`p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors ${
+                    isInLearnLater(courseId as string, currentLesson.id) 
+                      ? 'text-yellow-500' 
+                      : 'text-gray-500'
+                  } ${isAddingToLearnLater ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  title={user ? (isInLearnLater(courseId as string, currentLesson.id) ? 'View in Learn Later' : 'Add to Learn Later') : 'Please log in to add to learn later'}
+                >
+                  <BookOpen 
+                    className={`h-5 w-5 ${
+                      isInLearnLater(courseId as string, currentLesson.id) 
+                        ? 'fill-current text-yellow-500' 
+                        : ''
+                    }`}
+                  />
+                </button>
+              </div>
               <p className="text-gray-300 mb-6">
                 {currentLesson.description}
               </p>

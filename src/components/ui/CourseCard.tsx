@@ -12,12 +12,14 @@
  */
 
 import React from 'react';
-import { Play, Clock, Star, User, BookOpen, Award, TrendingUp, Users, Calendar, MapPin, Globe, Building2, GraduationCap, Briefcase, Target, Zap, ChevronRight, CheckCircle, AlertTriangle, Info, ExternalLink, Download, Share2, Heart, MessageCircle, Eye, EyeOff, Lock, Unlock, Shield, Crown, Medal, Trophy, Badge, Flag, Rocket, Diamond } from 'lucide-react';
+import { Play, Clock, Star, User, Award, TrendingUp, Users, Calendar, MapPin, Globe, Building2, GraduationCap, Briefcase, Target, Zap, ChevronRight, CheckCircle, AlertTriangle, Info, ExternalLink, Download, Share2, Heart, MessageCircle, Eye, EyeOff, Lock, Unlock, Shield, Crown, Medal, Trophy, Badge, Flag, Rocket, Diamond } from 'lucide-react';
 import { Course } from '../../types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useFavorites } from '../../hooks/useFavorites';
+import { useAuth } from '../../contexts/AuthContext';
+import { authService } from '../../lib/authService';
 
 interface CourseCardProps {
   /** Course data to display */
@@ -28,6 +30,7 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = true, rowId }) => {
   const router = useRouter();
+  const { user } = useAuth();
   const [isHovered, setIsHovered] = React.useState(false);
   const [hoveredCardId, setHoveredCardId] = React.useState<string | null>(null);
 
@@ -165,10 +168,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
     e.stopPropagation();
 
     // Check if user is logged in
-    const token = localStorage.getItem('forward_africa_token');
+    const token = authService.getToken();
     if (!token) {
       console.log('User not logged in, cannot add to favorites');
-      // You could show a login prompt here
+      router.push('/login');
       return;
     }
 
@@ -191,8 +194,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
       console.error('Error handling favorite action:', error);
     }
   };
-
-
 
   return (
     <div
@@ -259,14 +260,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
             </div>
           )}
 
-          {/* Red Circular Play Button - Center Overlay */}
-          {isPlayable && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="bg-red-600 text-white rounded-full p-4 shadow-2xl opacity-100 border-2 border-white">
-                <Play className="h-8 w-8 ml-1" fill="currentColor" />
-              </div>
-            </div>
-          )}
 
           {/* Coming Soon Badge - Top Left */}
           {isComingSoon && (
@@ -276,9 +269,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
             </div>
           )}
 
-          {/* Favorite Button */}
-          {showFavoriteButton && (
-            <div className="absolute top-3 right-3 z-20">
+          {/* Action Buttons Container */}
+          <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+            {/* Favorite Button */}
+            {showFavoriteButton && (
               <button
                 onClick={handleFavoriteClick}
                 disabled={favoritesLoading}
@@ -288,7 +282,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
                 title={
                   favoritesError
                     ? favoritesError
-                    : !localStorage.getItem('forward_africa_token')
+                    : !authService.getToken()
                       ? 'Please log in to add favorites'
                       : !hasInitialized
                         ? 'Click to load favorites'
@@ -304,7 +298,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
                     className={`h-5 w-5 ${
                       favoritesError
                         ? 'text-yellow-500'
-                        : !localStorage.getItem('forward_africa_token')
+                        : !authService.getToken()
                           ? 'text-gray-500' // Gray when not logged in
                           : !hasInitialized
                             ? 'text-gray-400' // Gray when not initialized
@@ -315,14 +309,15 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
                   />
                 )}
               </button>
-              {/* Error Tooltip */}
-              {favoritesError && (
-                <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-yellow-500 text-white text-xs rounded-lg shadow-lg z-50 max-w-xs">
-                  <div className="font-medium">Favorites Error</div>
-                  <div className="text-yellow-100">{favoritesError}</div>
-                  <div className="absolute bottom-full right-4 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-yellow-500"></div>
-                </div>
-              )}
+            )}
+          </div>
+          
+          {/* Error Tooltips */}
+          {favoritesError && (
+            <div className="absolute top-full right-3 mt-2 px-3 py-2 bg-yellow-500 text-white text-xs rounded-lg shadow-lg z-50 max-w-xs">
+              <div className="font-medium">Favorites Error</div>
+              <div className="text-yellow-100">{favoritesError}</div>
+              <div className="absolute bottom-full right-4 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-yellow-500"></div>
             </div>
           )}
 

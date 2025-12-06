@@ -11,6 +11,7 @@ import { downloadCertificate } from '../utils/certificateGenerator';
 import Image from 'next/image';
 import CourseProgressDashboard from '../components/ui/CourseProgressDashboard';
 import { useCourses } from '../hooks/useDatabase';
+import { courseAPI } from '../lib/api';
 
 const CoursePage: React.FC = () => {
   const router = useRouter();
@@ -60,16 +61,16 @@ const CoursePage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
-  // Fetch all courses on component mount
+  // Fetch all courses on component mount (works for both authenticated and unauthenticated users)
   useEffect(() => {
-    if (authLoading || !isAuthenticated || !hasCheckedToken) {
+    if (authLoading || !hasCheckedToken) {
       return;
     }
 
     if (allCourses.length === 0 && !coursesLoading) {
       fetchAllCourses();
     }
-  }, [authLoading, isAuthenticated, hasCheckedToken, allCourses.length, coursesLoading, fetchAllCourses]);
+  }, [authLoading, hasCheckedToken, allCourses.length, coursesLoading, fetchAllCourses]);
 
   useEffect(() => {
     if (courseId && isClient) {
@@ -79,7 +80,9 @@ const CoursePage: React.FC = () => {
   }, [courseId, getCertificate, isClient]);
 
   useEffect(() => {
-    if (authLoading || !isAuthenticated || !hasCheckedToken || coursesLoading) {
+    // Allow fetching course data even when not authenticated (course viewing is public)
+    // Wait for router to be ready before accessing query parameters
+    if (authLoading || !hasCheckedToken || coursesLoading || !router.isReady) {
       return;
     }
 
@@ -88,7 +91,11 @@ const CoursePage: React.FC = () => {
         try {
           setLoading(true);
           setError(null);
-          console.log('Fetching course data for:', courseId);
+          console.log('🔍 Fetching course data for:', courseId);
+          console.log('🔍 Router ready:', router.isReady);
+          console.log('🔍 Auth loading:', authLoading);
+          console.log('🔍 Has checked token:', hasCheckedToken);
+          console.log('🔍 Courses loading:', coursesLoading);
 
           // First: Try to find the course in the already-loaded courses list
           let foundCourse: any = allCourses.find(c => c.id === courseId);
@@ -96,18 +103,39 @@ const CoursePage: React.FC = () => {
           if (foundCourse) {
             console.log('✅ Found course in local cache:', foundCourse.id);
           } else {
-            // Second: If not found locally, fetch all courses first
-            console.log('📡 Course not in cache, fetching all courses...');
+            // Second: If not found locally, try fetching all courses first
+            console.log('📡 Course not in cache, trying to fetch all courses...');
             try {
               await fetchAllCourses();
               foundCourse = allCourses.find(c => c.id === courseId);
+            } catch (fetchError) {
+              console.warn('Failed to fetch all courses, will try direct course fetch:', fetchError);
+            }
 
-              if (!foundCourse) {
-                throw new Error('Course not found in database');
+            // Third: If still not found, fetch the course directly from API
+            if (!foundCourse) {
+              console.log('📡 Course still not found, fetching directly from API...');
+              try {
+                const courseResponse = await courseAPI.getCourse(courseId);
+                foundCourse = courseResponse.data || courseResponse;
+
+                if (!foundCourse || !foundCourse.id) {
+                  throw new Error('Course not found in database');
+                }
+                console.log('✅ Course fetched directly from API:', foundCourse.id);
+              } catch (apiError: any) {
+                console.error('Direct API fetch error:', apiError);
+                // Extract the actual error message from the API response
+                let errorMessage = apiError?.message || 'Failed to fetch course data. Please check your connection and try again.';
+                
+                // Make error messages more user-friendly
+                if (errorMessage.toLowerCase().includes('course not found') || 
+                    errorMessage.toLowerCase().includes('not found')) {
+                  errorMessage = 'Course not found in database';
+                }
+                
+                throw new Error(errorMessage);
               }
-            } catch (fallbackError) {
-              console.error('Fallback fetch error:', fallbackError);
-              throw new Error('Failed to fetch course data. Please check your connection and try again.');
             }
           }
 
@@ -314,32 +342,36 @@ const CoursePage: React.FC = () => {
             setProgress(0);
           }
 
-          // Load completion data from localStorage
-          useEffect(() => {
-            if (courseId && typeof window !== 'undefined') {
-              const storedCompletion = localStorage.getItem(`courseCompletion_${courseId}`);
-              if (storedCompletion) {
-                try {
-                  const completionData = JSON.parse(storedCompletion);
-                  setCompletedLessons(completionData.completedLessons || []);
-                  setCourseCompletionStatus({
-                    isCompleted: completionData.isCompleted || false,
-                    completedLessons: completionData.completedLessons || [],
-                    totalLessons: course?.lessons.length || 0,
-                    completionPercentage: completionData.completionPercentage || 0
-                  });
-                } catch (error) {
-                  console.error('Error parsing completion data:', error);
-                }
+          // Load completion data from localStorage (only on client side)
+          if (typeof window !== 'undefined' && courseId) {
+            const storedCompletion = localStorage.getItem(`courseCompletion_${courseId}`);
+            if (storedCompletion) {
+              try {
+                const completionData = JSON.parse(storedCompletion);
+                setCompletedLessons(completionData.completedLessons || []);
+                setCourseCompletionStatus({
+                  isCompleted: completionData.isCompleted || false,
+                  completedLessons: completionData.completedLessons || [],
+                  totalLessons: (foundCourse.lessons || []).length,
+                  completionPercentage: completionData.completionPercentage || 0
+                });
+              } catch (error) {
+                console.error('Error parsing completion data:', error);
               }
             }
-          }, [courseId, course]);
+          }
         } catch (error) {
           console.error('Error fetching course:', error);
           let errorMessage = 'Failed to load course. Please try again.';
 
           if (error instanceof Error) {
             errorMessage = error.message;
+          }
+
+          // Normalize error messages for better user experience
+          if (errorMessage.toLowerCase().includes('course not found') || 
+              errorMessage.toLowerCase().includes('not found in database')) {
+            errorMessage = 'Course not found in database';
           }
 
           // Show error state or redirect
@@ -352,7 +384,7 @@ const CoursePage: React.FC = () => {
     };
 
     fetchCourseData();
-  }, [courseId, router, authLoading, isAuthenticated, hasCheckedToken, allCourses, fetchAllCourses, coursesLoading]);
+  }, [courseId, router, router.isReady, authLoading, hasCheckedToken, allCourses, fetchAllCourses, coursesLoading]);
 
   // Reset redirect state when courseId changes
   useEffect(() => {
@@ -531,7 +563,8 @@ const CoursePage: React.FC = () => {
   }
 
   // Show loading state while redirecting or before client-side hydration
-  if (loading || redirecting || !isClient) {
+  // But don't show loading if there's an error
+  if ((loading || redirecting || !isClient) && !error) {
     return (
       <Layout>
         <div className="flex justify-center items-center h-screen">
@@ -548,20 +581,40 @@ const CoursePage: React.FC = () => {
 
   // Show error state
   if (error) {
+    // Check if error is specifically about course not found
+    const isCourseNotFound = error.toLowerCase().includes('course not found') || 
+                            error.toLowerCase().includes('not found in database');
+    
     return (
       <Layout>
         <div className="flex justify-center items-center h-screen">
-          <div className="text-center max-w-md">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-white mb-2">Unable to Load Course</h2>
-            <p className="text-gray-400 mb-6">{error}</p>
+          <div className="text-center max-w-md px-4">
+            <div className="text-red-500 text-6xl mb-4">
+              {isCourseNotFound ? '📚' : '⚠️'}
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              {isCourseNotFound ? 'Course Not Available' : 'Unable to Load Course'}
+            </h2>
+            <p className="text-gray-400 mb-2">
+              {isCourseNotFound 
+                ? 'The course you\'re looking for is not available or doesn\'t exist. It may have been removed or the URL is incorrect.'
+                : error
+              }
+            </p>
+            {isCourseNotFound && (
+              <p className="text-gray-500 text-sm mb-6">
+                Please check the course ID in the URL or browse our available courses.
+              </p>
+            )}
             <div className="flex gap-4 justify-center">
               <Button onClick={() => router.push('/courses')} variant="primary">
-                Back to Courses
+                Browse Courses
               </Button>
-              <Button onClick={() => window.location.reload()} variant="outline">
-                Retry
-              </Button>
+              {!isCourseNotFound && (
+                <Button onClick={() => window.location.reload()} variant="outline">
+                  Retry
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -573,12 +626,23 @@ const CoursePage: React.FC = () => {
     return (
       <Layout>
         <div className="flex justify-center items-center h-screen">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Course Not Found</h2>
-            <p className="text-gray-400 mb-4">The course you're looking for doesn't exist.</p>
-            <Button onClick={() => router.push('/courses')}>
-              Back to Courses
-            </Button>
+          <div className="text-center max-w-md px-4">
+            <div className="text-red-500 text-6xl mb-4">📚</div>
+            <h2 className="text-2xl font-bold text-white mb-2">Course Not Available</h2>
+            <p className="text-gray-400 mb-2">
+              The course you're looking for is not available or doesn't exist.
+            </p>
+            <p className="text-gray-500 text-sm mb-6">
+              It may have been removed, or the URL is incorrect. Please check the course ID or browse our available courses.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => router.push('/courses')} variant="primary">
+                Browse Courses
+              </Button>
+              <Button onClick={() => router.push('/home')} variant="outline">
+                Go to Home
+              </Button>
+            </div>
           </div>
         </div>
       </Layout>

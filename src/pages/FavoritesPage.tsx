@@ -2,9 +2,11 @@ import React from 'react';
 import Layout from '../components/layout/Layout';
 import CourseCard from '../components/ui/CourseCard';
 import { useFavorites } from '../hooks/useFavorites';
-import { Heart, RefreshCw } from 'lucide-react';
+import { Heart, RefreshCw, BookOpen } from 'lucide-react';
+import { useRouter } from 'next/router';
 
 const FavoritesPage: React.FC = () => {
+  const router = useRouter();
   const {
     favorites,
     loading,
@@ -38,10 +40,19 @@ const FavoritesPage: React.FC = () => {
     <Layout>
       <div className="max-w-screen-xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
-            <Heart className="h-8 w-8 text-red-500 mr-3" />
-            My Favorites
-          </h1>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-3xl font-bold text-white flex items-center">
+              <Heart className="h-8 w-8 text-red-500 mr-3" />
+              My Favorites
+            </h1>
+            <button
+              onClick={() => router.push('/learn-later')}
+              className="flex items-center space-x-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              <BookOpen className="h-5 w-5" />
+              <span>Learn Later</span>
+            </button>
+          </div>
           <p className="text-gray-400">Your saved courses and learning materials</p>
         </div>
 

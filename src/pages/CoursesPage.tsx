@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/layout/Layout';
 import CourseCard from '../components/ui/CourseCard';
-import { useCourses } from '../hooks/useDatabase';
+import { useCourses, useCategories } from '../hooks/useDatabase';
 import { useAuth } from '../contexts/AuthContext';
 import { Course } from '../types';
 
@@ -25,47 +25,57 @@ const CoursesPage: React.FC = () => {
     fetchAllCourses
   } = useCourses();
 
+  // Fetch all categories from API
+  const {
+    categories: allCategoriesFromAPI,
+    loading: categoriesLoading,
+    error: categoriesError,
+    fetchAllCategories
+  } = useCategories();
+
   // Fetch data only if authenticated
   useEffect(() => {
     if (authLoading || !isAuthenticated) {
       return;
     }
 
-    const loadCourses = async () => {
+    const loadData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // Fetch from API - same as HomePage
-        await fetchAllCourses();
+        // Fetch courses and categories from API
+        await Promise.all([
+          fetchAllCourses(),
+          fetchAllCategories()
+        ]);
       } catch (err) {
-        console.error('Failed to load courses:', err);
-        setError('Failed to load courses from server');
+        console.error('Failed to load data:', err);
+        setError('Failed to load data from server');
         setLoading(false);
       }
     };
 
-    loadCourses();
-  }, [fetchAllCourses, authLoading, isAuthenticated]);
+    loadData();
+  }, [fetchAllCourses, fetchAllCategories, authLoading, isAuthenticated]);
 
   // Update loading state based on API loading - same as HomePage
   useEffect(() => {
     console.log('🔄 CoursesPage Loading State:', {
       apiLoading,
+      categoriesLoading,
       authLoading,
       localLoading: loading,
       allCoursesLength: allCourses.length,
-      apiError
+      allCategoriesLength: allCategoriesFromAPI.length,
+      apiError,
+      categoriesError
     });
 
-    if (!apiLoading && !authLoading) {
+    if (!apiLoading && !categoriesLoading && !authLoading) {
       setLoading(false);
     }
-  }, [apiLoading, authLoading, allCourses, apiError]);
-
-  // Get unique categories from courses - same as HomePage
-  const allCategories = Array.from(new Set(allCourses.map(course => course.category)))
-    .map(categoryName => ({ id: categoryName, name: categoryName }));
+  }, [apiLoading, categoriesLoading, authLoading, allCourses, allCategoriesFromAPI, apiError, categoriesError]);
 
   // Show all courses including coming soon courses - same as HomePage
   const availableCourses = allCourses.filter(course => {
@@ -85,9 +95,18 @@ const CoursesPage: React.FC = () => {
     });
   }, [allCourses]);
 
+  // Filter courses by selected category
+  // Match by category name or category id
   const filteredCourses = selectedCategory === 'all'
     ? availableCourses
-    : availableCourses.filter(course => course.category === selectedCategory);
+    : availableCourses.filter(course => {
+        // Match by category name (from course.category) or by category id
+        const selectedCategoryData = allCategoriesFromAPI.find(cat => cat.id === selectedCategory || cat.name === selectedCategory);
+        if (selectedCategoryData) {
+          return course.category === selectedCategoryData.name || course.category === selectedCategoryData.id;
+        }
+        return course.category === selectedCategory;
+      });
 
   // Debug logging for filtered courses
   console.log('🎨 CoursesPage Filtered Courses:', {
@@ -187,31 +206,37 @@ const CoursesPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Category Filter */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-8">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-lg text-sm md:text-base transition-colors ${
-              selectedCategory === 'all'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            All Courses
-          </button>
-          {allCategories.map(category => (
+        {/* Category Filter - Display all categories from API */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-white mb-4">Browse by Category</h2>
+          <div className="flex flex-wrap gap-2">
             <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
+              onClick={() => setSelectedCategory('all')}
               className={`px-4 py-2 rounded-lg text-sm md:text-base transition-colors ${
-                selectedCategory === category.id
+                selectedCategory === 'all'
                   ? 'bg-red-600 text-white'
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
-              {category.name}
+              All Courses
             </button>
-          ))}
+            {allCategoriesFromAPI.map(category => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`px-4 py-2 rounded-lg text-sm md:text-base transition-colors ${
+                  selectedCategory === category.id
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+          {allCategoriesFromAPI.length === 0 && !categoriesLoading && (
+            <p className="text-gray-400 text-sm mt-2">No categories available</p>
+          )}
         </div>
 
         {/* Course Grid - Separated by rows */}

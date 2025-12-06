@@ -278,7 +278,11 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ course, onPlay }) => {
 
         {/* Overlay - use custom opacity if available */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-brand-background via-brand-background/70 to-transparent"
+          className={`absolute inset-0 ${
+            shouldUseCustomBanner && bannerConfig?.homepage_banner_overlay_opacity !== undefined
+              ? ''
+              : 'bg-gradient-to-t from-brand-background via-brand-background/70 to-transparent'
+          }`}
           style={shouldUseCustomBanner && bannerConfig?.homepage_banner_overlay_opacity !== undefined ? {
             backgroundColor: `rgba(0, 0, 0, ${bannerConfig.homepage_banner_overlay_opacity})`
           } : {}}

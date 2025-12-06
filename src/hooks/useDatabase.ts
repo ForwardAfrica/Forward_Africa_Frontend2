@@ -173,8 +173,17 @@ export const useCourses = () => {
 
   const fetchFeaturedCourses = useCallback(async () => {
     try {
-      const data = await courseAPI.getFeaturedCourses();
-      const dataArray: any[] = Array.isArray(data) ? (data as any[]) : ([] as any[]);
+      const response = await courseAPI.getFeaturedCourses();
+      
+      // Extract data array from response - handle both wrapped and unwrapped responses
+      let dataArray: any[] = [];
+      if (Array.isArray(response)) {
+        dataArray = response as any[];
+      } else if (response && response.data && Array.isArray(response.data)) {
+        dataArray = response.data as any[];
+      } else if (response && response.courses && Array.isArray(response.courses)) {
+        dataArray = response.courses as any[];
+      }
 
       // Transform backend data to frontend format with dual fallback logic
       const transformedCourses = dataArray.map((course: any) => {

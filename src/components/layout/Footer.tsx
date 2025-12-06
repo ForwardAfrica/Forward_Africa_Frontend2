@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useNavigate } from '../../lib/router';
-import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin, Phone, Globe, Lock } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin, Phone, Globe, Lock, BookOpen } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const navigate = useNavigate();
@@ -74,6 +74,18 @@ const Footer: React.FC = () => {
                 <Link href="/about" className="hover:text-red-500 transition-colors flex items-center text-sm sm:text-base">
                   <Globe className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
                   About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/learn-later" className="hover:text-red-500 transition-colors flex items-center text-sm sm:text-base">
+                  <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                  Learn Later
+                </Link>
+              </li>
+              <li>
+                <Link href="/favorites" className="hover:text-red-500 transition-colors flex items-center text-sm sm:text-base">
+                  <Globe className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                  Favorites
                 </Link>
               </li>
             </ul>
