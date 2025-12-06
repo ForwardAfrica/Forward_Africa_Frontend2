@@ -150,7 +150,7 @@ const ContinueLearningRow: React.FC<ContinueLearningRowProps> = ({ courses }) =>
             >
               <div className="relative w-full h-80 transition-all duration-500 ease-in-out card-expansion card-landscape-expand">
                 {/* Poster Container */}
-                <div className="w-full h-full relative rounded-lg overflow-hidden shadow-xl card-orientation-transition">
+                <div className="w-full h-full relative rounded-lg overflow-hidden shadow-xl card-orientation-transition bg-brand-surface">
                   {/* Thumbnail */}
                   {course.thumbnail.startsWith('http') ? (
                     <img

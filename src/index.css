@@ -50,7 +50,7 @@
 :root {
   color-scheme: dark;
   /* Disney+ Primary Gradient Colors */
-  --brand-royal-blue: #006EFF;
+  --brand-royal-blue: #0F0E47;
   --brand-vibrant-pink: #BD34FE;
   --brand-deep-purple: #5D58F2;
   /* Supporting & UI Colors */
@@ -66,12 +66,7 @@
 }
 
 body {
-  background: linear-gradient(180deg, 
-    var(--brand-royal-blue) 0%, 
-    var(--brand-deep-purple) 30%, 
-    rgba(93, 88, 242, 0.8) 50%,
-    rgba(15, 23, 42, 0.9) 70%,
-    rgba(15, 23, 42, 0.95) 100%);
+  background: linear-gradient(180deg, var(--brand-royal-blue) 0%, var(--brand-background) 100%);
   background-attachment: fixed;
   min-height: 100vh;
   color: var(--brand-text-light);
@@ -79,8 +74,8 @@ body {
 }
 
 .brand-gradient {
-  /* Disney+ Primary Gradient: Royal Blue -> Deep Purple -> Vibrant Pink */
-  background-image: linear-gradient(180deg, var(--brand-royal-blue) 0%, var(--brand-deep-purple) 50%, var(--brand-vibrant-pink) 100%);
+  /* Simple two-color vertical gradient: Bright Blue -> Dark (top to bottom) */
+  background-image: linear-gradient(180deg, var(--brand-royal-blue) 0%, var(--brand-background) 100%);
 }
 
 .brand-gradient-horizontal {
@@ -92,13 +87,8 @@ body {
 }
 
 .brand-background-gradient {
-  /* Royal Blue to Deep Purple to Dark - Bright at top, dark at bottom */
-  background: linear-gradient(180deg, 
-    var(--brand-royal-blue) 0%, 
-    var(--brand-deep-purple) 30%, 
-    rgba(93, 88, 242, 0.8) 50%,
-    rgba(15, 23, 42, 0.9) 70%,
-    rgba(15, 23, 42, 0.95) 100%);
+  /* Simple two-color vertical gradient: Bright Blue -> Dark (top to bottom) */
+  background: linear-gradient(180deg, var(--brand-royal-blue) 0%, var(--brand-background) 100%);
   background-attachment: fixed;
 }
 

@@ -14,7 +14,7 @@ module.exports = {
       colors: {
         brand: {
           // Disney+ Primary Gradient Colors
-          royalBlue: '#006EFF',
+          royalBlue: '#0F0E47',
           vibrantPink: '#BD34FE',
           deepPurple: '#5D58F2',
           // Supporting & UI Colors
@@ -31,16 +31,16 @@ module.exports = {
         },
       },
       backgroundImage: {
-        // Disney+ Primary Gradient: Royal Blue -> Deep Purple -> Vibrant Pink
-        'brand-gradient': 'linear-gradient(180deg, #006EFF 0%, #5D58F2 50%, #BD34FE 100%)',
-        'brand-gradient-horizontal': 'linear-gradient(90deg, #006EFF 0%, #5D58F2 50%, #BD34FE 100%)',
-        'brand-gradient-diagonal': 'linear-gradient(135deg, #006EFF 0%, #5D58F2 50%, #BD34FE 100%)',
-        // Background gradient: Royal Blue -> Deep Purple -> Dark (bright to dark)
-        'brand-background-gradient': 'linear-gradient(180deg, #006EFF 0%, #5D58F2 30%, rgba(93, 88, 242, 0.8) 50%, rgba(15, 23, 42, 0.9) 70%, rgba(15, 23, 42, 0.95) 100%)',
+        // Simple two-color vertical gradient: Bright Blue -> Dark (top to bottom)
+        'brand-gradient': 'linear-gradient(180deg, #0F0E47 0%, #0F172A 100%)',
+        'brand-gradient-horizontal': 'linear-gradient(90deg, #0F0E47 0%, #5D58F2 50%, #BD34FE 100%)',
+        'brand-gradient-diagonal': 'linear-gradient(135deg, #0F0E47 0%, #5D58F2 50%, #BD34FE 100%)',
+        // Simple two-color background gradient: Bright Blue -> Dark (top to bottom)
+        'brand-background-gradient': 'linear-gradient(180deg, #0F0E47 0%, #0F172A 100%)',
       },
       boxShadow: {
         'brand-glow': '0 10px 25px rgba(93, 88, 242, 0.35)',
-        'brand-glow-blue': '0 10px 25px rgba(0, 110, 255, 0.35)',
+        'brand-glow-blue': '0 10px 25px rgba(15, 14, 71, 0.35)',
         'brand-glow-pink': '0 10px 25px rgba(189, 52, 254, 0.35)',
         'brand-glow-purple': '0 10px 25px rgba(93, 88, 242, 0.35)',
       },

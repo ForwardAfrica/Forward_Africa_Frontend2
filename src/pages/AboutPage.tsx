@@ -1,33 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, Users, Brain, Globe, ChevronDown } from 'lucide-react';
+import { BookOpen, Users, Brain, Globe, ChevronDown, TrendingUp, Award, Target, Zap, ArrowRight } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 
 const AboutPage: React.FC = () => {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
+    setIsVisible(true);
   }, []);
 
   const metrics = [
-    { value: '10+', label: 'Certified Core Courses' },
+    { value: '10+', label: 'Certified Core Courses', icon: BookOpen },
     {
       value: '50+',
       label: 'Hours of Expert Video Content',
-      helper: 'Immediate depth of practical, high-impact learning'
+      helper: 'Immediate depth of practical, high-impact learning',
+      icon: Zap
     },
     {
       value: '54+',
       label: 'African Countries Covered by Afrisage Data',
-      helper: 'Unparalleled local context for decisions'
+      helper: 'Unparalleled local context for decisions',
+      icon: Globe
     },
     {
       value: '5+',
       label: 'Industry-Specific Forums',
-      helper: 'Instant access to peers and coaches'
+      helper: 'Instant access to peers and coaches',
+      icon: Users
     },
-    { value: '12k+', label: 'Active Learners Across Africa' },
-    { value: '650+', label: 'Subject-Matter Experts & Coaches' }
+    { value: '12k+', label: 'Active Learners Across Africa', icon: TrendingUp },
+    { value: '650+', label: 'Subject-Matter Experts & Coaches', icon: Award }
   ];
 
   const membershipBenefits = [
@@ -35,25 +40,29 @@ const AboutPage: React.FC = () => {
       icon: Users,
       title: 'Expert Instructors',
       description:
-        'Learn directly from vetted business minds and proven experts across Africa for unmatched relevance and credibility.'
+        'Learn directly from vetted business minds and proven experts across Africa for unmatched relevance and credibility.',
+      gradient: 'from-blue-500/20 to-purple-500/20'
     },
     {
       icon: BookOpen,
       title: 'Courses',
       description:
-        'High-quality, practical, on-demand business education delivering verifiable FWD App certifications that strengthen your profile.'
+        'High-quality, practical, on-demand business education delivering verifiable FWD App certifications that strengthen your profile.',
+      gradient: 'from-purple-500/20 to-pink-500/20'
     },
     {
       icon: Brain,
       title: 'Akira',
       description:
-        'Our AI assistant and coach delivers market data, regulatory insight, and cultural nuance—your trusted local expert on demand.'
+        'Our AI assistant and coach delivers market data, regulatory insight, and cultural nuance—your trusted local expert on demand.',
+      gradient: 'from-pink-500/20 to-blue-500/20'
     },
     {
       icon: Globe,
       title: 'Community',
       description:
-        'A vibrant network for professionals and entrepreneurs to collaborate, share experiences, and build high-value support systems.'
+        'A vibrant network for professionals and entrepreneurs to collaborate, share experiences, and build high-value support systems.',
+      gradient: 'from-purple-500/20 to-blue-500/20'
     }
   ];
 
@@ -61,179 +70,269 @@ const AboutPage: React.FC = () => {
     {
       title: 'Context-First Curriculum',
       copy:
-        'Practical, results-driven training rooted in African economic, regulatory, and cultural realities with strategies that work here.'
+        'Practical, results-driven training rooted in African economic, regulatory, and cultural realities with strategies that work here.',
+      icon: Target
     },
     {
       title: 'Master Future-Proof Skills & Earn Credentials',
       copy:
-        'Build the leadership, technology, finance, and professional excellence needed to navigate a dynamic landscape and graduate with a verifiable Forward Africa Certification.'
+        'Build the leadership, technology, finance, and professional excellence needed to navigate a dynamic landscape and graduate with a verifiable Forward Africa Certification.',
+      icon: Award
     },
     {
       title: 'Tangible Results, Guaranteed',
       copy:
-        'Apply your learning immediately to daily work and ventures, ensuring measurable impact on career trajectory and business growth.'
+        'Apply your learning immediately to daily work and ventures, ensuring measurable impact on career trajectory and business growth.',
+      icon: TrendingUp
     }
   ];
 
   return (
     <Layout>
-      <div className="max-w-screen-xl mx-auto py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-          <section className="text-center mt-4 sm:mt-6 md:mt-8 lg:mt-12 xl:mt-16 mb-10 sm:mb-12 md:mb-16">
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-[0.3em] text-white mb-3 sm:mb-4 px-4">
-              About Forward Africa
+      <div className="relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-deepPurple/10 rounded-full blur-3xl animate-pulse-slow"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-brand-vibrantPink/10 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        <div className={`max-w-7xl mx-auto py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 relative transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+          {/* Hero Section */}
+          <section className="text-center mb-16 sm:mb-20 md:mb-24">
+            <div className="inline-block mb-6">
+              <span className="text-xs sm:text-sm md:text-base uppercase tracking-[0.3em] text-brand-primary font-semibold px-4 py-2 bg-brand-primary/10 border border-brand-primary/30 rounded-full backdrop-blur-sm">
+                About Forward Africa
+              </span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-white via-brand-primary to-brand-vibrantPink bg-clip-text text-transparent">
+                Get Smarter, Faster
+              </span>
+            </h1>
+            
+            <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-8 bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+              Acquire the Skills to Move Forward.
             </p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-3 sm:mb-4 px-4 leading-tight">
-            Get Smarter, Faster            </h1>
-            <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl text-red-500 font-semibold mb-4 sm:mb-5 md:mb-6 px-4">
-            Acquire the Skills to Move Forward.
-            </p>
-            <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-6 sm:mb-8 md:mb-10 px-4">
+            
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-10 leading-relaxed">
               We believe in the boundless potential of Africa. We built the FWD App to
               empower Africa's workforce, advance careers, and move the continent
-              forward with precision-engineered learning.
+              forward with <span className="text-brand-primary font-semibold">precision-engineered learning</span>.
             </p>
-            <div className="px-4 mb-6 sm:mb-8 md:mb-10">
-              <button className="bg-[#ef4444] hover:bg-[#dc2626] hover:shadow-lg text-white px-6 py-3 sm:px-8 sm:py-4 rounded-lg transition-colors text-base sm:text-lg font-semibold w-full sm:w-auto">
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <button className="group relative px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50 flex items-center gap-2">
                 Start Learning Today
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-            </div>
-
-            <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mt-6 sm:mt-7 md:mt-8 mb-8 sm:mb-9 md:mb-10 px-4">
-            We have built to Empower Africa's Workforce, Advance Careers and to Move Africa Forward.
-            </p>
-          </section>
-          <section>
-          </section>
-
-          <section className="bg-brand-surface/70 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 mb-10 sm:mb-12 md:mb-16 backdrop-blur">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-5 md:mb-6">Metrics</h2>
-            <div className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {metrics.map((metric, index) => (
-                <div
-                  key={metric.label}
-                  className="bg-brand-surface-muted/60 border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6"
-                >
-                  <div className="text-3xl sm:text-4xl font-extrabold text-red-500 mb-2 sm:mb-3">
-                    {metric.value}
-                  </div>
-                  <div className="text-white text-base sm:text-lg font-semibold mb-1.5 sm:mb-2">
-                    {metric.label}
-                  </div>
-                  {metric.helper && (
-                    <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
-                      {metric.helper}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="mt-8 sm:mt-9 md:mt-10 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-              <button className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base font-semibold transition-colors w-full sm:w-auto">
-                Visit Platform
-              </button>
-              <button className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base font-semibold transition-colors w-full sm:w-auto">
+              <button className="px-8 py-4 bg-brand-surface/80 border-2 border-white/20 hover:border-brand-primary/50 text-white rounded-xl font-semibold text-lg transition-all duration-300 backdrop-blur-sm">
                 Learn More
               </button>
             </div>
-          </section>
 
-          <section className="bg-gradient-to-r from-brand-primary/20 to-brand-background/40 rounded-2xl sm:rounded-3xl border border-white/10 p-6 sm:p-8 mb-10 sm:mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4 md:mb-5">Our Mission</h2>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-            Expert Education to build the African Workforce, for precise advancement strategies of careers and Africa.
-            </p>
-            <p className="text-red-500 text-lg sm:text-xl font-semibold mt-6 sm:mt-7 md:mt-8">
-              Precision-Engineered Learning for African Success.
-            </p>
-            <p className="text-gray-300 text-base sm:text-lg leading-relaxed mt-3 sm:mt-4">
-              The future of Africa is built by masters of their craft. FWD App is
-              designed to drive that growth with accessible, actionable knowledge that
-              translates directly into measurable results for professionals,
-              entrepreneurs, and the organizations powering Africa's workforce.
+            <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto italic">
+              "We have built to Empower Africa's Workforce, Advance Careers and to Move Africa Forward."
             </p>
           </section>
 
-          <section className="mb-10 sm:mb-12 md:mb-16">
-            <div className="space-y-3 sm:space-y-4">
-              {precisionHighlights.map((item, index) => (
-                <div
-                  key={item.title}
-                  className="bg-brand-surface/70 border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300"
-                >
-                  <button
-                    onClick={() => setExpandedCard(expandedCard === index ? null : index)}
-                    className="w-full flex items-center justify-between p-4 sm:p-5 md:p-6 text-left hover:bg-brand-deepPurple/10 transition-colors"
-                  >
-                    <h3 className="text-white text-base sm:text-lg md:text-xl font-semibold pr-3 sm:pr-4">
-                      {item.title}
-                    </h3>
-                    <ChevronDown
-                      className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 flex-shrink-0 transition-transform duration-300 ${
-                        expandedCard === index ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {expandedCard === index && (
-                    <div className="px-4 sm:px-5 md:px-6 pb-4 sm:pb-5 md:pb-6 pt-0">
-                      <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                        {item.copy}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
+          {/* Metrics Section */}
+          <section className="mb-16 sm:mb-20 md:mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+                Our Impact in Numbers
+              </h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Real metrics that showcase our commitment to transforming Africa's workforce
+              </p>
             </div>
-          </section>
-
-          <section className="mb-10 sm:mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-5 sm:mb-6 md:mb-8">
-              A Platform Engineered for Growth and Mastery
-            </h2>
-            <p className="text-gray-300 text-base sm:text-lg mb-6 sm:mb-7 md:mb-8 max-w-3xl">
-              A Forward membership provides the infrastructure, people, and tools you
-              need to master your craft and see measurable outcomes quickly.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 md:gap-8">
-              {membershipBenefits.map((benefit) => {
-                const IconComponent = benefit.icon;
+            
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {metrics.map((metric, index) => {
+                const IconComponent = metric.icon;
                 return (
                   <div
-                    key={benefit.title}
-                    className="bg-brand-surface/70 border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6"
+                    key={metric.label}
+                    className="group relative bg-gradient-to-br from-brand-surface/90 to-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-brand-primary/50 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-brand-primary/20 backdrop-blur-sm overflow-hidden"
                   >
-                    <div className="bg-brand-primary/10 rounded-lg p-2.5 sm:p-3 inline-flex mb-3 sm:mb-4">
-                      <IconComponent className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-red-500" />
+                    {/* Animated background gradient on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/0 to-brand-vibrantPink/0 group-hover:from-brand-primary/10 group-hover:to-brand-vibrantPink/10 transition-all duration-300"></div>
+                    
+                    <div className="relative z-10">
+                      <div className="inline-flex p-3 bg-gradient-to-br from-brand-primary/20 to-brand-vibrantPink/20 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <IconComponent className="h-6 w-6 text-brand-primary" />
+                      </div>
+                      <div className="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent mb-3">
+                        {metric.value}
+                      </div>
+                      <div className="text-white text-lg sm:text-xl font-semibold mb-2">
+                        {metric.label}
+                      </div>
+                      {metric.helper && (
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                          {metric.helper}
+                        </p>
+                      )}
                     </div>
-                    <h3 className="text-white text-xl sm:text-2xl font-semibold mb-2 sm:mb-3">
-                      {benefit.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-                      {benefit.description}
-                    </p>
                   </div>
                 );
               })}
             </div>
           </section>
 
-          <section className="text-center bg-brand-surface/80 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">
-              Ready to Move Forward?
-            </h2>
-            <p className="text-gray-300 text-base sm:text-lg mb-6 sm:mb-7 md:mb-8 max-w-3xl mx-auto">
-              Expert instructors, transformative curriculum, Akira AI co-pilot, and a
-              thriving community—all inside one membership made for Africa's builders.
-            </p>
-            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
-              <button className="bg-[#ef4444] hover:bg-[#dc2626] hover:shadow-lg text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-colors w-full sm:w-auto">
-                Reach Out to Us
-              </button>
-              <button className="bg-[#ef4444] hover:bg-[#dc2626] text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-colors w-full sm:w-auto">
-                Start Learning Today
-              </button>
+          {/* Mission Section */}
+          <section className="mb-16 sm:mb-20 md:mb-24 relative">
+            <div className="relative bg-gradient-to-br from-brand-primary/20 via-brand-deepPurple/20 to-brand-vibrantPink/20 rounded-3xl border border-white/20 p-8 sm:p-10 md:p-12 lg:p-16 backdrop-blur-sm overflow-hidden">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-vibrantPink/10 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-primary/10 rounded-full blur-3xl"></div>
+              
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <Target className="h-8 w-8 text-brand-primary" />
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">Our Mission</h2>
+                </div>
+                
+                <p className="text-xl sm:text-2xl text-gray-200 leading-relaxed mb-8 max-w-4xl">
+                  Expert Education to build the African Workforce, for precise advancement strategies of careers and Africa.
+                </p>
+                
+                <div className="bg-brand-surface/60 rounded-2xl p-6 sm:p-8 border border-white/10 backdrop-blur-sm">
+                  <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-6">
+                    Precision-Engineered Learning for African Success.
+                  </p>
+                  <p className="text-lg sm:text-xl text-gray-300 leading-relaxed">
+                    The future of Africa is built by masters of their craft. FWD App is
+                    designed to drive that growth with accessible, actionable knowledge that
+                    translates directly into measurable results for professionals,
+                    entrepreneurs, and the organizations powering Africa's workforce.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Precision Highlights Section */}
+          <section className="mb-16 sm:mb-20 md:mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+                Why Forward Africa?
+              </h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Discover what makes our platform uniquely powerful
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              {precisionHighlights.map((item, index) => {
+                const IconComponent = item.icon;
+                return (
+                  <div
+                    key={item.title}
+                    className="group bg-gradient-to-r from-brand-surface/90 to-brand-surface-muted/70 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-brand-primary/50 hover:shadow-xl hover:shadow-brand-primary/10"
+                  >
+                    <button
+                      onClick={() => setExpandedCard(expandedCard === index ? null : index)}
+                      className="w-full flex items-center justify-between p-6 sm:p-8 text-left hover:bg-gradient-to-r hover:from-brand-primary/5 hover:to-brand-vibrantPink/5 transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-4 sm:gap-6 flex-1">
+                        <div className="flex-shrink-0 p-3 bg-gradient-to-br from-brand-primary/20 to-brand-vibrantPink/20 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                          <IconComponent className="h-6 w-6 sm:h-7 sm:w-7 text-brand-primary" />
+                        </div>
+                        <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white pr-4">
+                          {item.title}
+                        </h3>
+                      </div>
+                      <ChevronDown
+                        className={`h-6 w-6 sm:h-7 sm:w-7 text-brand-primary flex-shrink-0 transition-transform duration-300 ${
+                          expandedCard === index ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                    <div className={`overflow-hidden transition-all duration-500 ${
+                      expandedCard === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                    }`}>
+                      <div className="px-6 sm:px-8 pb-6 sm:pb-8 pt-0">
+                        <p className="text-gray-300 text-base sm:text-lg leading-relaxed pl-0 sm:pl-20">
+                          {item.copy}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Platform Features Section */}
+          <section className="mb-16 sm:mb-20 md:mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+                A Platform Engineered for Growth and Mastery
+              </h2>
+              <p className="text-gray-400 text-lg sm:text-xl max-w-3xl mx-auto">
+                A Forward membership provides the infrastructure, people, and tools you
+                need to master your craft and see measurable outcomes quickly.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              {membershipBenefits.map((benefit, index) => {
+                const IconComponent = benefit.icon;
+                return (
+                  <div
+                    key={benefit.title}
+                    className="group relative bg-gradient-to-br from-brand-surface/90 to-brand-surface-muted/70 border border-white/10 rounded-2xl p-6 sm:p-8 hover:border-brand-primary/50 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-brand-primary/20 overflow-hidden backdrop-blur-sm"
+                  >
+                    {/* Gradient overlay on hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                    
+                    <div className="relative z-10">
+                      <div className="inline-flex p-4 bg-gradient-to-br from-brand-primary/20 to-brand-vibrantPink/20 rounded-2xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                        <IconComponent className="h-8 w-8 sm:h-10 sm:w-10 text-brand-primary" />
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                        {benefit.title}
+                      </h3>
+                      <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
+                        {benefit.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="relative">
+            <div className="relative bg-gradient-to-br from-brand-primary/30 via-brand-deepPurple/30 to-brand-vibrantPink/30 rounded-3xl border-2 border-white/20 p-10 sm:p-12 md:p-16 lg:p-20 text-center backdrop-blur-sm overflow-hidden">
+              {/* Animated background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-brand-primary/0 via-brand-vibrantPink/0 to-brand-primary/0 animate-pulse-slow"></div>
+              
+              <div className="relative z-10">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+                  Ready to Move Forward?
+                </h2>
+                <p className="text-xl sm:text-2xl text-gray-200 mb-10 max-w-3xl mx-auto leading-relaxed">
+                  Expert instructors, transformative curriculum, Akira AI co-pilot, and a
+                  thriving community—all inside one membership made for Africa's builders.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <button className="group px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50 flex items-center gap-2">
+                    Reach Out to Us
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button className="group px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center gap-2">
+                    Start Learning Today
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
         </div>
+      </div>
     </Layout>
   );
 };

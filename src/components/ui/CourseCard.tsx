@@ -204,7 +204,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, showFavoriteButton = tr
     >
       <div className="relative w-full h-80">
         {/* Poster Container */}
-        <div className="w-full h-full relative rounded-lg overflow-hidden shadow-xl">
+        <div className="w-full h-full relative rounded-lg overflow-hidden shadow-xl bg-brand-surface">
           {/* Thumbnail */}
           {thumbnail.startsWith('http') ? (
             // Use regular img tag for external URLs to avoid Next.js Image issues
