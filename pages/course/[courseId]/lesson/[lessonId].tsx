@@ -578,6 +578,16 @@ export default function LessonPage() {
                />
             </div>
 
+             {/* Lesson Info */}
+             <div className="mt-6">
+              <h1 className="text-2xl font-bold text-white mb-4">
+                {currentLesson.title}
+              </h1>
+              <p className="text-gray-300 mb-6">
+                {currentLesson.description}
+              </p>
+            </div>
+
             {/* Instructor Details */}
             <div className="mt-6 mb-6">
               <div className="bg-gray-800 rounded-lg p-6">
@@ -689,15 +699,7 @@ export default function LessonPage() {
               </div>
             </div>
 
-            {/* Lesson Info */}
-            <div className="mt-6">
-              <h1 className="text-2xl font-bold text-white mb-4">
-                {currentLesson.title}
-              </h1>
-              <p className="text-gray-300 mb-6">
-                {currentLesson.description}
-              </p>
-            </div>
+           
           </div>
 
           {/* Sidebar */}
